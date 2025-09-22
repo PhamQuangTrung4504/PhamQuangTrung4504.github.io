@@ -1,86 +1,2104 @@
 <!DOCTYPE html>
 <html lang="vi">
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Phạm Quang Trung</title>
-  <style>
-    body {
-      margin: 0;
-      font-family: sans-serif;
-      background: #fafafa;
-      color: #222;
-    }
-    /* menu */
-    header {
-      background: #333;
-      color: white;
-      padding: 12px 20px;
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-    }
-    header .title {
-      font-weight: bold;
-    }
-    header nav a {
-      color: white;
-      margin-left: 15px;
-      text-decoration: none;
-    }
-    header nav a:hover {
-      text-decoration: underline;
-    }
-    /* profile */
-    .profile {
-      text-align: center;
-      padding: 40px 20px;
-    }
-    .profile img {
-      width: 140px;
-      height: 140px;
-      border-radius: 50%;
-      object-fit: cover;
-    }
-    .profile h1 {
-      margin: 15px 0 5px;
-    }
-    .profile p {
-      margin: 4px 0;
-    }
-    /* box giới thiệu */
-    .about {
-      max-width: 650px;
-      margin: 0 auto 50px;
-      background: white;
-      padding: 20px;
-      border-radius: 6px;
-      box-shadow: 0 0 5px rgba(0,0,0,0.1);
-    }
-  </style>
-</head>
-<body>
-  <!-- menu -->
-  <header>
-    <div class="title">Trang cá nhân</div>
-    <nav>
-      <a href="https://zalo.me/0326658276" target="_blank">Zalo</a>
-      <a href="https://www.facebook.com/share/1a38Y15xhZ/?mibextid=wwXIfr" target="_blank">Facebook</a>
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Phạm Quang Trung - Portfolio</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap"
+      rel="stylesheet"
+    />
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css"
+    />
+
+    <style>
+      :root {
+        --primary-color: #667eea;
+        --secondary-color: #764ba2;
+        --accent-color: #f093fb;
+        --text-dark: #2d3748;
+        --text-light: #718096;
+        --bg-light: #f7fafc;
+        --bg-dark: #1a202c;
+        --white: #ffffff;
+        --shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+        --shadow-hover: 0 20px 40px rgba(0, 0, 0, 0.15);
+        --gradient: linear-gradient(
+          135deg,
+          var(--primary-color),
+          var(--secondary-color)
+        );
+        --gradient-accent: linear-gradient(
+          135deg,
+          var(--accent-color),
+          var(--primary-color)
+        );
+      }
+
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+      }
+
+      html {
+        scroll-behavior: smooth;
+      }
+
+      body {
+        font-family: "Poppins", sans-serif;
+        line-height: 1.6;
+        color: var(--text-dark);
+        background: var(--bg-light);
+        overflow-x: hidden;
+      }
+
+      /* Loading Animation */
+      .loader {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: var(--gradient);
+        z-index: 9999;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        transition: opacity 0.5s ease;
+      }
+
+      .loader.hidden {
+        opacity: 0;
+        pointer-events: none;
+      }
+
+      .loader-content {
+        text-align: center;
+        color: white;
+      }
+
+      .loader-spinner {
+        width: 50px;
+        height: 50px;
+        border: 3px solid rgba(255, 255, 255, 0.3);
+        border-top: 3px solid white;
+        border-radius: 50%;
+        animation: spin 1s linear infinite;
+        margin: 0 auto 20px;
+      }
+
+      @keyframes spin {
+        0% {
+          transform: rotate(0deg);
+        }
+        100% {
+          transform: rotate(360deg);
+        }
+      }
+
+      /* Navigation */
+      .navbar {
+        position: fixed;
+        top: 0;
+        width: 100%;
+        background: rgba(255, 255, 255, 0.95);
+        backdrop-filter: blur(10px);
+        z-index: 1000;
+        padding: 1rem 0;
+        transition: all 0.3s ease;
+        box-shadow: 0 2px 20px rgba(0, 0, 0, 0.1);
+      }
+
+      .navbar.scrolled {
+        padding: 0.5rem 0;
+        background: rgba(255, 255, 255, 0.98);
+      }
+
+      .nav-container {
+        max-width: 1200px;
+        margin: 0 auto;
+        padding: 0 2rem;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+      }
+
+      .logo {
+        font-size: 1.5rem;
+        font-weight: 700;
+        background: var(--gradient);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        background-clip: text;
+      }
+
+      .nav-links {
+        display: flex;
+        list-style: none;
+        gap: 2rem;
+      }
+
+      .nav-links a {
+        text-decoration: none;
+        color: var(--text-dark);
+        font-weight: 500;
+        transition: all 0.3s ease;
+        position: relative;
+      }
+
+      .nav-links a::after {
+        content: "";
+        position: absolute;
+        bottom: -5px;
+        left: 0;
+        width: 0;
+        height: 2px;
+        background: var(--gradient);
+        transition: width 0.3s ease;
+      }
+
+      .nav-links a:hover::after {
+        width: 100%;
+      }
+
+      .mobile-menu {
+        display: none;
+        flex-direction: column;
+        cursor: pointer;
+        padding: 4px;
+      }
+
+      .mobile-menu span {
+        width: 25px;
+        height: 3px;
+        background: var(--text-dark);
+        margin: 3px 0;
+        transition: 0.3s;
+        border-radius: 2px;
+      }
+
+      .mobile-menu.active span:nth-child(1) {
+        transform: rotate(-45deg) translate(-5px, 6px);
+      }
+
+      .mobile-menu.active span:nth-child(2) {
+        opacity: 0;
+      }
+
+      .mobile-menu.active span:nth-child(3) {
+        transform: rotate(45deg) translate(-5px, -6px);
+      }
+
+      /* Hero Section */
+      .hero {
+        height: 100vh;
+        background: var(--gradient);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        text-align: center;
+        color: white;
+        position: relative;
+        overflow: hidden;
+      }
+
+      .hero::before {
+        content: "";
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1000 1000"><polygon fill="rgba(255,255,255,0.1)" points="0,1000 1000,0 1000,1000"/></svg>');
+        animation: float 6s ease-in-out infinite;
+      }
+
+      @keyframes float {
+        0%,
+        100% {
+          transform: translateY(0px);
+        }
+        50% {
+          transform: translateY(-20px);
+        }
+      }
+
+      .hero-content {
+        max-width: 800px;
+        padding: 0 2rem;
+        z-index: 2;
+        position: relative;
+      }
+
+      .hero-avatar {
+        width: 200px;
+        height: 200px;
+        border-radius: 50%;
+        object-fit: cover;
+        border: 5px solid rgba(255, 255, 255, 0.3);
+        margin-bottom: 2rem;
+        animation: pulse 2s ease-in-out infinite;
+        box-shadow: 0 0 50px rgba(255, 255, 255, 0.3);
+      }
+
+      @keyframes pulse {
+        0%,
+        100% {
+          transform: scale(1);
+        }
+        50% {
+          transform: scale(1.05);
+        }
+      }
+
+      .hero-title {
+        font-size: 3.5rem;
+        font-weight: 700;
+        margin-bottom: 1rem;
+        opacity: 0;
+        animation: fadeInUp 1s ease 0.5s forwards;
+      }
+
+      .hero-subtitle {
+        font-size: 1.3rem;
+        font-weight: 300;
+        margin-bottom: 2rem;
+        opacity: 0;
+        animation: fadeInUp 1s ease 0.7s forwards;
+      }
+
+      .typed-text {
+        border-right: 2px solid white;
+        animation: blink 1s infinite;
+      }
+
+      @keyframes blink {
+        0%,
+        50% {
+          border-color: white;
+        }
+        51%,
+        100% {
+          border-color: transparent;
+        }
+      }
+
+      @keyframes spin {
+        0% {
+          transform: rotate(0deg);
+        }
+        100% {
+          transform: rotate(360deg);
+        }
+      }
+
+      @keyframes fadeInUp {
+        from {
+          opacity: 0;
+          transform: translateY(30px);
+        }
+        to {
+          opacity: 1;
+          transform: translateY(0);
+        }
+      }
+
+      .hero-buttons {
+        display: flex;
+        gap: 1rem;
+        justify-content: center;
+        margin-top: 2rem;
+        opacity: 0;
+        animation: fadeInUp 1s ease 0.9s forwards;
+      }
+
+      .btn {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.5rem;
+        padding: 1rem 2rem;
+        border: none;
+        border-radius: 50px;
+        font-weight: 600;
+        text-decoration: none;
+        transition: all 0.3s ease;
+        cursor: pointer;
+        font-size: 1rem;
+      }
+
+      .btn-primary {
+        background: rgba(255, 255, 255, 0.2);
+        color: white;
+        backdrop-filter: blur(10px);
+        border: 2px solid rgba(255, 255, 255, 0.3);
+      }
+
+      .btn-primary:hover {
+        background: rgba(255, 255, 255, 0.3);
+        transform: translateY(-3px);
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+      }
+
+      .btn-secondary {
+        background: white;
+        color: var(--primary-color);
+        border: 2px solid white;
+      }
+
+      .btn-secondary:hover {
+        background: transparent;
+        color: white;
+        transform: translateY(-3px);
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+      }
+
+      /* Scroll Indicator */
+      .scroll-indicator {
+        position: absolute;
+        bottom: 2rem;
+        left: 50%;
+        transform: translateX(-50%);
+        color: white;
+        animation: bounce 2s infinite;
+      }
+
+      @keyframes bounce {
+        0%,
+        20%,
+        50%,
+        80%,
+        100% {
+          transform: translateX(-50%) translateY(0);
+        }
+        40% {
+          transform: translateX(-50%) translateY(-10px);
+        }
+        60% {
+          transform: translateX(-50%) translateY(-5px);
+        }
+      }
+
+      /* Sections */
+      section {
+        padding: 5rem 0;
+      }
+
+      .container {
+        max-width: 1200px;
+        margin: 0 auto;
+        padding: 0 2rem;
+      }
+
+      .section-title {
+        text-align: center;
+        font-size: 2.5rem;
+        font-weight: 700;
+        margin-bottom: 1rem;
+        background: var(--gradient);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        background-clip: text;
+      }
+
+      .section-subtitle {
+        text-align: center;
+        font-size: 1.1rem;
+        color: var(--text-light);
+        margin-bottom: 3rem;
+        max-width: 600px;
+        margin-left: auto;
+        margin-right: auto;
+      }
+
+      /* About Section */
+      .about {
+        background: white;
+      }
+
+      .about-content {
+        display: grid;
+        grid-template-columns: 1fr 2fr;
+        gap: 4rem;
+        align-items: center;
+      }
+
+      .about-image {
+        position: relative;
+      }
+
+      .about-image img {
+        width: 100%;
+        border-radius: 20px;
+        box-shadow: var(--shadow);
+        transition: transform 0.3s ease;
+      }
+
+      .about-image:hover img {
+        transform: scale(1.05);
+      }
+
+      .about-text h3 {
+        font-size: 1.5rem;
+        margin-bottom: 1rem;
+        color: var(--text-dark);
+      }
+
+      .about-text p {
+        margin-bottom: 1.5rem;
+        color: var(--text-light);
+        line-height: 1.8;
+      }
+
+      .stats {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+        gap: 2rem;
+        margin-top: 2rem;
+      }
+
+      .stat-item {
+        text-align: center;
+        padding: 1.5rem;
+        background: var(--bg-light);
+        border-radius: 15px;
+        transition: transform 0.3s ease;
+      }
+
+      .stat-item:hover {
+        transform: translateY(-5px);
+      }
+
+      .stat-number {
+        font-size: 2rem;
+        font-weight: 700;
+        color: var(--primary-color);
+        display: block;
+      }
+
+      .stat-label {
+        color: var(--text-light);
+        font-size: 0.9rem;
+      }
+
+      /* Gallery Section */
+      .gallery {
+        background: var(--bg-light);
+      }
+
+      .gallery-filter {
+        display: flex;
+        justify-content: center;
+        gap: 1rem;
+        margin-bottom: 3rem;
+        flex-wrap: wrap;
+      }
+
+      .filter-btn {
+        padding: 0.8rem 1.5rem;
+        border: 2px solid var(--primary-color);
+        background: transparent;
+        color: var(--primary-color);
+        border-radius: 25px;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        font-weight: 500;
+      }
+
+      .filter-btn:hover,
+      .filter-btn.active {
+        background: var(--gradient);
+        color: white;
+        transform: translateY(-2px);
+        box-shadow: var(--shadow);
+      }
+
+      .gallery-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+        gap: 2rem;
+        margin-bottom: 3rem;
+      }
+
+      .gallery-item {
+        position: relative;
+        aspect-ratio: 1;
+        border-radius: 15px;
+        overflow: hidden;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        background: white;
+        box-shadow: var(--shadow);
+      }
+
+      .gallery-item:hover {
+        transform: translateY(-10px);
+        box-shadow: var(--shadow-hover);
+      }
+
+      .gallery-item img,
+      .gallery-item video {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        transition: transform 0.3s ease;
+      }
+
+      .gallery-item:hover img,
+      .gallery-item:hover video {
+        transform: scale(1.1);
+      }
+
+      .gallery-overlay {
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background: linear-gradient(to bottom, transparent, rgba(0, 0, 0, 0.8));
+        display: flex;
+        flex-direction: column;
+        justify-content: flex-end;
+        padding: 1.5rem;
+        opacity: 0;
+        transition: opacity 0.3s ease;
+      }
+
+      .gallery-item:hover .gallery-overlay {
+        opacity: 1;
+      }
+
+      .gallery-info h4 {
+        color: white;
+        font-size: 1.1rem;
+        font-weight: 600;
+        margin-bottom: 0.5rem;
+      }
+
+      .gallery-info p {
+        color: rgba(255, 255, 255, 0.8);
+        font-size: 0.9rem;
+      }
+
+      .gallery-actions {
+        position: absolute;
+        top: 1rem;
+        right: 1rem;
+      }
+
+      .gallery-btn {
+        width: 40px;
+        height: 40px;
+        border: none;
+        border-radius: 50%;
+        background: rgba(255, 255, 255, 0.2);
+        color: white;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        backdrop-filter: blur(10px);
+        transition: all 0.3s ease;
+      }
+
+      .gallery-btn:hover {
+        background: rgba(255, 255, 255, 0.3);
+        transform: scale(1.1);
+      }
+
+      .load-more-container {
+        text-align: center;
+      }
+
+      /* Skills Section */
+      .skills {
+        background: white;
+      }
+
+      .skills-content {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 4rem;
+      }
+
+      .skills-category h3 {
+        font-size: 1.5rem;
+        margin-bottom: 2rem;
+        color: var(--text-dark);
+      }
+
+      .skill-items {
+        display: flex;
+        flex-direction: column;
+        gap: 1.5rem;
+      }
+
+      .skill-item {
+        display: flex;
+        align-items: center;
+        gap: 1rem;
+        padding: 1rem;
+        background: var(--bg-light);
+        border-radius: 10px;
+        transition: transform 0.3s ease;
+      }
+
+      .skill-item:hover {
+        transform: translateX(10px);
+      }
+
+      .skill-icon {
+        width: 50px;
+        height: 50px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        background: var(--gradient);
+        color: white;
+        border-radius: 10px;
+        font-size: 1.5rem;
+      }
+
+      .skill-info {
+        flex: 1;
+      }
+
+      .skill-info h4 {
+        margin-bottom: 0.5rem;
+        color: var(--text-dark);
+      }
+
+      .skill-progress {
+        height: 8px;
+        background: #e2e8f0;
+        border-radius: 4px;
+        overflow: hidden;
+      }
+
+      .progress-bar {
+        height: 100%;
+        background: var(--gradient);
+        border-radius: 4px;
+        width: 0;
+        transition: width 1s ease;
+      }
+
+      .hobby-items {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+        gap: 1.5rem;
+      }
+
+      .hobby-item {
+        text-align: center;
+        padding: 2rem 1rem;
+        background: var(--bg-light);
+        border-radius: 15px;
+        transition: all 0.3s ease;
+      }
+
+      .hobby-item:hover {
+        transform: translateY(-5px);
+        box-shadow: var(--shadow);
+      }
+
+      .hobby-item i {
+        font-size: 2.5rem;
+        color: var(--primary-color);
+        margin-bottom: 1rem;
+      }
+
+      .hobby-item h4 {
+        margin-bottom: 0.5rem;
+        color: var(--text-dark);
+      }
+
+      .hobby-item p {
+        color: var(--text-light);
+        font-size: 0.9rem;
+      }
+
+      /* Contact Section */
+      .contact {
+        background: var(--gradient);
+        color: white;
+      }
+
+      .contact .section-title,
+      .contact .section-subtitle {
+        color: white;
+      }
+
+      .contact-content {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 4rem;
+        align-items: start;
+      }
+
+      .contact-item {
+        display: flex;
+        align-items: flex-start;
+        gap: 1rem;
+        margin-bottom: 2rem;
+      }
+
+      .contact-icon {
+        width: 50px;
+        height: 50px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        background: rgba(255, 255, 255, 0.2);
+        border-radius: 10px;
+        font-size: 1.2rem;
+      }
+
+      .contact-details h4 {
+        margin-bottom: 0.5rem;
+        font-weight: 600;
+      }
+
+      .contact-details p {
+        color: rgba(255, 255, 255, 0.8);
+        line-height: 1.6;
+      }
+
+      .social-links h3 {
+        margin-bottom: 2rem;
+        font-size: 1.5rem;
+      }
+
+      .social-buttons {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+        gap: 1rem;
+      }
+
+      .social-btn {
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+        padding: 1rem;
+        background: rgba(255, 255, 255, 0.1);
+        border: 2px solid rgba(255, 255, 255, 0.2);
+        border-radius: 10px;
+        color: white;
+        text-decoration: none;
+        transition: all 0.3s ease;
+        backdrop-filter: blur(10px);
+      }
+
+      .social-btn:hover {
+        background: rgba(255, 255, 255, 0.2);
+        transform: translateY(-3px);
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+      }
+
+      .social-btn i {
+        font-size: 1.2rem;
+      }
+
+      /* Footer */
+      .footer {
+        background: var(--bg-dark);
+        color: white;
+        padding: 2rem 0;
+      }
+
+      .footer-content {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+      }
+
+      .scroll-top {
+        width: 50px;
+        height: 50px;
+        border: none;
+        border-radius: 50%;
+        background: var(--gradient);
+        color: white;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        transition: all 0.3s ease;
+      }
+
+      .scroll-top:hover {
+        transform: translateY(-3px);
+        box-shadow: var(--shadow);
+      }
+
+      /* Lightbox */
+      .lightbox {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: rgba(0, 0, 0, 0.9);
+        z-index: 10000;
+        display: none;
+        align-items: center;
+        justify-content: center;
+      }
+
+      .lightbox.active {
+        display: flex;
+      }
+
+      .lightbox-content {
+        position: relative;
+        max-width: 90%;
+        max-height: 90%;
+      }
+
+      .lightbox-close {
+        position: absolute;
+        top: -40px;
+        right: 0;
+        color: white;
+        font-size: 2rem;
+        cursor: pointer;
+        z-index: 10001;
+      }
+
+      .lightbox-media img,
+      .lightbox-media video {
+        max-width: 100%;
+        max-height: 80vh;
+        border-radius: 10px;
+      }
+
+      .lightbox-navigation {
+        position: absolute;
+        top: 50%;
+        width: 100%;
+        display: flex;
+        justify-content: space-between;
+        padding: 0 2rem;
+        transform: translateY(-50%);
+        pointer-events: none;
+      }
+
+      .lightbox-nav {
+        width: 50px;
+        height: 50px;
+        border: none;
+        border-radius: 50%;
+        background: rgba(255, 255, 255, 0.2);
+        color: white;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        backdrop-filter: blur(10px);
+        transition: all 0.3s ease;
+        pointer-events: auto;
+      }
+
+      .lightbox-nav:hover {
+        background: rgba(255, 255, 255, 0.3);
+      }
+
+      /* Responsive Design */
+      @media (max-width: 768px) {
+        .nav-links {
+          display: none;
+          position: absolute;
+          top: 100%;
+          left: 0;
+          width: 100%;
+          background: rgba(255, 255, 255, 0.98);
+          backdrop-filter: blur(10px);
+          flex-direction: column;
+          padding: 1rem 0;
+          box-shadow: 0 2px 20px rgba(0, 0, 0, 0.1);
+          border-radius: 0 0 15px 15px;
+        }
+
+        .nav-links.active {
+          display: flex;
+        }
+
+        .nav-links li {
+          margin: 0;
+          padding: 0.5rem 2rem;
+        }
+
+        .nav-links a {
+          width: 100%;
+          display: block;
+          padding: 0.5rem 0;
+        }
+
+        .mobile-menu {
+          display: flex;
+        }
+
+        .hero-title {
+          font-size: 2.5rem;
+        }
+
+        .hero-subtitle {
+          font-size: 1.1rem;
+        }
+
+        .hero-buttons {
+          flex-direction: column;
+          align-items: center;
+        }
+
+        .about-content {
+          grid-template-columns: 1fr;
+          text-align: center;
+        }
+
+        .stats {
+          grid-template-columns: repeat(2, 1fr);
+        }
+
+        .gallery-grid {
+          grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+          gap: 1rem;
+        }
+
+        .gallery-filter {
+          gap: 0.5rem;
+        }
+
+        .filter-btn {
+          padding: 0.6rem 1rem;
+          font-size: 0.9rem;
+        }
+
+        .skills-content {
+          grid-template-columns: 1fr;
+          gap: 2rem;
+        }
+
+        .contact-content {
+          grid-template-columns: 1fr;
+          gap: 2rem;
+        }
+
+        .social-buttons {
+          grid-template-columns: repeat(2, 1fr);
+        }
+
+        .footer-content {
+          flex-direction: column;
+          gap: 1rem;
+          text-align: center;
+        }
+
+        .hobby-items {
+          grid-template-columns: repeat(2, 1fr);
+        }
+      }
+
+      @media (max-width: 480px) {
+        .hero-title {
+          font-size: 2rem;
+        }
+
+        .section-title {
+          font-size: 2rem;
+        }
+
+        .gallery-grid {
+          grid-template-columns: 1fr;
+        }
+
+        .stats {
+          grid-template-columns: 1fr;
+        }
+
+        .hobby-items {
+          grid-template-columns: 1fr;
+        }
+
+        .social-buttons {
+          grid-template-columns: 1fr;
+        }
+      }
+
+      /* Animations */
+      .fade-in {
+        opacity: 0;
+        transform: translateY(30px);
+        transition: all 0.8s ease;
+      }
+
+      .fade-in.visible {
+        opacity: 1;
+        transform: translateY(0);
+      }
+
+      .slide-in-left {
+        opacity: 0;
+        transform: translateX(-50px);
+        transition: all 0.8s ease;
+      }
+
+      .slide-in-left.visible {
+        opacity: 1;
+        transform: translateX(0);
+      }
+
+      .slide-in-right {
+        opacity: 0;
+        transform: translateX(50px);
+        transition: all 0.8s ease;
+      }
+
+      .slide-in-right.visible {
+        opacity: 1;
+        transform: translateX(0);
+      }
+
+      /* Hidden class for gallery filtering */
+      .gallery-item.hidden {
+        display: none;
+      }
+    </style>
+  </head>
+  <body>
+    <!-- Loading Screen -->
+    <div class="loader" id="loader">
+      <div class="loader-content">
+        <div class="loader-spinner"></div>
+        <h3>Đang tải...</h3>
+      </div>
+    </div>
+
+    <!-- Navigation -->
+    <nav class="navbar" id="navbar">
+      <div class="nav-container">
+        <div class="logo">Phạm Quang Trung</div>
+        <ul class="nav-links" id="nav-links">
+          <li><a href="#home">Trang chủ</a></li>
+          <li><a href="#about">Giới thiệu</a></li>
+          <li><a href="#gallery">Kỷ niệm</a></li>
+          <li><a href="#skills">Kỹ năng</a></li>
+          <li><a href="#contact">Liên hệ</a></li>
+        </ul>
+        <div class="mobile-menu" id="mobile-menu">
+          <span></span>
+          <span></span>
+          <span></span>
+        </div>
+      </div>
     </nav>
-  </header>
 
-  <!-- thông tin -->
-  <div class="profile">
-    <img src="https://www.facebook.com/share/19dRwBFJyP/?mibextid=wwXIfr" alt="Ảnh đại diện">
-    <h1>Phạm Quang Trung</h1>
-    <p>Sinh viên HUTECH - Đại học Công nghệ TP.HCM</p>
-    <p>Sống tại TP.HCM, quê ở Vũng Tàu</p>
-  </div>
+    <!-- Hero Section -->
+    <section class="hero" id="home">
+      <div class="hero-content">
+        <img src="avatar/avt.png" alt="Phạm Quang Trung" class="hero-avatar" />
+        <h1 class="hero-title">Phạm Quang Trung</h1>
+        <p class="hero-subtitle">
+          Sinh viên HUTECH - <span class="typed-text" id="typed-text"></span>
+        </p>
+        <div class="hero-buttons">
+          <a href="#about" class="btn btn-primary">
+            <i class="fas fa-user"></i>
+            Khám phá về tôi
+          </a>
+          <a href="#contact" class="btn btn-secondary">
+            <i class="fas fa-envelope"></i>
+            Liên hệ
+          </a>
+        </div>
+      </div>
+      <div class="scroll-indicator">
+        <i class="fas fa-chevron-down"></i>
+      </div>
+    </section>
 
-  <!-- giới thiệu -->
-  <div class="about">
-    <h2>Giới thiệu</h2>
-    <p>Xin chào, mình là Trunggg</p>
-  </div>
-</body>
+    <!-- About Section -->
+    <section class="about" id="about">
+      <div class="container">
+        <h2 class="section-title fade-in">Giới thiệu về tôi</h2>
+        <p class="section-subtitle fade-in">
+          Tôi là một sinh viên đam mê công nghệ, luôn tìm kiếm những trải nghiệm
+          mới và phát triển bản thân
+        </p>
+
+        <div class="about-content">
+          <div class="about-image slide-in-left">
+            <img
+              src="ki_niem/selfphytaidinhdoclap.jpg"
+              alt="Phạm Quang Trung"
+            />
+          </div>
+
+          <div class="about-text slide-in-right">
+            <h3>Xin chào! Tôi là Trung</h3>
+            <p>
+              Tôi là sinh viên tại Đại học Công nghệ TP.HCM (HUTECH), đang theo
+              học chuyên ngành Công nghệ Thông tin. Với niềm đam mê công nghệ và
+              sự sáng tạo, tôi luôn tìm kiếm những cơ hội để học hỏi và phát
+              triển kỹ năng.
+            </p>
+            <p>
+              Ngoài việc học, tôi còn thích khám phá những địa điểm mới, chụp
+              ảnh và tạo ra những kỷ niệm đẹp cùng bạn bè. Tôi tin rằng cuộc
+              sống không chỉ có học tập mà còn cần có những trải nghiệm thú vị.
+            </p>
+            <p>
+              Hiện tại tôi đang sống tại TP.HCM và quê ở Vũng Tàu - một thành
+              phố biển tuyệt đẹp mà tôi luôn yêu thích.
+            </p>
+          </div>
+        </div>
+
+        <div class="stats fade-in">
+          <div class="stat-item">
+            <span class="stat-number">4+</span>
+            <span class="stat-label">Năm học tập</span>
+          </div>
+          <div class="stat-item">
+            <span class="stat-number">50+</span>
+            <span class="stat-label">Kỷ niệm đẹp</span>
+          </div>
+          <div class="stat-item">
+            <span class="stat-number">100+</span>
+            <span class="stat-label">Bạn bè</span>
+          </div>
+          <div class="stat-item">
+            <span class="stat-number">∞</span>
+            <span class="stat-label">Niềm vui</span>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Gallery Section -->
+    <section class="gallery" id="gallery">
+      <div class="container">
+        <h2 class="section-title">Kỷ niệm của tôi</h2>
+        <p class="section-subtitle">
+          Những khoảnh khắc đẹp và ý nghĩa trong cuộc sống của tôi
+        </p>
+
+        <!-- Gallery Filter -->
+        <div class="gallery-filter">
+          <button class="filter-btn active" data-filter="all">Tất cả</button>
+          <button class="filter-btn" data-filter="photos">Ảnh</button>
+          <button class="filter-btn" data-filter="videos">Video</button>
+          <button class="filter-btn" data-filter="friends">Bạn bè</button>
+          <button class="filter-btn" data-filter="travel">Du lịch</button>
+        </div>
+
+        <!-- Gallery Grid -->
+        <div class="gallery-grid" id="gallery-grid">
+          <!-- Photos -->
+          <div class="gallery-item" data-category="photos friends">
+            <img
+              src="ki_niem/8thang3withclass.jpg"
+              alt="Ngày 8/3 cùng lớp"
+              loading="lazy"
+            />
+            <div class="gallery-overlay">
+              <div class="gallery-info">
+                <h4>Ngày 8/3 cùng lớp</h4>
+                <p>Kỷ niệm đẹp cùng các bạn</p>
+              </div>
+              <div class="gallery-actions">
+                <button
+                  class="gallery-btn"
+                  onclick="openLightbox('ki_niem/8thang3withclass.jpg', 'image')"
+                >
+                  <i class="fas fa-eye"></i>
+                </button>
+              </div>
+            </div>
+          </div>
+
+          <div class="gallery-item" data-category="photos travel">
+            <img
+              src="ki_niem/backgroundcamping.jpg"
+              alt="Cắm trại"
+              loading="lazy"
+            />
+            <div class="gallery-overlay">
+              <div class="gallery-info">
+                <h4>Chuyến cắm trại</h4>
+                <p>Trải nghiệm thiên nhiên tuyệt vời</p>
+              </div>
+              <div class="gallery-actions">
+                <button
+                  class="gallery-btn"
+                  onclick="openLightbox('ki_niem/backgroundcamping.jpg', 'image')"
+                >
+                  <i class="fas fa-eye"></i>
+                </button>
+              </div>
+            </div>
+          </div>
+
+          <div class="gallery-item" data-category="photos">
+            <img src="ki_niem/childhood.jpg" alt="Tuổi thơ" loading="lazy" />
+            <div class="gallery-overlay">
+              <div class="gallery-info">
+                <h4>Kỷ niệm tuổi thơ</h4>
+                <p>Những ngày tháng đẹp nhất</p>
+              </div>
+              <div class="gallery-actions">
+                <button
+                  class="gallery-btn"
+                  onclick="openLightbox('ki_niem/childhood.jpg', 'image')"
+                >
+                  <i class="fas fa-eye"></i>
+                </button>
+              </div>
+            </div>
+          </div>
+
+          <div class="gallery-item" data-category="photos">
+            <img src="ki_niem/childhood2.jpg" alt="Tuổi thơ 2" loading="lazy" />
+            <div class="gallery-overlay">
+              <div class="gallery-info">
+                <h4>Thêm kỷ niệm tuổi thơ</h4>
+                <p>Hồn nhiên và vô tư</p>
+              </div>
+              <div class="gallery-actions">
+                <button
+                  class="gallery-btn"
+                  onclick="openLightbox('ki_niem/childhood2.jpg', 'image')"
+                >
+                  <i class="fas fa-eye"></i>
+                </button>
+              </div>
+            </div>
+          </div>
+
+          <div class="gallery-item" data-category="videos friends">
+            <video
+              src="ki_niem/food_phuochai_vungtau.mp4"
+              muted
+              loop
+              loading="lazy"
+            >
+              Your browser does not support the video tag.
+            </video>
+            <div class="gallery-overlay">
+              <div class="gallery-info">
+                <h4>Ăn uống tại Vũng Tàu</h4>
+                <p>Khám phá ẩm thực quê nhà</p>
+              </div>
+              <div class="gallery-actions">
+                <button
+                  class="gallery-btn"
+                  onclick="openLightbox('ki_niem/food_phuochai_vungtau.mp4', 'video')"
+                >
+                  <i class="fas fa-play"></i>
+                </button>
+              </div>
+            </div>
+          </div>
+
+          <div class="gallery-item" data-category="photos">
+            <img
+              src="ki_niem/gifcardcollection_milktea_.jpg"
+              alt="Bộ sưu tập"
+              loading="lazy"
+            />
+            <div class="gallery-overlay">
+              <div class="gallery-info">
+                <h4>Bộ sưu tập thẻ</h4>
+                <p>Những món đồ yêu thích</p>
+              </div>
+              <div class="gallery-actions">
+                <button
+                  class="gallery-btn"
+                  onclick="openLightbox('ki_niem/gifcardcollection_milktea_.jpg', 'image')"
+                >
+                  <i class="fas fa-eye"></i>
+                </button>
+              </div>
+            </div>
+          </div>
+
+          <div class="gallery-item" data-category="photos travel friends">
+            <img
+              src="ki_niem/hotram_vungtauwithfrends.jpg"
+              alt="Hồ Tràm với bạn bè"
+              loading="lazy"
+            />
+            <div class="gallery-overlay">
+              <div class="gallery-info">
+                <h4>Hồ Tràm cùng bạn bè</h4>
+                <p>Chuyến đi biển thú vị</p>
+              </div>
+              <div class="gallery-actions">
+                <button
+                  class="gallery-btn"
+                  onclick="openLightbox('ki_niem/hotram_vungtauwithfrends.jpg', 'image')"
+                >
+                  <i class="fas fa-eye"></i>
+                </button>
+              </div>
+            </div>
+          </div>
+
+          <div class="gallery-item" data-category="videos">
+            <video src="ki_niem/iamatclass.mp4" muted loop loading="lazy">
+              Your browser does not support the video tag.
+            </video>
+            <div class="gallery-overlay">
+              <div class="gallery-info">
+                <h4>Trong lớp học</h4>
+                <p>Những giờ học vui vẻ</p>
+              </div>
+              <div class="gallery-actions">
+                <button
+                  class="gallery-btn"
+                  onclick="openLightbox('ki_niem/iamatclass.mp4', 'video')"
+                >
+                  <i class="fas fa-play"></i>
+                </button>
+              </div>
+            </div>
+          </div>
+
+          <div class="gallery-item" data-category="photos">
+            <img
+              src="ki_niem/iama_become_memer.jpg"
+              alt="Trở thành memer"
+              loading="lazy"
+            />
+            <div class="gallery-overlay">
+              <div class="gallery-info">
+                <h4>Thành memer</h4>
+                <p>Khi tôi khám phá meme</p>
+              </div>
+              <div class="gallery-actions">
+                <button
+                  class="gallery-btn"
+                  onclick="openLightbox('ki_niem/iama_become_memer.jpg', 'image')"
+                >
+                  <i class="fas fa-eye"></i>
+                </button>
+              </div>
+            </div>
+          </div>
+
+          <div class="gallery-item" data-category="photos friends">
+            <img
+              src="ki_niem/idol_with_myfrends.jpg"
+              alt="Với bạn bè"
+              loading="lazy"
+            />
+            <div class="gallery-overlay">
+              <div class="gallery-info">
+                <h4>Cùng hội bạn thân</h4>
+                <p>Tình bạn đẹp</p>
+              </div>
+              <div class="gallery-actions">
+                <button
+                  class="gallery-btn"
+                  onclick="openLightbox('ki_niem/idol_with_myfrends.jpg', 'image')"
+                >
+                  <i class="fas fa-eye"></i>
+                </button>
+              </div>
+            </div>
+          </div>
+
+          <div class="gallery-item" data-category="photos">
+            <img src="ki_niem/mycats.jpg" alt="Mèo cưng" loading="lazy" />
+            <div class="gallery-overlay">
+              <div class="gallery-info">
+                <h4>Những chú mèo cưng</h4>
+                <p>Bạn đồng hành đáng yêu</p>
+              </div>
+              <div class="gallery-actions">
+                <button
+                  class="gallery-btn"
+                  onclick="openLightbox('ki_niem/mycats.jpg', 'image')"
+                >
+                  <i class="fas fa-eye"></i>
+                </button>
+              </div>
+            </div>
+          </div>
+
+          <div class="gallery-item" data-category="photos friends">
+            <img
+              src="ki_niem/playingbilliard.jpg"
+              alt="Chơi bi-a"
+              loading="lazy"
+            />
+            <div class="gallery-overlay">
+              <div class="gallery-info">
+                <h4>Giải trí bi-a</h4>
+                <p>Thư giãn cùng bạn bè</p>
+              </div>
+              <div class="gallery-actions">
+                <button
+                  class="gallery-btn"
+                  onclick="openLightbox('ki_niem/playingbilliard.jpg', 'image')"
+                >
+                  <i class="fas fa-eye"></i>
+                </button>
+              </div>
+            </div>
+          </div>
+
+          <!-- More gallery items can be added here -->
+        </div>
+
+        <!-- Load More Button -->
+        <div class="load-more-container">
+          <button class="btn btn-primary" id="loadMoreBtn">
+            <i class="fas fa-plus"></i>
+            Xem thêm
+          </button>
+        </div>
+      </div>
+    </section>
+
+    <!-- Skills Section -->
+    <section class="skills" id="skills">
+      <div class="container">
+        <h2 class="section-title">Kỹ năng & Sở thích</h2>
+        <p class="section-subtitle">
+          Những điều tôi đam mê và kỹ năng tôi đang phát triển
+        </p>
+
+        <div class="skills-content">
+          <div class="skills-category">
+            <h3>Kỹ năng công nghệ</h3>
+            <div class="skill-items">
+              <div class="skill-item">
+                <div class="skill-icon">
+                  <i class="fas fa-gamepad"></i>
+                </div>
+                <div class="skill-info">
+                  <h4>Chơi game TFT</h4>
+                  <div class="skill-progress">
+                    <div class="progress-bar" data-percent="99"></div>
+                  </div>
+                </div>
+              </div>
+
+              <div class="skill-item">
+                <div class="skill-icon">
+                  <i class="fas fa-code"></i>
+                </div>
+                <div class="skill-info">
+                  <h4>Coding</h4>
+                  <div class="skill-progress">
+                    <div class="progress-bar" data-percent="1"></div>
+                  </div>
+                </div>
+              </div>
+
+              <div class="skill-item">
+                <div class="skill-icon">
+                  <i class="fas fa-bed"></i>
+                </div>
+                <div class="skill-info">
+                  <h4>Lười</h4>
+                  <div class="skill-progress">
+                    <div class="progress-bar" data-percent="36"></div>
+                  </div>
+                </div>
+              </div>
+
+              <div class="skill-item">
+                <div class="skill-icon">
+                  <i class="fas fa-plane"></i>
+                </div>
+                <div class="skill-info">
+                  <h4>Thích đi chơi</h4>
+                  <div class="skill-progress">
+                    <div class="progress-bar" data-percent="100"></div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="skills-category">
+            <h3>Sở thích</h3>
+            <div class="hobby-items">
+              <div class="hobby-item">
+                <i class="fas fa-camera"></i>
+                <h4>Chụp ảnh</h4>
+                <p>Ghi lại những khoảnh khắc đẹp</p>
+              </div>
+
+              <div class="hobby-item">
+                <i class="fas fa-mountain"></i>
+                <h4>Du lịch</h4>
+                <p>Khám phá những địa điểm mới</p>
+              </div>
+
+              <div class="hobby-item">
+                <i class="fas fa-gamepad"></i>
+                <h4>Gaming</h4>
+                <p>Thư giãn với trò chơi</p>
+              </div>
+
+              <div class="hobby-item">
+                <i class="fas fa-users"></i>
+                <h4>Giao lưu</h4>
+                <p>Kết bạn và chia sẻ</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Contact Section -->
+    <section class="contact" id="contact">
+      <div class="container">
+        <h2 class="section-title">Liên hệ với tôi</h2>
+        <p class="section-subtitle">Hãy kết nối và trò chuyện cùng tôi!</p>
+
+        <div class="contact-content">
+          <div class="contact-info">
+            <div class="contact-item">
+              <div class="contact-icon">
+                <i class="fas fa-map-marker-alt"></i>
+              </div>
+              <div class="contact-details">
+                <h4>Địa chỉ</h4>
+                <p>TP. Hồ Chí Minh, Việt Nam</p>
+                <p>Quê quán: Vũng Tàu</p>
+              </div>
+            </div>
+
+            <div class="contact-item">
+              <div class="contact-icon">
+                <i class="fas fa-graduation-cap"></i>
+              </div>
+              <div class="contact-details">
+                <h4>Trường học</h4>
+                <p>Đại học Công nghệ TP.HCM</p>
+                <p>(HUTECH)</p>
+              </div>
+            </div>
+
+            <div class="contact-item">
+              <div class="contact-icon">
+                <i class="fas fa-heart"></i>
+              </div>
+              <div class="contact-details">
+                <h4>Tính cách</h4>
+                <p>Thân thiện, hòa đồng</p>
+                <p>Luôn sẵn sàng học hỏi</p>
+              </div>
+            </div>
+
+            <div class="contact-item">
+              <div class="contact-icon">
+                <i class="fas fa-envelope"></i>
+              </div>
+              <div class="contact-details">
+                <h4>Email</h4>
+                <p>phamquangtrung4504@gmail.com</p>
+                <p>Liên hệ trực tiếp qua email</p>
+              </div>
+            </div>
+          </div>
+
+          <div class="social-links">
+            <h3>Kết nối với tôi</h3>
+            <div class="social-buttons">
+              <a
+                href="https://zalo.me/0326658276"
+                target="_blank"
+                class="social-btn zalo"
+              >
+                <i class="fas fa-phone"></i>
+                <span>Zalo</span>
+              </a>
+              <a
+                href="https://www.facebook.com/share/1a38Y15xhZ/?mibextid=wwXIfr"
+                target="_blank"
+                class="social-btn facebook"
+              >
+                <i class="fab fa-facebook-f"></i>
+                <span>Facebook</span>
+              </a>
+              <a
+                href="mailto:phamquangtrung4504@gmail.com"
+                class="social-btn email"
+                title="Gửi email cho tôi: phamquangtrung4504@gmail.com"
+              >
+                <i class="fas fa-envelope"></i>
+                <span>Email</span>
+              </a>
+              <a
+                href="https://github.com"
+                target="_blank"
+                class="social-btn github"
+              >
+                <i class="fab fa-github"></i>
+                <span>GitHub</span>
+              </a>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="footer">
+      <div class="container">
+        <div class="footer-content">
+          <div class="footer-text">
+            <p>&copy; 2025 Phạm Quang Trung. Made with ❤️ and lots of ☕</p>
+          </div>
+          <div class="footer-scroll">
+            <button class="scroll-top" id="scrollTop">
+              <i class="fas fa-chevron-up"></i>
+            </button>
+          </div>
+        </div>
+      </div>
+    </footer>
+
+    <!-- Lightbox Modal -->
+    <div class="lightbox" id="lightbox">
+      <div class="lightbox-content">
+        <span class="lightbox-close" id="lightboxClose">&times;</span>
+        <div class="lightbox-media" id="lightboxMedia">
+          <!-- Content will be inserted here -->
+        </div>
+        <div class="lightbox-navigation">
+          <button class="lightbox-nav prev" id="lightboxPrev">
+            <i class="fas fa-chevron-left"></i>
+          </button>
+          <button class="lightbox-nav next" id="lightboxNext">
+            <i class="fas fa-chevron-right"></i>
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <script>
+      // Global variables
+      let currentLightboxIndex = 0;
+      let lightboxItems = [];
+
+      // Wait for DOM to be fully loaded
+      document.addEventListener("DOMContentLoaded", function () {
+        // Initialize all features
+        initLoader();
+        initNavbar();
+        initTypedText();
+        initScrollAnimations();
+        initGalleryFilter();
+        initLightbox();
+        initSkillBars();
+        initSmoothScrolling();
+        initScrollToTop();
+      });
+
+      // Loading Screen
+      function initLoader() {
+        window.addEventListener("load", function () {
+          setTimeout(() => {
+            const loader = document.getElementById("loader");
+            loader.classList.add("hidden");
+            setTimeout(() => {
+              loader.style.display = "none";
+            }, 500);
+          }, 1000);
+        });
+      }
+
+      // Navbar Scroll Effect
+      function initNavbar() {
+        const navbar = document.getElementById("navbar");
+        const mobileMenu = document.getElementById("mobile-menu");
+        const navLinks = document.getElementById("nav-links");
+
+        window.addEventListener("scroll", function () {
+          if (window.scrollY > 100) {
+            navbar.classList.add("scrolled");
+          } else {
+            navbar.classList.remove("scrolled");
+          }
+        });
+
+        // Mobile menu toggle
+        mobileMenu.addEventListener("click", function () {
+          navLinks.classList.toggle("active");
+
+          // Animate hamburger menu
+          mobileMenu.classList.toggle("active");
+        });
+
+        // Close mobile menu when clicking on a link
+        const navLinkItems = navLinks.querySelectorAll("a");
+        navLinkItems.forEach((link) => {
+          link.addEventListener("click", () => {
+            navLinks.classList.remove("active");
+            mobileMenu.classList.remove("active");
+          });
+        });
+
+        // Close mobile menu when clicking outside
+        document.addEventListener("click", function (event) {
+          const isClickInsideNav = navbar.contains(event.target);
+          if (!isClickInsideNav && navLinks.classList.contains("active")) {
+            navLinks.classList.remove("active");
+            mobileMenu.classList.remove("active");
+          }
+        });
+      }
+
+      // Typed Text Effect
+      function initTypedText() {
+        const typedElement = document.getElementById("typed-text");
+        const texts = [
+          "Đam mê công nghệ",
+          "Yêu thích chụp ảnh",
+          "Thích khám phá",
+          "Sinh viên năng động",
+          "Người bạn thân thiện",
+        ];
+
+        let textIndex = 0;
+        let charIndex = 0;
+        let isDeleting = false;
+
+        function typeText() {
+          const currentText = texts[textIndex];
+
+          if (isDeleting) {
+            typedElement.textContent = currentText.substring(0, charIndex - 1);
+            charIndex--;
+          } else {
+            typedElement.textContent = currentText.substring(0, charIndex + 1);
+            charIndex++;
+          }
+
+          let typeSpeed = isDeleting ? 50 : 100;
+
+          if (!isDeleting && charIndex === currentText.length) {
+            typeSpeed = 2000;
+            isDeleting = true;
+          } else if (isDeleting && charIndex === 0) {
+            isDeleting = false;
+            textIndex = (textIndex + 1) % texts.length;
+            typeSpeed = 500;
+          }
+
+          setTimeout(typeText, typeSpeed);
+        }
+
+        typeText();
+      }
+
+      // Scroll Animations
+      function initScrollAnimations() {
+        const observerOptions = {
+          threshold: 0.1,
+          rootMargin: "0px 0px -50px 0px",
+        };
+
+        const observer = new IntersectionObserver(function (entries) {
+          entries.forEach((entry) => {
+            if (entry.isIntersecting) {
+              entry.target.classList.add("visible");
+            }
+          });
+        }, observerOptions);
+
+        // Observe all elements with animation classes
+        const animatedElements = document.querySelectorAll(
+          ".fade-in, .slide-in-left, .slide-in-right"
+        );
+        animatedElements.forEach((el) => observer.observe(el));
+      }
+
+      // Gallery Filter
+      function initGalleryFilter() {
+        const filterBtns = document.querySelectorAll(".filter-btn");
+        const galleryItems = document.querySelectorAll(".gallery-item");
+
+        filterBtns.forEach((btn) => {
+          btn.addEventListener("click", function () {
+            // Remove active class from all buttons
+            filterBtns.forEach((b) => b.classList.remove("active"));
+            // Add active class to clicked button
+            this.classList.add("active");
+
+            const filterValue = this.getAttribute("data-filter");
+
+            galleryItems.forEach((item) => {
+              if (filterValue === "all") {
+                item.classList.remove("hidden");
+                setTimeout(() => {
+                  item.style.display = "block";
+                }, 10);
+              } else {
+                const categories = item.getAttribute("data-category");
+                if (categories && categories.includes(filterValue)) {
+                  item.classList.remove("hidden");
+                  setTimeout(() => {
+                    item.style.display = "block";
+                  }, 10);
+                } else {
+                  item.style.display = "none";
+                  item.classList.add("hidden");
+                }
+              }
+            });
+          });
+        });
+      }
+
+      // Lightbox
+      function initLightbox() {
+        const lightbox = document.getElementById("lightbox");
+        const lightboxClose = document.getElementById("lightboxClose");
+        const lightboxPrev = document.getElementById("lightboxPrev");
+        const lightboxNext = document.getElementById("lightboxNext");
+
+        // Collect all gallery items for navigation
+        const galleryItems = document.querySelectorAll(".gallery-item");
+        lightboxItems = Array.from(galleryItems)
+          .map((item) => {
+            const img = item.querySelector("img");
+            const video = item.querySelector("video");
+            if (img) {
+              return { src: img.src, type: "image" };
+            } else if (video) {
+              return { src: video.src, type: "video" };
+            }
+          })
+          .filter((item) => item);
+
+        // Close lightbox
+        lightboxClose.addEventListener("click", closeLightbox);
+        lightbox.addEventListener("click", function (e) {
+          if (e.target === lightbox) {
+            closeLightbox();
+          }
+        });
+
+        // Navigation
+        lightboxPrev.addEventListener("click", function () {
+          currentLightboxIndex =
+            (currentLightboxIndex - 1 + lightboxItems.length) %
+            lightboxItems.length;
+          updateLightboxContent();
+        });
+
+        lightboxNext.addEventListener("click", function () {
+          currentLightboxIndex =
+            (currentLightboxIndex + 1) % lightboxItems.length;
+          updateLightboxContent();
+        });
+
+        // Keyboard navigation
+        document.addEventListener("keydown", function (e) {
+          if (lightbox.classList.contains("active")) {
+            if (e.key === "Escape") {
+              closeLightbox();
+            } else if (e.key === "ArrowLeft") {
+              lightboxPrev.click();
+            } else if (e.key === "ArrowRight") {
+              lightboxNext.click();
+            }
+          }
+        });
+      }
+
+      // Open Lightbox Function (called from HTML)
+      function openLightbox(src, type) {
+        const lightbox = document.getElementById("lightbox");
+        const lightboxMedia = document.getElementById("lightboxMedia");
+
+        // Find the index of the current item
+        currentLightboxIndex = lightboxItems.findIndex(
+          (item) => item.src === src
+        );
+
+        updateLightboxContent();
+        lightbox.classList.add("active");
+        document.body.style.overflow = "hidden";
+      }
+
+      function updateLightboxContent() {
+        const lightboxMedia = document.getElementById("lightboxMedia");
+        const currentItem = lightboxItems[currentLightboxIndex];
+
+        if (currentItem.type === "image") {
+          lightboxMedia.innerHTML = `<img src="${currentItem.src}" alt="Gallery Image">`;
+        } else if (currentItem.type === "video") {
+          lightboxMedia.innerHTML = `<video src="${currentItem.src}" controls autoplay></video>`;
+        }
+      }
+
+      function closeLightbox() {
+        const lightbox = document.getElementById("lightbox");
+        lightbox.classList.remove("active");
+        document.body.style.overflow = "auto";
+      }
+
+      // Skill Progress Bars
+      function initSkillBars() {
+        const skillBars = document.querySelectorAll(".progress-bar");
+
+        const skillObserver = new IntersectionObserver(
+          function (entries) {
+            entries.forEach((entry) => {
+              if (entry.isIntersecting) {
+                const progressBar = entry.target;
+                const percent = progressBar.getAttribute("data-percent");
+                setTimeout(() => {
+                  progressBar.style.width = percent + "%";
+                }, 500);
+              }
+            });
+          },
+          { threshold: 0.5 }
+        );
+
+        skillBars.forEach((bar) => skillObserver.observe(bar));
+      }
+
+      // Smooth Scrolling
+      function initSmoothScrolling() {
+        const links = document.querySelectorAll('a[href^="#"]');
+
+        links.forEach((link) => {
+          link.addEventListener("click", function (e) {
+            e.preventDefault();
+
+            const targetId = this.getAttribute("href");
+            const targetSection = document.querySelector(targetId);
+
+            if (targetSection) {
+              const offsetTop = targetSection.offsetTop - 80;
+
+              window.scrollTo({
+                top: offsetTop,
+                behavior: "smooth",
+              });
+            }
+          });
+        });
+      }
+
+      // Scroll to Top
+      function initScrollToTop() {
+        const scrollTopBtn = document.getElementById("scrollTop");
+
+        window.addEventListener("scroll", function () {
+          if (window.scrollY > 300) {
+            scrollTopBtn.style.opacity = "1";
+            scrollTopBtn.style.pointerEvents = "auto";
+          } else {
+            scrollTopBtn.style.opacity = "0";
+            scrollTopBtn.style.pointerEvents = "none";
+          }
+        });
+
+        scrollTopBtn.addEventListener("click", function () {
+          window.scrollTo({
+            top: 0,
+            behavior: "smooth",
+          });
+        });
+      }
+
+      // Lazy Loading for Images
+      function initLazyLoading() {
+        const images = document.querySelectorAll('img[loading="lazy"]');
+
+        if ("IntersectionObserver" in window) {
+          const imageObserver = new IntersectionObserver(function (entries) {
+            entries.forEach((entry) => {
+              if (entry.isIntersecting) {
+                const img = entry.target;
+                img.src = img.dataset.src || img.src;
+                img.classList.remove("lazy");
+                imageObserver.unobserve(img);
+              }
+            });
+          });
+
+          images.forEach((img) => imageObserver.observe(img));
+        }
+      }
+
+      // Video hover effects
+      document.addEventListener("DOMContentLoaded", function () {
+        const videos = document.querySelectorAll(".gallery-item video");
+
+        videos.forEach((video) => {
+          video.addEventListener("mouseenter", function () {
+            this.play();
+          });
+
+          video.addEventListener("mouseleave", function () {
+            this.pause();
+            this.currentTime = 0;
+          });
+        });
+      });
+
+      // Performance optimizations
+      let ticking = false;
+
+      function updateScrollEffects() {
+        // Add any scroll-based animations here
+        ticking = false;
+      }
+
+      window.addEventListener("scroll", function () {
+        if (!ticking) {
+          requestAnimationFrame(updateScrollEffects);
+          ticking = true;
+        }
+      });
+
+      // Add some fun easter eggs
+      let clickCount = 0;
+      document
+        .querySelector(".hero-avatar")
+        .addEventListener("click", function () {
+          clickCount++;
+          if (clickCount === 5) {
+            this.style.animation = "spin 2s linear";
+            setTimeout(() => {
+              this.style.animation = "pulse 2s ease-in-out infinite";
+              clickCount = 0;
+            }, 2000);
+          }
+        });
+
+      // Preload critical images
+      function preloadImages() {
+        const criticalImages = [
+          "avatar/avt.png",
+          "ki_niem/selfphytaidinhdoclap.jpg",
+        ];
+
+        criticalImages.forEach((src) => {
+          const img = new Image();
+          img.src = src;
+        });
+      }
+
+      // Initialize preloading
+      preloadImages();
+    </script>
+  </body>
 </html>
