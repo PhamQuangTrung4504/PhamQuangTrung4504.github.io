@@ -546,6 +546,7 @@
         height: 100%;
         object-fit: cover;
         transition: transform 0.3s ease;
+        cursor: pointer;
       }
 
       .gallery-item:hover img,
@@ -588,6 +589,7 @@
         position: absolute;
         top: 1rem;
         right: 1rem;
+        display: none; /* Ẩn nút con mắt vì giờ click vào đâu cũng được */
       }
 
       .gallery-btn {
@@ -1536,6 +1538,530 @@
             </div>
           </div>
 
+          <div class="gallery-item" data-category="photos">
+            <img
+              src="ki_niem/bi_chup_len.jpg"
+              alt="Bị chụp lén"
+              loading="lazy"
+            />
+            <div class="gallery-overlay">
+              <div class="gallery-info">
+                <h4>Bị chụp lén</h4>
+                <p>Khoảnh khắc tự nhiên</p>
+              </div>
+              <div class="gallery-actions">
+                <button
+                  class="gallery-btn"
+                  onclick="openLightbox('ki_niem/bi_chup_len.jpg', 'image')"
+                >
+                  <i class="fas fa-eye"></i>
+                </button>
+              </div>
+            </div>
+          </div>
+
+          <div class="gallery-item" data-category="photos">
+            <img
+              src="ki_niem/iam_criminal.jpg"
+              alt="Tôi là tội phạm"
+              loading="lazy"
+            />
+            <div class="gallery-overlay">
+              <div class="gallery-info">
+                <h4>Tôi là tội phạm</h4>
+                <p>Phong cách gangster</p>
+              </div>
+              <div class="gallery-actions">
+                <button
+                  class="gallery-btn"
+                  onclick="openLightbox('ki_niem/iam_criminal.jpg', 'image')"
+                >
+                  <i class="fas fa-eye"></i>
+                </button>
+              </div>
+            </div>
+          </div>
+
+          <div class="gallery-item" data-category="photos friends">
+            <img
+              src="ki_niem/iama_idol_gangster.jpg"
+              alt="Idol gangster"
+              loading="lazy"
+            />
+            <div class="gallery-overlay">
+              <div class="gallery-info">
+                <h4>Idol phong cách gangster</h4>
+                <p>Ảnh chụp cùng bạn bè</p>
+              </div>
+              <div class="gallery-actions">
+                <button
+                  class="gallery-btn"
+                  onclick="openLightbox('ki_niem/iama_idol_gangster.jpg', 'image')"
+                >
+                  <i class="fas fa-eye"></i>
+                </button>
+              </div>
+            </div>
+          </div>
+
+          <div class="gallery-item" data-category="photos">
+            <img
+              src="ki_niem/iamseriushomework.jpg"
+              alt="Làm bài tập nghiêm túc"
+              loading="lazy"
+            />
+            <div class="gallery-overlay">
+              <div class="gallery-info">
+                <h4>Làm bài tập nghiêm túc</h4>
+                <p>Chăm chỉ học tập</p>
+              </div>
+              <div class="gallery-actions">
+                <button
+                  class="gallery-btn"
+                  onclick="openLightbox('ki_niem/iamseriushomework.jpg', 'image')"
+                >
+                  <i class="fas fa-eye"></i>
+                </button>
+              </div>
+            </div>
+          </div>
+
+          <div class="gallery-item" data-category="photos friends">
+            <img
+              src="ki_niem/idol_with_myfrends2.jpg"
+              alt="Với bạn bè 2"
+              loading="lazy"
+            />
+            <div class="gallery-overlay">
+              <div class="gallery-info">
+                <h4>Cùng nhóm bạn thân</h4>
+                <p>Kỷ niệm đáng nhớ</p>
+              </div>
+              <div class="gallery-actions">
+                <button
+                  class="gallery-btn"
+                  onclick="openLightbox('ki_niem/idol_with_myfrends2.jpg', 'image')"
+                >
+                  <i class="fas fa-eye"></i>
+                </button>
+              </div>
+            </div>
+          </div>
+
+          <div class="gallery-item" data-category="photos travel">
+            <img
+              src="ki_niem/selfphywithbeach.jpg"
+              alt="Selfie tại bãi biển"
+              loading="lazy"
+            />
+            <div class="gallery-overlay">
+              <div class="gallery-info">
+                <h4>Selfie bên bờ biển</h4>
+                <p>Thả hồn trên cát trắng</p>
+              </div>
+              <div class="gallery-actions">
+                <button
+                  class="gallery-btn"
+                  onclick="openLightbox('ki_niem/selfphywithbeach.jpg', 'image')"
+                >
+                  <i class="fas fa-eye"></i>
+                </button>
+              </div>
+            </div>
+          </div>
+
+          <div class="gallery-item" data-category="photos friends">
+            <img
+              src="ki_niem/selfphywithmyfrendsbro.jpg"
+              alt="Selfie với anh em"
+              loading="lazy"
+            />
+            <div class="gallery-overlay">
+              <div class="gallery-info">
+                <h4>Selfie cùng anh em</h4>
+                <p>Hội anh em thân thiết</p>
+              </div>
+              <div class="gallery-actions">
+                <button
+                  class="gallery-btn"
+                  onclick="openLightbox('ki_niem/selfphywithmyfrendsbro.jpg', 'image')"
+                >
+                  <i class="fas fa-eye"></i>
+                </button>
+              </div>
+            </div>
+          </div>
+
+          <div class="gallery-item" data-category="photos travel">
+            <img
+              src="ki_niem/selfphywith_buffalostatue.jpg"
+              alt="Selfie với tượng trâu"
+              loading="lazy"
+            />
+            <div class="gallery-overlay">
+              <div class="gallery-info">
+                <h4>Chụp với tượng trâu</h4>
+                <p>Điểm check-in độc đáo</p>
+              </div>
+              <div class="gallery-actions">
+                <button
+                  class="gallery-btn"
+                  onclick="openLightbox('ki_niem/selfphywith_buffalostatue.jpg', 'image')"
+                >
+                  <i class="fas fa-eye"></i>
+                </button>
+              </div>
+            </div>
+          </div>
+
+          <div class="gallery-item" data-category="photos">
+            <img
+              src="ki_niem/selfphy_preparecook.jpg"
+              alt="Chuẩn bị nấu ăn"
+              loading="lazy"
+            />
+            <div class="gallery-overlay">
+              <div class="gallery-info">
+                <h4>Chuẩn bị nấu ăn</h4>
+                <p>Khám phá tài năng bếp núc</p>
+              </div>
+              <div class="gallery-actions">
+                <button
+                  class="gallery-btn"
+                  onclick="openLightbox('ki_niem/selfphy_preparecook.jpg', 'image')"
+                >
+                  <i class="fas fa-eye"></i>
+                </button>
+              </div>
+            </div>
+          </div>
+
+          <div class="gallery-item" data-category="photos">
+            <img
+              src="ki_niem/selfphy_voi_nhungcogaila_chuplen.jpg"
+              alt="Bị các cô gái chụp lén"
+              loading="lazy"
+            />
+            <div class="gallery-overlay">
+              <div class="gallery-info">
+                <h4>Bị chụp lén</h4>
+                <p>Khoảnh khắc thú vị</p>
+              </div>
+              <div class="gallery-actions">
+                <button
+                  class="gallery-btn"
+                  onclick="openLightbox('ki_niem/selfphy_voi_nhungcogaila_chuplen.jpg', 'image')"
+                >
+                  <i class="fas fa-eye"></i>
+                </button>
+              </div>
+            </div>
+          </div>
+
+          <div class="gallery-item" data-category="photos travel">
+            <img
+              src="ki_niem/selfphy_with_buffalostatue2meme.jpg"
+              alt="Meme với tượng trâu"
+              loading="lazy"
+            />
+            <div class="gallery-overlay">
+              <div class="gallery-info">
+                <h4>Tạo dáng meme</h4>
+                <p>Pose hài hước</p>
+              </div>
+              <div class="gallery-actions">
+                <button
+                  class="gallery-btn"
+                  onclick="openLightbox('ki_niem/selfphy_with_buffalostatue2meme.jpg', 'image')"
+                >
+                  <i class="fas fa-eye"></i>
+                </button>
+              </div>
+            </div>
+          </div>
+
+          <div class="gallery-item" data-category="photos">
+            <img
+              src="ki_niem/selfphy_with_mirror_atviewcoffe.jpg"
+              alt="Selfie với gương"
+              loading="lazy"
+            />
+            <div class="gallery-overlay">
+              <div class="gallery-info">
+                <h4>Selfie tại quán cà phê</h4>
+                <p>View đẹp và gương soi</p>
+              </div>
+              <div class="gallery-actions">
+                <button
+                  class="gallery-btn"
+                  onclick="openLightbox('ki_niem/selfphy_with_mirror_atviewcoffe.jpg', 'image')"
+                >
+                  <i class="fas fa-eye"></i>
+                </button>
+              </div>
+            </div>
+          </div>
+
+          <div class="gallery-item" data-category="photos travel">
+            <img
+              src="ki_niem/selftphywithdeer statue.jpg"
+              alt="Selfie với tượng hươu"
+              loading="lazy"
+            />
+            <div class="gallery-overlay">
+              <div class="gallery-info">
+                <h4>Chụp với tượng hươu</h4>
+                <p>Điểm tham quan độc đáo</p>
+              </div>
+              <div class="gallery-actions">
+                <button
+                  class="gallery-btn"
+                  onclick="openLightbox('ki_niem/selftphywithdeer statue.jpg', 'image')"
+                >
+                  <i class="fas fa-eye"></i>
+                </button>
+              </div>
+            </div>
+          </div>
+
+          <div class="gallery-item" data-category="photos travel">
+            <img
+              src="ki_niem/selftphywithdinorsorusstatue.jpg"
+              alt="Selfie với tượng khủng long"
+              loading="lazy"
+            />
+            <div class="gallery-overlay">
+              <div class="gallery-info">
+                <h4>Chụp với tượng khủng long</h4>
+                <p>Trở về thời tiền sử</p>
+              </div>
+              <div class="gallery-actions">
+                <button
+                  class="gallery-btn"
+                  onclick="openLightbox('ki_niem/selftphywithdinorsorusstatue.jpg', 'image')"
+                >
+                  <i class="fas fa-eye"></i>
+                </button>
+              </div>
+            </div>
+          </div>
+
+          <div class="gallery-item" data-category="photos friends travel">
+            <img
+              src="ki_niem/talkingatcamping.jpg"
+              alt="Trò chuyện tại cắm trại"
+              loading="lazy"
+            />
+            <div class="gallery-overlay">
+              <div class="gallery-info">
+                <h4>Trò chuyện khi cắm trại</h4>
+                <p>Chia sẻ câu chuyện bên lửa trại</p>
+              </div>
+              <div class="gallery-actions">
+                <button
+                  class="gallery-btn"
+                  onclick="openLightbox('ki_niem/talkingatcamping.jpg', 'image')"
+                >
+                  <i class="fas fa-eye"></i>
+                </button>
+              </div>
+            </div>
+          </div>
+
+          <div class="gallery-item" data-category="photos friends travel">
+            <img
+              src="ki_niem/talkingatcampingwithfrendlys.jpg"
+              alt="Trò chuyện với bạn bè"
+              loading="lazy"
+            />
+            <div class="gallery-overlay">
+              <div class="gallery-info">
+                <h4>Tâm sự cùng bạn</h4>
+                <p>Những câu chuyện thú vị</p>
+              </div>
+              <div class="gallery-actions">
+                <button
+                  class="gallery-btn"
+                  onclick="openLightbox('ki_niem/talkingatcampingwithfrendlys.jpg', 'image')"
+                >
+                  <i class="fas fa-eye"></i>
+                </button>
+              </div>
+            </div>
+          </div>
+
+          <div class="gallery-item" data-category="photos">
+            <img
+              src="ki_niem/toilamnhanvienphucvunhahang.jpg"
+              alt="Làm nhân viên phục vụ"
+              loading="lazy"
+            />
+            <div class="gallery-overlay">
+              <div class="gallery-info">
+                <h4>Làm nhân viên phục vụ</h4>
+                <p>Trải nghiệm công việc thú vị</p>
+              </div>
+              <div class="gallery-actions">
+                <button
+                  class="gallery-btn"
+                  onclick="openLightbox('ki_niem/toilamnhanvienphucvunhahang.jpg', 'image')"
+                >
+                  <i class="fas fa-eye"></i>
+                </button>
+              </div>
+            </div>
+          </div>
+
+          <div class="gallery-item" data-category="photos">
+            <img
+              src="ki_niem/toi_bi_chup_len_atclass.jpg"
+              alt="Bị chụp lén trong lớp"
+              loading="lazy"
+            />
+            <div class="gallery-overlay">
+              <div class="gallery-info">
+                <h4>Bị chụp lén trong lớp</h4>
+                <p>Khoảnh khắc học tập</p>
+              </div>
+              <div class="gallery-actions">
+                <button
+                  class="gallery-btn"
+                  onclick="openLightbox('ki_niem/toi_bi_chup_len_atclass.jpg', 'image')"
+                >
+                  <i class="fas fa-eye"></i>
+                </button>
+              </div>
+            </div>
+          </div>
+
+          <div class="gallery-item" data-category="photos">
+            <img
+              src="ki_niem/toi_duoc_trao_giaithuong.jpg"
+              alt="Được trao giải thưởng"
+              loading="lazy"
+            />
+            <div class="gallery-overlay">
+              <div class="gallery-info">
+                <h4>Nhận giải thưởng</h4>
+                <p>Kỷ niệm đáng tự hào</p>
+              </div>
+              <div class="gallery-actions">
+                <button
+                  class="gallery-btn"
+                  onclick="openLightbox('ki_niem/toi_duoc_trao_giaithuong.jpg', 'image')"
+                >
+                  <i class="fas fa-eye"></i>
+                </button>
+              </div>
+            </div>
+          </div>
+
+          <div class="gallery-item" data-category="photos friends travel">
+            <img
+              src="ki_niem/touringwithfrends.jpg"
+              alt="Du lịch với bạn bè"
+              loading="lazy"
+            />
+            <div class="gallery-overlay">
+              <div class="gallery-info">
+                <h4>Du lịch cùng bạn</h4>
+                <p>Khám phá những vùng đất mới</p>
+              </div>
+              <div class="gallery-actions">
+                <button
+                  class="gallery-btn"
+                  onclick="openLightbox('ki_niem/touringwithfrends.jpg', 'image')"
+                >
+                  <i class="fas fa-eye"></i>
+                </button>
+              </div>
+            </div>
+          </div>
+
+          <div class="gallery-item" data-category="photos friends">
+            <img
+              src="ki_niem/wewonbilliard.jpg"
+              alt="Chiến thắng bi-a"
+              loading="lazy"
+            />
+            <div class="gallery-overlay">
+              <div class="gallery-info">
+                <h4>Chiến thắng bi-a</h4>
+                <p>Niềm vui chiến thắng</p>
+              </div>
+              <div class="gallery-actions">
+                <button
+                  class="gallery-btn"
+                  onclick="openLightbox('ki_niem/wewonbilliard.jpg', 'image')"
+                >
+                  <i class="fas fa-eye"></i>
+                </button>
+              </div>
+            </div>
+          </div>
+
+          <div class="gallery-item" data-category="photos friends">
+            <img
+              src="ki_niem/we_drinking party.jpg"
+              alt="Bữa tiệc với bạn bè"
+              loading="lazy"
+            />
+            <div class="gallery-overlay">
+              <div class="gallery-info">
+                <h4>Bữa tiệc cùng bạn bè</h4>
+                <p>Khoảnh khắc vui vẻ</p>
+              </div>
+              <div class="gallery-actions">
+                <button
+                  class="gallery-btn"
+                  onclick="openLightbox('ki_niem/we_drinking party.jpg', 'image')"
+                >
+                  <i class="fas fa-eye"></i>
+                </button>
+              </div>
+            </div>
+          </div>
+
+          <div class="gallery-item" data-category="videos">
+            <video src="ki_niem/sigmamewingvmeme.mp4" muted loop loading="lazy">
+              Your browser does not support the video tag.
+            </video>
+            <div class="gallery-overlay">
+              <div class="gallery-info">
+                <h4>Sigma mewing meme</h4>
+                <p>Video hài hước meme</p>
+              </div>
+              <div class="gallery-actions">
+                <button
+                  class="gallery-btn"
+                  onclick="openLightbox('ki_niem/sigmamewingvmeme.mp4', 'video')"
+                >
+                  <i class="fas fa-play"></i>
+                </button>
+              </div>
+            </div>
+          </div>
+
+          <div class="gallery-item" data-category="videos travel friends">
+            <video src="ki_niem/touring.mp4" muted loop loading="lazy">
+              Your browser does not support the video tag.
+            </video>
+            <div class="gallery-overlay">
+              <div class="gallery-info">
+                <h4>Video du lịch</h4>
+                <p>Chuyến đi khám phá</p>
+              </div>
+              <div class="gallery-actions">
+                <button
+                  class="gallery-btn"
+                  onclick="openLightbox('ki_niem/touring.mp4', 'video')"
+                >
+                  <i class="fas fa-play"></i>
+                </button>
+              </div>
+            </div>
+          </div>
+
           <!-- More gallery items can be added here -->
         </div>
 
@@ -1657,8 +2183,8 @@
               </div>
               <div class="contact-details">
                 <h4>Địa chỉ</h4>
-                <p>TP. Hồ Chí Minh, Việt Nam</p>
-                <p>Quê quán: Vũng Tàu</p>
+                <p>Vũng Tàu, TP. Hồ Chí Minh, Việt Nam</p>
+                <p>Quê quán: Nam Định</p>
               </div>
             </div>
 
@@ -1995,34 +2521,33 @@
           })
           .filter((item) => item);
 
-        // Add click events to gallery items
+        // Add click events to entire gallery items
         galleryItems.forEach((item) => {
           const img = item.querySelector("img");
           const video = item.querySelector("video");
 
-          if (img) {
-            img.addEventListener("click", function () {
-              const title =
-                item.querySelector(".gallery-info h4")?.textContent ||
-                "Không có tiêu đề";
-              const description =
-                item.querySelector(".gallery-info p")?.textContent ||
-                "Không có mô tả";
-              openLightbox(this.src, "image", title, description);
-            });
-          }
+          // Make entire gallery item clickable
+          item.style.cursor = "pointer";
 
-          if (video) {
-            video.addEventListener("click", function () {
-              const title =
-                item.querySelector(".gallery-info h4")?.textContent ||
-                "Không có tiêu đề";
-              const description =
-                item.querySelector(".gallery-info p")?.textContent ||
-                "Không có mô tả";
-              openLightbox(this.src, "video", title, description);
-            });
-          }
+          item.addEventListener("click", function (e) {
+            // Prevent button clicks from triggering this event
+            if (e.target.closest(".gallery-btn")) {
+              return;
+            }
+
+            const title =
+              item.querySelector(".gallery-info h4")?.textContent ||
+              "Không có tiêu đề";
+            const description =
+              item.querySelector(".gallery-info p")?.textContent ||
+              "Không có mô tả";
+
+            if (img) {
+              openLightbox(img.src, "image", title, description);
+            } else if (video) {
+              openLightbox(video.src, "video", title, description);
+            }
+          });
         });
 
         // Close lightbox
