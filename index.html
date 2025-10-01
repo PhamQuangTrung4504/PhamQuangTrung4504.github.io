@@ -3,7 +3,7 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Phạm Quang Trung - Portfolio</title>
+    <title>Phạm Quang Trung</title>
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link
@@ -842,54 +842,91 @@
         left: 0;
         width: 100%;
         height: 100%;
-        background: rgba(0, 0, 0, 0.9);
+        background: rgba(0, 0, 0, 0.95);
         z-index: 10000;
         display: none;
         align-items: center;
         justify-content: center;
+        opacity: 0;
+        transition: opacity 0.3s ease;
+        backdrop-filter: blur(5px);
       }
 
       .lightbox.active {
         display: flex;
+        opacity: 1;
       }
 
       .lightbox-content {
         position: relative;
-        max-width: 90%;
-        max-height: 90%;
+        max-width: 95%;
+        max-height: 95%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        animation: lightboxZoom 0.3s ease;
+      }
+
+      @keyframes lightboxZoom {
+        from {
+          transform: scale(0.8);
+          opacity: 0;
+        }
+        to {
+          transform: scale(1);
+          opacity: 1;
+        }
       }
 
       .lightbox-close {
-        position: absolute;
-        top: -40px;
-        right: 0;
+        position: fixed;
+        top: 20px;
+        right: 20px;
+        width: 50px;
+        height: 50px;
+        border: none;
+        border-radius: 50%;
+        background: rgba(255, 255, 255, 0.2);
         color: white;
-        font-size: 2rem;
+        font-size: 1.5rem;
         cursor: pointer;
         z-index: 10001;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        backdrop-filter: blur(10px);
+        transition: all 0.3s ease;
+      }
+
+      .lightbox-close:hover {
+        background: rgba(255, 255, 255, 0.3);
+        transform: scale(1.1);
       }
 
       .lightbox-media img,
       .lightbox-media video {
         max-width: 100%;
-        max-height: 80vh;
+        max-height: 90vh;
+        object-fit: contain;
         border-radius: 10px;
+        box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5);
       }
 
       .lightbox-navigation {
-        position: absolute;
+        position: fixed;
         top: 50%;
         width: 100%;
         display: flex;
         justify-content: space-between;
-        padding: 0 2rem;
+        padding: 0 20px;
         transform: translateY(-50%);
         pointer-events: none;
+        z-index: 10002;
       }
 
       .lightbox-nav {
-        width: 50px;
-        height: 50px;
+        width: 60px;
+        height: 60px;
         border: none;
         border-radius: 50%;
         background: rgba(255, 255, 255, 0.2);
@@ -898,13 +935,60 @@
         display: flex;
         align-items: center;
         justify-content: center;
+        font-size: 1.5rem;
+        pointer-events: auto;
         backdrop-filter: blur(10px);
         transition: all 0.3s ease;
-        pointer-events: auto;
       }
 
       .lightbox-nav:hover {
         background: rgba(255, 255, 255, 0.3);
+        transform: scale(1.1);
+      }
+
+      .lightbox-nav:disabled {
+        opacity: 0.3;
+        cursor: not-allowed;
+      }
+
+      .lightbox-info {
+        position: fixed;
+        bottom: 20px;
+        left: 50%;
+        transform: translateX(-50%);
+        background: rgba(0, 0, 0, 0.7);
+        color: white;
+        padding: 15px 25px;
+        border-radius: 25px;
+        backdrop-filter: blur(10px);
+        text-align: center;
+        max-width: 80%;
+        z-index: 10001;
+      }
+
+      .lightbox-info h4 {
+        margin: 0 0 5px 0;
+        font-size: 1.1rem;
+        font-weight: 600;
+      }
+
+      .lightbox-info p {
+        margin: 0;
+        font-size: 0.9rem;
+        opacity: 0.8;
+      }
+
+      .lightbox-counter {
+        position: fixed;
+        top: 20px;
+        left: 20px;
+        background: rgba(0, 0, 0, 0.7);
+        color: white;
+        padding: 10px 15px;
+        border-radius: 20px;
+        backdrop-filter: blur(10px);
+        font-size: 0.9rem;
+        z-index: 10001;
       }
 
       /* Responsive Design */
@@ -1475,16 +1559,16 @@
 
         <div class="skills-content">
           <div class="skills-category">
-            <h3>Kỹ năng công nghệ</h3>
+            <h3>Kỹ năng</h3>
             <div class="skill-items">
               <div class="skill-item">
                 <div class="skill-icon">
                   <i class="fas fa-gamepad"></i>
                 </div>
                 <div class="skill-info">
-                  <h4>Chơi game TFT</h4>
+                  <h4>Chơi game</h4>
                   <div class="skill-progress">
-                    <div class="progress-bar" data-percent="99"></div>
+                    <div class="progress-bar" data-percent="88"></div>
                   </div>
                 </div>
               </div>
@@ -1671,19 +1755,30 @@
 
     <!-- Lightbox Modal -->
     <div class="lightbox" id="lightbox">
+      <button class="lightbox-close" id="lightboxClose">
+        <i class="fas fa-times"></i>
+      </button>
+
+      <div class="lightbox-counter" id="lightboxCounter">1 / 10</div>
+
       <div class="lightbox-content">
-        <span class="lightbox-close" id="lightboxClose">&times;</span>
         <div class="lightbox-media" id="lightboxMedia">
           <!-- Content will be inserted here -->
         </div>
-        <div class="lightbox-navigation">
-          <button class="lightbox-nav prev" id="lightboxPrev">
-            <i class="fas fa-chevron-left"></i>
-          </button>
-          <button class="lightbox-nav next" id="lightboxNext">
-            <i class="fas fa-chevron-right"></i>
-          </button>
-        </div>
+      </div>
+
+      <div class="lightbox-navigation">
+        <button class="lightbox-nav prev" id="lightboxPrev">
+          <i class="fas fa-chevron-left"></i>
+        </button>
+        <button class="lightbox-nav next" id="lightboxNext">
+          <i class="fas fa-chevron-right"></i>
+        </button>
+      </div>
+
+      <div class="lightbox-info" id="lightboxInfo">
+        <h4 id="lightboxTitle">Tiêu đề ảnh</h4>
+        <p id="lightboxDescription">Mô tả ảnh</p>
       </div>
     </div>
 
@@ -1875,13 +1970,60 @@
           .map((item) => {
             const img = item.querySelector("img");
             const video = item.querySelector("video");
+            const title =
+              item.querySelector(".gallery-info h4")?.textContent ||
+              "Không có tiêu đề";
+            const description =
+              item.querySelector(".gallery-info p")?.textContent ||
+              "Không có mô tả";
+
             if (img) {
-              return { src: img.src, type: "image" };
+              return {
+                src: img.src,
+                type: "image",
+                title: title,
+                description: description,
+              };
             } else if (video) {
-              return { src: video.src, type: "video" };
+              return {
+                src: video.src,
+                type: "video",
+                title: title,
+                description: description,
+              };
             }
           })
           .filter((item) => item);
+
+        // Add click events to gallery items
+        galleryItems.forEach((item) => {
+          const img = item.querySelector("img");
+          const video = item.querySelector("video");
+
+          if (img) {
+            img.addEventListener("click", function () {
+              const title =
+                item.querySelector(".gallery-info h4")?.textContent ||
+                "Không có tiêu đề";
+              const description =
+                item.querySelector(".gallery-info p")?.textContent ||
+                "Không có mô tả";
+              openLightbox(this.src, "image", title, description);
+            });
+          }
+
+          if (video) {
+            video.addEventListener("click", function () {
+              const title =
+                item.querySelector(".gallery-info h4")?.textContent ||
+                "Không có tiêu đề";
+              const description =
+                item.querySelector(".gallery-info p")?.textContent ||
+                "Không có mô tả";
+              openLightbox(this.src, "video", title, description);
+            });
+          }
+        });
 
         // Close lightbox
         lightboxClose.addEventListener("click", closeLightbox);
@@ -1920,14 +2062,19 @@
       }
 
       // Open Lightbox Function (called from HTML)
-      function openLightbox(src, type) {
+      function openLightbox(src, type, title = "", description = "") {
         const lightbox = document.getElementById("lightbox");
-        const lightboxMedia = document.getElementById("lightboxMedia");
 
         // Find the index of the current item
         currentLightboxIndex = lightboxItems.findIndex(
           (item) => item.src === src
         );
+
+        // If not found, add the item to the array
+        if (currentLightboxIndex === -1) {
+          lightboxItems.push({ src, type, title, description });
+          currentLightboxIndex = lightboxItems.length - 1;
+        }
 
         updateLightboxContent();
         lightbox.classList.add("active");
@@ -1936,17 +2083,47 @@
 
       function updateLightboxContent() {
         const lightboxMedia = document.getElementById("lightboxMedia");
+        const lightboxTitle = document.getElementById("lightboxTitle");
+        const lightboxDescription = document.getElementById(
+          "lightboxDescription"
+        );
+        const lightboxCounter = document.getElementById("lightboxCounter");
+        const lightboxPrev = document.getElementById("lightboxPrev");
+        const lightboxNext = document.getElementById("lightboxNext");
+
         const currentItem = lightboxItems[currentLightboxIndex];
 
+        // Update media content
         if (currentItem.type === "image") {
-          lightboxMedia.innerHTML = `<img src="${currentItem.src}" alt="Gallery Image">`;
+          lightboxMedia.innerHTML = `<img src="${currentItem.src}" alt="${currentItem.title}">`;
         } else if (currentItem.type === "video") {
-          lightboxMedia.innerHTML = `<video src="${currentItem.src}" controls autoplay></video>`;
+          lightboxMedia.innerHTML = `<video src="${currentItem.src}" controls autoplay loop></video>`;
         }
+
+        // Update info
+        lightboxTitle.textContent = currentItem.title;
+        lightboxDescription.textContent = currentItem.description;
+
+        // Update counter
+        lightboxCounter.textContent = `${currentLightboxIndex + 1} / ${
+          lightboxItems.length
+        }`;
+
+        // Update navigation buttons
+        lightboxPrev.disabled = lightboxItems.length <= 1;
+        lightboxNext.disabled = lightboxItems.length <= 1;
       }
 
       function closeLightbox() {
         const lightbox = document.getElementById("lightbox");
+        const videos = lightbox.querySelectorAll("video");
+
+        // Pause any playing videos
+        videos.forEach((video) => {
+          video.pause();
+          video.currentTime = 0;
+        });
+
         lightbox.classList.remove("active");
         document.body.style.overflow = "auto";
       }
