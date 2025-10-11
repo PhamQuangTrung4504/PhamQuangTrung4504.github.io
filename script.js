@@ -510,7 +510,7 @@ document.addEventListener("DOMContentLoaded", function () {
     document.body.removeChild(link);
   }
 
-  // Hàm thử mở app banking
+  // Hàm hướng dẫn mở app banking
   function tryOpenBankingApp(event) {
     if (event) {
       event.preventDefault();
@@ -525,31 +525,20 @@ document.addEventListener("DOMContentLoaded", function () {
       }, 200);
     }
 
-    // Tạo deep link cho VietQR
-    const vietQRDeepLink = `https://api.vietqr.io/image/${bankInfo.bank}-${bankInfo.accountNo}-compact2.jpg`;
-
-    // Thử các phương án để mở app
-    if (isIOS) {
-      // iOS: Thử mở Universal Link của VietQR
-      window.location.href = vietQRDeepLink;
-
-      // Sau 1.5s nếu vẫn ở trang, hiển thị hướng dẫn
-      setTimeout(() => {
-        const message = `Không thể mở ứng dụng ngân hàng.\n\nBạn có muốn xem QR code để quét thủ công không?\n\nThông tin chuyển khoản:\n- Ngân hàng: ${bankInfo.bankName}\n- STK: ${bankInfo.accountNo}\n- Chủ TK: ${bankInfo.accountName}`;
-
-        if (confirm(message)) {
-          openQRCode();
-        }
-      }, 1500);
-    } else if (isMobile) {
-      // Android: Hiển thị dialog và mở QR
-      const message = `Vui lòng quét QR code bằng ứng dụng ngân hàng của bạn.\n\nThông tin chuyển khoản:\n- Ngân hàng: ${bankInfo.bankName}\n- STK: ${bankInfo.accountNo}\n- Chủ TK: ${bankInfo.accountName}\n\nNhấn OK để xem QR code.`;
+    if (isMobile) {
+      // Hiển thị hướng dẫn chi tiết cho mobile
+      const message = isIOS
+        ? `📱 HƯỚNG DẪN THANH TOÁN:\n\n1️⃣ Nhấn OK để xem QR code\n2️⃣ Chụp màn hình (Screenshot)\n3️⃣ Mở app TPBank/Banking của bạn\n4️⃣ Chọn "Quét QR" hoặc "Chuyển tiền"\n5️⃣ Chọn quét từ thư viện ảnh\n6️⃣ Chọn ảnh QR vừa chụp\n\n💡 Thông tin:\n- Bank: ${bankInfo.bankName}\n- STK: ${bankInfo.accountNo}\n- Tên: ${bankInfo.accountName}`
+        : `📱 HƯỚNG DẪN THANH TOÁN:\n\n1️⃣ Nhấn OK để xem QR code\n2️⃣ Chụp màn hình hoặc lưu ảnh\n3️⃣ Mở app ngân hàng của bạn\n4️⃣ Quét QR từ thư viện ảnh\n\n💡 Hoặc nhập thủ công:\n- Bank: ${bankInfo.bankName}\n- STK: ${bankInfo.accountNo}\n- Tên: ${bankInfo.accountName}`;
 
       if (confirm(message)) {
         openQRCode();
       }
     } else {
-      // Desktop: Mở QR code trực tiếp
+      // Desktop: Hiển thị hướng dẫn và mở QR
+      alert(
+        `💳 Quét QR code bằng app ngân hàng trên điện thoại\n\nHoặc chuyển khoản thủ công:\n- Ngân hàng: ${bankInfo.bankName}\n- STK: ${bankInfo.accountNo}\n- Chủ TK: ${bankInfo.accountName}`
+      );
       openQRCode();
     }
   }
