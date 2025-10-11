@@ -479,85 +479,111 @@ preloadImages();
 // QR Payment - Open Banking App
 document.addEventListener("DOMContentLoaded", function () {
   const qrPayment = document.getElementById("qr-payment");
+  const qrImage = document.getElementById("qr-image");
+  const btnOpenBanking = document.getElementById("btn-open-banking");
 
-  if (qrPayment) {
-    qrPayment.addEventListener("click", function () {
-      // Thông tin thanh toán
-      const bankInfo = {
-        bank: "970423", // Mã ngân hàng TPBank
-        accountNo: "45404052004",
-        accountName: "PHAM QUANG TRUNG",
-        amount: "", // Để trống cho người dùng nhập
-        description: "", // Để trống cho người dùng nhập
-      };
+  // Thông tin thanh toán
+  const bankInfo = {
+    bank: "970423", // Mã ngân hàng TPBank
+    bankName: "TPBank",
+    accountNo: "45404052004",
+    accountName: "PHAM QUANG TRUNG",
+  };
 
-      // Tạo VietQR deep link
-      const vietQRUrl = `https://img.vietqr.io/image/${bankInfo.bank}-${
-        bankInfo.accountNo
-      }-compact2.jpg?amount=${bankInfo.amount}&addInfo=${
-        bankInfo.description
-      }&accountName=${encodeURIComponent(bankInfo.accountName)}`;
+  // Tạo VietQR URL động
+  const vietQRUrl = `https://img.vietqr.io/image/${bankInfo.bank}-${
+    bankInfo.accountNo
+  }-compact2.jpg?accountName=${encodeURIComponent(bankInfo.accountName)}`;
 
-      // Deep links cho các app banking phổ biến
-      const deepLinks = [
-        `tpbank://qr_payment?data=${encodeURIComponent(vietQRUrl)}`, // TPBank app
-        `vietqr://pay?bank=${bankInfo.bank}&account=${
-          bankInfo.accountNo
-        }&name=${encodeURIComponent(bankInfo.accountName)}`, // VietQR universal
-        `banking://qrpay?bankCode=${bankInfo.bank}&accountNo=${bankInfo.accountNo}`, // Generic banking
-      ];
+  // Phát hiện thiết bị
+  const isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
+  const isIOS = /iPhone|iPad|iPod/i.test(navigator.userAgent);
 
-      // Thử mở app banking
-      let appOpened = false;
+  // Hàm mở QR code trong cửa sổ mới
+  function openQRCode() {
+    const link = document.createElement("a");
+    link.href = vietQRUrl;
+    link.target = "_blank";
+    link.rel = "noopener noreferrer";
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+  }
 
-      // Thử từng deep link
-      for (let i = 0; i < deepLinks.length && !appOpened; i++) {
-        try {
-          window.location.href = deepLinks[i];
-          appOpened = true;
-          break;
-        } catch (e) {
-          console.log(`Deep link ${i} failed:`, e);
+  // Hàm thử mở app banking
+  function tryOpenBankingApp(event) {
+    if (event) {
+      event.preventDefault();
+      event.stopPropagation();
+    }
+
+    // Visual feedback
+    if (btnOpenBanking) {
+      btnOpenBanking.style.transform = "scale(0.95)";
+      setTimeout(() => {
+        btnOpenBanking.style.transform = "scale(1)";
+      }, 200);
+    }
+
+    // Tạo deep link cho VietQR
+    const vietQRDeepLink = `https://api.vietqr.io/image/${bankInfo.bank}-${bankInfo.accountNo}-compact2.jpg`;
+
+    // Thử các phương án để mở app
+    if (isIOS) {
+      // iOS: Thử mở Universal Link của VietQR
+      window.location.href = vietQRDeepLink;
+
+      // Sau 1.5s nếu vẫn ở trang, hiển thị hướng dẫn
+      setTimeout(() => {
+        const message = `Không thể mở ứng dụng ngân hàng.\n\nBạn có muốn xem QR code để quét thủ công không?\n\nThông tin chuyển khoản:\n- Ngân hàng: ${bankInfo.bankName}\n- STK: ${bankInfo.accountNo}\n- Chủ TK: ${bankInfo.accountName}`;
+
+        if (confirm(message)) {
+          openQRCode();
         }
+      }, 1500);
+    } else if (isMobile) {
+      // Android: Hiển thị dialog và mở QR
+      const message = `Vui lòng quét QR code bằng ứng dụng ngân hàng của bạn.\n\nThông tin chuyển khoản:\n- Ngân hàng: ${bankInfo.bankName}\n- STK: ${bankInfo.accountNo}\n- Chủ TK: ${bankInfo.accountName}\n\nNhấn OK để xem QR code.`;
+
+      if (confirm(message)) {
+        openQRCode();
+      }
+    } else {
+      // Desktop: Mở QR code trực tiếp
+      openQRCode();
+    }
+  }
+
+  // Xử lý click vào QR container (chỉ khi click vào ảnh hoặc vùng trống)
+  if (qrPayment) {
+    qrPayment.addEventListener("click", function (e) {
+      // Nếu click vào nút, không xử lý
+      if (e.target.closest("#btn-open-banking")) {
+        return;
       }
 
-      // Nếu không mở được app, hiển thị hướng dẫn
-      setTimeout(() => {
-        if (!appOpened || !document.hidden) {
-          // Fallback: Hiển thị thông báo hoặc mở trang web VietQR
-          const userConfirm = confirm(
-            "Không thể mở ứng dụng ngân hàng.\n\n" +
-              "Bạn có muốn xem QR code để quét thủ công không?\n\n" +
-              "Thông tin chuyển khoản:\n" +
-              "- Ngân hàng: TPBank\n" +
-              "- STK: 45404052004\n" +
-              "- Chủ TK: PHAM QUANG TRUNG"
-          );
-
-          if (userConfirm) {
-            // Mở VietQR image trong tab mới
-            window.open(vietQRUrl, "_blank");
-          }
-        }
-      }, 1000);
-
-      // Visual feedback
-      qrPayment.style.transform = "scale(0.95)";
-      setTimeout(() => {
-        qrPayment.style.transform = "scale(1)";
-      }, 200);
+      // Click vào bất kỳ chỗ nào khác: mở QR lớn
+      e.preventDefault();
+      openQRCode();
     });
 
-    // Thêm hover effect
-    qrPayment.style.transition = "transform 0.3s ease, box-shadow 0.3s ease";
-    qrPayment.addEventListener("mouseenter", function () {
-      this.style.transform = "scale(1.02)";
-      this.style.boxShadow = "0 8px 16px rgba(0, 0, 0, 0.2)";
-    });
+    // Thêm hover effect cho desktop
+    if (!isMobile) {
+      qrPayment.style.transition = "transform 0.3s ease, box-shadow 0.3s ease";
+      qrPayment.addEventListener("mouseenter", function () {
+        this.style.transform = "scale(1.02)";
+        this.style.boxShadow = "0 8px 16px rgba(0, 0, 0, 0.2)";
+      });
 
-    qrPayment.addEventListener("mouseleave", function () {
-      this.style.transform = "scale(1)";
-      this.style.boxShadow = "";
-    });
+      qrPayment.addEventListener("mouseleave", function () {
+        this.style.transform = "scale(1)";
+        this.style.boxShadow = "";
+      });
+    }
+  }
+
+  // Xử lý click vào nút "Mở App Ngân Hàng"
+  if (btnOpenBanking) {
+    btnOpenBanking.addEventListener("click", tryOpenBankingApp);
   }
 });
