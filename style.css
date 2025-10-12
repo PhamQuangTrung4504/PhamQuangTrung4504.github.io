@@ -868,7 +868,6 @@ section {
   padding-top: calc(24px + env(safe-area-inset-top, 0px));
   padding-bottom: calc(24px + env(safe-area-inset-bottom, 0px));
   z-index: 12000;
-  min-height: var(--modal-viewport-height, 100vh);
   backdrop-filter: blur(10px);
   overscroll-behavior: contain;
   overflow-y: auto;
@@ -883,11 +882,8 @@ section {
   position: relative;
   width: min(520px, 100%);
   height: auto;
-  min-height: 400px;
-  max-height: calc(
-    var(--modal-viewport-height, 100vh) - 64px - env(safe-area-inset-top, 0px) -
-      env(safe-area-inset-bottom, 0px)
-  );
+  min-height: 500px;
+  max-height: 90vh;
   background: linear-gradient(
     160deg,
     rgba(100, 67, 255, 0.92),
@@ -905,15 +901,8 @@ section {
 }
 
 @supports (height: 100dvh) {
-  .bank-modal {
-    min-height: var(--modal-viewport-height, 100dvh);
-  }
-
   .bank-modal-content {
-    max-height: calc(
-      var(--modal-viewport-height, 100dvh) - 64px -
-        env(safe-area-inset-top, 0px) - env(safe-area-inset-bottom, 0px)
-    );
+    max-height: 90dvh;
   }
 }
 
@@ -1096,20 +1085,19 @@ section {
 @media (max-width: 600px) {
   .bank-modal {
     align-items: flex-start;
-    justify-content: center;
-    padding-top: calc(16px + env(safe-area-inset-top, 0px));
-    padding-bottom: calc(24px + env(safe-area-inset-bottom, 0px));
+    justify-content: flex-start;
+    padding: 8px;
+    padding-top: calc(8px + env(safe-area-inset-top, 0px));
+    padding-bottom: calc(8px + env(safe-area-inset-bottom, 0px));
   }
 
   .bank-modal-content {
-    padding: 24px 18px;
+    padding: 20px 16px;
     width: 100%;
-    margin-top: 4px;
-    min-height: 350px;
-    max-height: calc(
-      var(--modal-viewport-height, 100vh) - 40px - env(safe-area-inset-top, 0px) -
-        env(safe-area-inset-bottom, 0px)
-    );
+    margin: 0;
+    min-height: auto;
+    max-height: none;
+    height: auto;
   }
 
   .bank-list {
@@ -1127,11 +1115,9 @@ section {
 
   @supports (height: 100dvh) {
     .bank-modal-content {
-      min-height: 350px;
-      max-height: calc(
-        var(--modal-viewport-height, 100dvh) - 40px -
-          env(safe-area-inset-top, 0px) - env(safe-area-inset-bottom, 0px)
-      );
+      height: auto;
+      min-height: auto;
+      max-height: none;
     }
   }
 }
