@@ -590,6 +590,9 @@ function initBankSelector() {
     },
   ];
 
+  const root = document.documentElement;
+  const viewport = window.visualViewport;
+
   const fallbackBankMap = new Map(
     fallbackBanks.map((bank) => [bank.appId, bank])
   );
@@ -687,9 +690,12 @@ function initBankSelector() {
   }
 
   function openModal() {
+    updateViewportHeight();
+    attachViewportListeners();
     modal.classList.add("active");
     modal.setAttribute("aria-hidden", "false");
     document.body.style.overflow = "hidden";
+    modal.scrollTop = 0;
     setTimeout(() => searchInput.focus({ preventScroll: true }), 100);
   }
 
@@ -697,6 +703,8 @@ function initBankSelector() {
     modal.classList.remove("active");
     modal.setAttribute("aria-hidden", "true");
     document.body.style.overflow = "";
+    detachViewportListeners();
+    root.style.removeProperty("--modal-viewport-height");
     qrTrigger.focus();
   }
 
@@ -724,6 +732,31 @@ function initBankSelector() {
   searchInput.addEventListener("input", (event) => {
     filterBanks(event.target.value);
   });
+
+  function updateViewportHeight() {
+    const height = viewport ? viewport.height : window.innerHeight;
+    root.style.setProperty("--modal-viewport-height", `${height}px`);
+  }
+
+  function attachViewportListeners() {
+    if (!viewport) {
+      window.addEventListener("resize", updateViewportHeight);
+      return;
+    }
+
+    viewport.addEventListener("resize", updateViewportHeight);
+    viewport.addEventListener("scroll", updateViewportHeight);
+  }
+
+  function detachViewportListeners() {
+    if (!viewport) {
+      window.removeEventListener("resize", updateViewportHeight);
+      return;
+    }
+
+    viewport.removeEventListener("resize", updateViewportHeight);
+    viewport.removeEventListener("scroll", updateViewportHeight);
+  }
 
   renderList(bankData);
 

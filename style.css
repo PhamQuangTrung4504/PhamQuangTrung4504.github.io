@@ -863,7 +863,7 @@ section {
   padding-top: calc(24px + env(safe-area-inset-top, 0px));
   padding-bottom: calc(24px + env(safe-area-inset-bottom, 0px));
   z-index: 12000;
-  min-height: 100vh;
+  min-height: var(--modal-viewport-height, 100vh);
   backdrop-filter: blur(10px);
   overscroll-behavior: contain;
   overflow-y: auto;
@@ -878,7 +878,7 @@ section {
   position: relative;
   width: min(520px, 100%);
   max-height: calc(
-    100vh - 64px - env(safe-area-inset-top, 0px) -
+    var(--modal-viewport-height, 100vh) - 64px - env(safe-area-inset-top, 0px) -
       env(safe-area-inset-bottom, 0px)
   );
   background: linear-gradient(
@@ -897,13 +897,13 @@ section {
 
 @supports (height: 100dvh) {
   .bank-modal {
-    min-height: 100dvh;
+    min-height: var(--modal-viewport-height, 100dvh);
   }
 
   .bank-modal-content {
     max-height: calc(
-      100dvh - 64px - env(safe-area-inset-top, 0px) -
-        env(safe-area-inset-bottom, 0px)
+      var(--modal-viewport-height, 100dvh) - 64px -
+        env(safe-area-inset-top, 0px) - env(safe-area-inset-bottom, 0px)
     );
   }
 }
@@ -1076,11 +1076,11 @@ section {
   }
 
   .bank-modal-content {
-    padding: 28px 20px;
+    padding: 24px 18px;
     width: 100%;
-    margin-top: 8px;
+    margin-top: 4px;
     max-height: calc(
-      100vh - 48px - env(safe-area-inset-top, 0px) -
+      var(--modal-viewport-height, 100vh) - 40px - env(safe-area-inset-top, 0px) -
         env(safe-area-inset-bottom, 0px)
     );
   }
@@ -1097,8 +1097,8 @@ section {
   @supports (height: 100dvh) {
     .bank-modal-content {
       max-height: calc(
-        100dvh - 48px - env(safe-area-inset-top, 0px) -
-          env(safe-area-inset-bottom, 0px)
+        var(--modal-viewport-height, 100dvh) - 40px -
+          env(safe-area-inset-top, 0px) - env(safe-area-inset-bottom, 0px)
       );
     }
   }
