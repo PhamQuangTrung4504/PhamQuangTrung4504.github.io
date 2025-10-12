@@ -1133,7 +1133,12 @@
         <!-- QR Thanh toán - Đặt ở cuối -->
         <div class="payment-qr">
           <h3>Banking</h3>
-          <div class="qr-container">
+          <div
+            class="qr-container"
+            role="button"
+            tabindex="0"
+            aria-label="Chọn ứng dụng ngân hàng để mở VietQR"
+          >
             <img
               src="avatar/qr-payment.png"
               alt="QR Thanh toán TPBank"
@@ -1150,6 +1155,45 @@
         </div>
       </div>
     </section>
+
+    <div class="bank-modal" id="bankModal" aria-hidden="true">
+      <div
+        class="bank-modal-content"
+        role="dialog"
+        aria-modal="true"
+        aria-labelledby="bankModalTitle"
+      >
+        <button
+          class="bank-modal-close"
+          id="bankModalClose"
+          aria-label="Đóng lựa chọn ngân hàng"
+        >
+          <i class="fas fa-times"></i>
+        </button>
+        <h3 class="bank-modal-title" id="bankModalTitle">
+          Chọn ứng dụng ngân hàng
+        </h3>
+        <p class="bank-modal-subtitle">
+          Chạm vào ứng dụng bạn dùng để được điều hướng sang app ngân hàng và
+          quét VietQR.
+        </p>
+        <div class="bank-search">
+          <i class="fas fa-search"></i>
+          <input
+            type="text"
+            id="bankSearch"
+            placeholder="Tìm ngân hàng hoặc tên app..."
+            aria-label="Tìm kiếm ngân hàng"
+          />
+        </div>
+        <div class="bank-status" id="bankStatus"></div>
+        <div class="bank-list" id="bankList" role="list"></div>
+        <p class="bank-modal-note">
+          Nếu app không mở, hãy chắc chắn bạn đang sử dụng điện thoại và đã cài
+          sẵn ứng dụng ngân hàng tương ứng.
+        </p>
+      </div>
+    </div>
 
     <!-- Footer -->
     <footer class="footer">

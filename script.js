@@ -14,6 +14,7 @@ document.addEventListener("DOMContentLoaded", function () {
   initSkillBars();
   initSmoothScrolling();
   initScrollToTop();
+  initBankSelector();
 });
 
 // Loading Screen
@@ -397,6 +398,298 @@ function initScrollToTop() {
       behavior: "smooth",
     });
   });
+}
+
+function initBankSelector() {
+  const qrTrigger = document.querySelector(".qr-container");
+  const modal = document.getElementById("bankModal");
+  const closeBtn = document.getElementById("bankModalClose");
+  const searchInput = document.getElementById("bankSearch");
+  const listEl = document.getElementById("bankList");
+  const statusEl = document.getElementById("bankStatus");
+
+  if (
+    !qrTrigger ||
+    !modal ||
+    !closeBtn ||
+    !searchInput ||
+    !listEl ||
+    !statusEl
+  ) {
+    return;
+  }
+
+  const ACCOUNT_INFO = {
+    ba: "45404052004@TPB",
+    tn: "Ung ho Pham Quang Trung",
+  };
+
+  const POPULAR_BANK_IDS = [
+    "vcb",
+    "bidv",
+    "icb",
+    "mb",
+    "tcb",
+    "vpb",
+    "acb",
+    "ocb",
+    "tpb",
+    "vba",
+    "vib",
+    "lpb",
+    "shb",
+    "hdb",
+    "cake",
+  ];
+
+  const fallbackBanks = [
+    {
+      appId: "vcb",
+      appName: "Vietcombank",
+      bankName: "Ngân hàng TMCP Ngoại Thương Việt Nam",
+      deeplink: "https://dl.vietqr.io/pay?app=vcb",
+      appLogo: "",
+    },
+    {
+      appId: "bidv",
+      appName: "BIDV SmartBanking",
+      bankName: "Ngân hàng TMCP Đầu tư và Phát triển Việt Nam",
+      deeplink: "https://dl.vietqr.io/pay?app=bidv",
+      appLogo: "",
+    },
+    {
+      appId: "icb",
+      appName: "VietinBank iPay",
+      bankName: "Ngân hàng TMCP Công thương Việt Nam",
+      deeplink: "https://dl.vietqr.io/pay?app=icb",
+      appLogo: "",
+    },
+    {
+      appId: "mb",
+      appName: "MB Bank",
+      bankName: "Ngân hàng TMCP Quân đội",
+      deeplink: "https://dl.vietqr.io/pay?app=mb",
+      appLogo: "",
+    },
+    {
+      appId: "tcb",
+      appName: "Techcombank Mobile",
+      bankName: "Ngân hàng TMCP Kỹ Thương Việt Nam",
+      deeplink: "https://dl.vietqr.io/pay?app=tcb",
+      appLogo: "",
+    },
+    {
+      appId: "vpb",
+      appName: "VPBank NEO",
+      bankName: "Ngân hàng TMCP Việt Nam Thịnh Vượng",
+      deeplink: "https://dl.vietqr.io/pay?app=vpb",
+      appLogo: "",
+    },
+    {
+      appId: "acb",
+      appName: "ACB One",
+      bankName: "Ngân hàng TMCP Á Châu",
+      deeplink: "https://dl.vietqr.io/pay?app=acb",
+      appLogo: "",
+    },
+    {
+      appId: "ocb",
+      appName: "OCB OMNI",
+      bankName: "Ngân hàng TMCP Phương Đông",
+      deeplink: "https://dl.vietqr.io/pay?app=ocb",
+      appLogo: "",
+    },
+    {
+      appId: "tpb",
+      appName: "TPBank Mobile",
+      bankName: "Ngân hàng TMCP Tiên Phong",
+      deeplink: "https://dl.vietqr.io/pay?app=tpb",
+      appLogo: "",
+    },
+    {
+      appId: "vba",
+      appName: "Agribank E-Mobile Banking",
+      bankName: "Ngân hàng Nông nghiệp và Phát triển Nông thôn Việt Nam",
+      deeplink: "https://dl.vietqr.io/pay?app=vba",
+      appLogo: "",
+    },
+    {
+      appId: "vib",
+      appName: "MyVIB 2.0",
+      bankName: "Ngân hàng TMCP Quốc tế Việt Nam",
+      deeplink: "https://dl.vietqr.io/pay?app=vib",
+      appLogo: "",
+    },
+    {
+      appId: "lpb",
+      appName: "LienViet24h",
+      bankName: "Ngân hàng TMCP Bưu điện Liên Việt",
+      deeplink: "https://dl.vietqr.io/pay?app=lpb",
+      appLogo: "",
+    },
+    {
+      appId: "shb",
+      appName: "SHB Mobile Banking",
+      bankName: "Ngân hàng TMCP Sài Gòn - Hà Nội",
+      deeplink: "https://dl.vietqr.io/pay?app=shb",
+      appLogo: "",
+    },
+    {
+      appId: "hdb",
+      appName: "HDBank",
+      bankName: "Ngân hàng TMCP Phát triển TP.HCM",
+      deeplink: "https://dl.vietqr.io/pay?app=hdb",
+      appLogo: "",
+    },
+    {
+      appId: "cake",
+      appName: "CAKE by VPBank",
+      bankName: "Ngân hàng số CAKE by VPBank",
+      deeplink: "https://dl.vietqr.io/pay?app=cake",
+      appLogo: "",
+    },
+  ];
+
+  let bankData = fallbackBanks;
+
+  function buildDeeplink(base) {
+    try {
+      const url = new URL(base);
+      url.searchParams.set("ba", ACCOUNT_INFO.ba);
+      url.searchParams.set("tn", ACCOUNT_INFO.tn);
+      return url.toString();
+    } catch (error) {
+      return base;
+    }
+  }
+
+  function renderList(items) {
+    listEl.innerHTML = "";
+
+    if (!items.length) {
+      statusEl.textContent = "Không tìm thấy ngân hàng phù hợp.";
+      return;
+    }
+
+    statusEl.textContent = "";
+
+    items.forEach((bank) => {
+      const button = document.createElement("button");
+      button.type = "button";
+      button.className = "bank-item";
+      button.setAttribute("role", "listitem");
+
+      const logoMarkup = bank.appLogo
+        ? `<img src="${bank.appLogo}" alt="${bank.bankName}" loading="lazy" />`
+        : `<div class="bank-logo-fallback">${bank.appId.substring(0, 3)}</div>`;
+
+      button.innerHTML = `
+        ${logoMarkup}
+        <div class="bank-item-text">
+          <span class="bank-name">${bank.appName}</span>
+          <span class="bank-desc">${bank.bankName}</span>
+        </div>
+      `;
+
+      button.addEventListener("click", () => {
+        const url = buildDeeplink(bank.deeplink);
+        closeModal();
+        window.location.href = url;
+      });
+
+      listEl.appendChild(button);
+    });
+  }
+
+  function filterBanks(term) {
+    const normalized = term.trim().toLowerCase();
+    if (!normalized) {
+      renderList(bankData);
+      return;
+    }
+
+    const filtered = bankData.filter((bank) => {
+      return (
+        bank.appName.toLowerCase().includes(normalized) ||
+        bank.bankName.toLowerCase().includes(normalized) ||
+        bank.appId.toLowerCase().includes(normalized)
+      );
+    });
+
+    renderList(filtered);
+  }
+
+  function openModal() {
+    modal.classList.add("active");
+    modal.setAttribute("aria-hidden", "false");
+    document.body.style.overflow = "hidden";
+    setTimeout(() => searchInput.focus({ preventScroll: true }), 100);
+  }
+
+  function closeModal() {
+    modal.classList.remove("active");
+    modal.setAttribute("aria-hidden", "true");
+    document.body.style.overflow = "";
+    qrTrigger.focus();
+  }
+
+  qrTrigger.addEventListener("click", openModal);
+  qrTrigger.addEventListener("keypress", (event) => {
+    if (["Enter", " ", "Space", "Spacebar"].includes(event.key)) {
+      event.preventDefault();
+      openModal();
+    }
+  });
+
+  closeBtn.addEventListener("click", closeModal);
+  modal.addEventListener("click", (event) => {
+    if (event.target === modal) {
+      closeModal();
+    }
+  });
+
+  document.addEventListener("keydown", (event) => {
+    if (event.key === "Escape" && modal.classList.contains("active")) {
+      closeModal();
+    }
+  });
+
+  searchInput.addEventListener("input", (event) => {
+    filterBanks(event.target.value);
+  });
+
+  renderList(bankData);
+
+  fetch("https://api.vietqr.io/v2/android-app-deeplinks")
+    .then((response) => response.json())
+    .then((data) => {
+      if (!data || !Array.isArray(data.apps)) {
+        renderList(bankData);
+        return;
+      }
+
+      const mapped = data.apps
+        .filter((app) => POPULAR_BANK_IDS.includes(app.appId))
+        .map((app) => ({
+          appId: app.appId,
+          appName: app.appName,
+          bankName: app.bankName,
+          deeplink: app.deeplink,
+          appLogo: app.appLogo,
+        }));
+
+      if (mapped.length) {
+        // Keep order as POPULAR_BANK_IDS
+        bankData = POPULAR_BANK_IDS.map((id) =>
+          mapped.find((app) => app.appId === id)
+        ).filter((app) => app);
+
+        renderList(bankData);
+      }
+    })
+    .catch(() => {
+      renderList(bankData);
+    });
 }
 
 // Lazy Loading for Images
