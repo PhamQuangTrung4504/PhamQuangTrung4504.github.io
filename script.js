@@ -720,6 +720,16 @@ function initBankSelector() {
     modal.setAttribute("aria-hidden", "false");
     document.body.style.overflow = "hidden";
     modal.scrollTop = 0;
+
+    // Đảm bảo danh sách hiển thị khi mở modal
+    if (listEl.children.length === 0) {
+      renderList(bankData, true);
+    } else {
+      // Hiện tất cả items nếu đã có
+      const allItems = listEl.querySelectorAll(".bank-item");
+      allItems.forEach((item) => (item.style.display = ""));
+    }
+
     setTimeout(() => searchInput.focus({ preventScroll: true }), 100);
   }
 
