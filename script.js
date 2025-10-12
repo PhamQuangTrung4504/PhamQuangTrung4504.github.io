@@ -732,7 +732,7 @@ function initBankSelector() {
     return storeLinks.android;
   }
 
-  // Mở app với fallback tự động đến store
+  // Mở app với fallback tự động đến store (KHÔNG gây lỗi)
   function openBankApp(bank) {
     const deeplinkUrl = buildDeeplink(bank.deeplink);
     const storeLink = getStoreLink(bank.appId);
@@ -740,29 +740,57 @@ function initBankSelector() {
     // Đóng modal
     closeModal();
 
-    // Thử mở deeplink
+    let appOpened = false;
     const startTime = Date.now();
-    window.location.href = deeplinkUrl;
 
-    // Nếu sau 2.5s không chuyển được (app chưa cài), mở store
+    // Tạo iframe ẩn để thử mở deeplink (KHÔNG hiển thị lỗi cho user)
+    const iframe = document.createElement("iframe");
+    iframe.style.display = "none";
+    iframe.style.width = "0";
+    iframe.style.height = "0";
+    iframe.style.border = "none";
+    document.body.appendChild(iframe);
+
+    // Thử mở app qua iframe
+    try {
+      iframe.src = deeplinkUrl;
+    } catch (e) {
+      // Bỏ qua lỗi
+    }
+
+    // Lắng nghe sự kiện blur (user rời khỏi trang = app đã mở)
+    const onBlur = () => {
+      appOpened = true;
+      cleanup();
+    };
+    window.addEventListener("blur", onBlur);
+
+    // Cleanup function
+    const cleanup = () => {
+      window.removeEventListener("blur", onBlur);
+      if (iframe && iframe.parentNode) {
+        document.body.removeChild(iframe);
+      }
+    };
+
+    // Sau 1.5 giây kiểm tra xem app có mở không
     setTimeout(() => {
-      const elapsed = Date.now() - startTime;
-      // Kiểm tra nếu user vẫn trên trang (app không mở được)
-      if (document.hasFocus() && elapsed >= 2500) {
+      cleanup();
+
+      // Nếu app không mở được (user vẫn trên trang)
+      if (!appOpened) {
         if (storeLink) {
-          // Tự động chuyển đến store để tải app
+          // Chuyển trực tiếp đến store
           window.location.href = storeLink;
         } else {
-          // Nếu không có store link, hiện thông báo
+          // Fallback nếu không có store link
           alert(
-            `Không thể mở ${bank.appName}.\n\n` +
-              `Vui lòng tải ứng dụng từ App Store hoặc CH Play.`
+            `Vui lòng tải ${bank.appName} từ App Store hoặc CH Play để sử dụng tính năng này.`
           );
         }
       }
-    }, 2500);
+    }, 1500);
   }
-
   function renderList(items, isInitial = false) {
     // Nếu không phải lần đầu render, không clear innerHTML
     if (isInitial) {
