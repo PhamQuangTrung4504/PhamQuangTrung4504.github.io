@@ -29,6 +29,8 @@
 
 html {
   scroll-behavior: smooth;
+  -webkit-text-size-adjust: 100%;
+  text-size-adjust: 100%;
 }
 
 body {
@@ -989,33 +991,35 @@ section {
 
 .bank-list {
   overflow-y: auto;
-  padding: 10px;
+  padding: clamp(8px, 2vw, 12px);
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 10px;
-  margin-bottom: 16px;
+  gap: clamp(8px, 2vw, 12px);
+  margin: 0 auto clamp(14px, 4vw, 18px);
   -webkit-overflow-scrolling: touch;
   flex: 1;
   min-height: 0;
   box-sizing: border-box;
+  width: 100%;
+  max-width: 520px;
 }
 
 .bank-item {
   display: flex;
-  align-items: center;
-  gap: 12px;
+  align-items: flex-start;
+  gap: clamp(8px, 2.4vw, 12px);
   width: 100%;
   max-width: 480px;
-  padding: 12px 14px;
+  padding: clamp(10px, 3vw, 14px) clamp(12px, 3vw, 16px);
   border: none;
-  border-radius: 14px;
+  border-radius: clamp(12px, 3vw, 14px);
   background: rgba(255, 255, 255, 0.12);
   color: #fff;
   cursor: pointer;
   text-align: left;
   transition: background 0.2s ease, box-shadow 0.2s ease, filter 0.2s ease;
-  min-height: 72px;
+  min-height: clamp(60px, 18vw, 72px);
   box-sizing: border-box;
   margin: 0 auto;
   word-wrap: break-word;
@@ -1030,17 +1034,18 @@ section {
 }
 
 .bank-item img {
-  width: 42px;
-  height: 42px;
+  width: clamp(34px, 10vw, 42px);
+  height: clamp(34px, 10vw, 42px);
   border-radius: 12px;
   object-fit: cover;
   background: rgba(255, 255, 255, 0.95);
-  padding: 4px;
+  padding: clamp(3px, 1vw, 4px);
+  align-self: center;
 }
 
 .bank-item .bank-logo-fallback {
-  width: 42px;
-  height: 42px;
+  width: clamp(34px, 10vw, 42px);
+  height: clamp(34px, 10vw, 42px);
   border-radius: 12px;
   background: linear-gradient(
     160deg,
@@ -1049,12 +1054,13 @@ section {
   );
   color: #fff;
   font-weight: 600;
-  font-size: 13px;
+  font-size: clamp(11px, 3vw, 13px);
   display: flex;
   align-items: center;
   justify-content: center;
   text-transform: uppercase;
   border: 1px solid rgba(255, 255, 255, 0.2);
+  align-self: center;
 }
 
 .bank-item .bank-item-text {
@@ -1063,17 +1069,20 @@ section {
   gap: 4px;
   min-width: 0;
   word-break: break-word;
+  flex: 1;
 }
 
 .bank-item .bank-name {
-  font-size: 15px;
+  font-size: clamp(14px, 4vw, 15px);
   font-weight: 600;
   color: #fff;
+  line-height: 1.25;
 }
 
 .bank-item .bank-desc {
-  font-size: 12px;
+  font-size: clamp(11px, 3.5vw, 12px);
   color: rgba(255, 255, 255, 0.65);
+  line-height: 1.3;
 }
 
 @media (max-width: 600px) {
@@ -1095,21 +1104,16 @@ section {
   }
 
   .bank-list {
-    padding: 8px;
-    gap: 8px;
+    padding: clamp(6px, 2.5vw, 10px);
+    gap: clamp(6px, 2.5vw, 10px);
   }
 
   .bank-item {
     max-width: 100%;
-    padding: 10px 12px;
-    gap: 8px;
-    border-radius: 10px;
-    min-height: 64px;
-  }
-
-  .bank-item img {
-    width: 32px;
-    height: 32px;
+    padding: clamp(8px, 3vw, 12px);
+    gap: clamp(6px, 2.5vw, 10px);
+    border-radius: clamp(10px, 4vw, 12px);
+    min-height: clamp(56px, 20vw, 66px);
   }
 
   @supports (height: 100dvh) {
@@ -1125,8 +1129,8 @@ section {
 @media (max-width: 380px) {
   .bank-item {
     font-size: 14px;
-    padding: 8px 10px;
-    min-height: 60px;
+    padding: clamp(8px, 3.5vw, 10px);
+    min-height: clamp(54px, 22vw, 60px);
   }
 }
 
