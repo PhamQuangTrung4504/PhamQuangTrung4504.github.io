@@ -590,7 +590,20 @@ function initBankSelector() {
     },
   ];
 
-  let bankData = fallbackBanks;
+  const fallbackBankMap = new Map(
+    fallbackBanks.map((bank) => [bank.appId, bank])
+  );
+
+  let bankData = [...fallbackBanks];
+
+  function normalizeText(value) {
+    return value
+      ? value
+          .normalize("NFD")
+          .replace(/[\u0300-\u036f]/g, "")
+          .toLowerCase()
+      : "";
+  }
 
   function buildDeeplink(base) {
     try {
@@ -652,17 +665,21 @@ function initBankSelector() {
   }
 
   function filterBanks(term) {
-    const normalized = term.trim().toLowerCase();
+    const normalized = normalizeText(term.trim());
     if (!normalized) {
       renderList(bankData);
       return;
     }
 
     const filtered = bankData.filter((bank) => {
+      const appName = normalizeText(bank.appName);
+      const bankName = normalizeText(bank.bankName);
+      const appId = normalizeText(bank.appId);
+
       return (
-        bank.appName.toLowerCase().includes(normalized) ||
-        bank.bankName.toLowerCase().includes(normalized) ||
-        bank.appId.toLowerCase().includes(normalized)
+        appName.includes(normalized) ||
+        bankName.includes(normalized) ||
+        appId.includes(normalized)
       );
     });
 
@@ -718,21 +735,31 @@ function initBankSelector() {
         return;
       }
 
-      const mapped = data.apps
-        .filter((app) => POPULAR_BANK_IDS.includes(app.appId))
-        .map((app) => ({
-          appId: app.appId,
-          appName: app.appName,
-          bankName: app.bankName,
-          deeplink: app.deeplink,
-          appLogo: app.appLogo,
-        }));
+      const mapped = data.apps.reduce((acc, app) => {
+        if (POPULAR_BANK_IDS.includes(app.appId)) {
+          acc.set(app.appId, {
+            appId: app.appId,
+            appName: app.appName,
+            bankName: app.bankName,
+            deeplink: app.deeplink,
+            appLogo: app.appLogo,
+          });
+        }
+        return acc;
+      }, new Map());
 
-      if (mapped.length) {
-        // Keep order as POPULAR_BANK_IDS
-        bankData = POPULAR_BANK_IDS.map((id) =>
-          mapped.find((app) => app.appId === id)
-        ).filter((app) => app);
+      if (mapped.size) {
+        // Keep order as POPULAR_BANK_IDS while falling back when API misses entries
+        bankData = POPULAR_BANK_IDS.map((id) => {
+          const fallbackEntry = fallbackBankMap.get(id);
+          const remoteEntry = mapped.get(id);
+
+          if (fallbackEntry && remoteEntry) {
+            return { ...fallbackEntry, ...remoteEntry };
+          }
+
+          return remoteEntry || fallbackEntry;
+        }).filter(Boolean);
 
         renderList(bankData);
       }
