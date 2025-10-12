@@ -31,6 +31,7 @@ html {
   scroll-behavior: smooth;
   -webkit-text-size-adjust: 100%;
   text-size-adjust: 100%;
+  height: 100%;
 }
 
 body {
@@ -39,6 +40,8 @@ body {
   color: var(--text-dark);
   background: var(--bg-light);
   overflow-x: hidden;
+  min-height: 100%;
+  position: relative;
 }
 
 /* Loading Animation */
@@ -894,6 +897,7 @@ section {
   overflow: hidden;
   display: flex;
   flex-direction: column;
+  justify-content: flex-start;
   border: 1px solid rgba(255, 255, 255, 0.12);
 }
 
@@ -991,6 +995,7 @@ section {
 
 .bank-list {
   overflow-y: auto;
+  overflow-x: hidden;
   padding: clamp(8px, 2vw, 12px);
   display: flex;
   flex-direction: column;
@@ -999,7 +1004,8 @@ section {
   margin: 0 auto clamp(14px, 4vw, 18px);
   -webkit-overflow-scrolling: touch;
   flex: 1 1 auto;
-  min-height: fit-content;
+  min-height: 0;
+  max-height: 60vh;
   box-sizing: border-box;
   width: 100%;
   max-width: 520px;
@@ -1107,6 +1113,8 @@ section {
   .bank-list {
     padding: clamp(6px, 2.5vw, 10px);
     gap: clamp(6px, 2.5vw, 10px);
+    max-height: 50vh;
+    min-height: 0;
   }
 
   .bank-item {

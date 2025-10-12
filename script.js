@@ -619,58 +619,82 @@ function initBankSelector() {
     }
   }
 
-  function renderList(items) {
-    listEl.innerHTML = "";
+  function renderList(items, isInitial = false) {
+    // Nếu không phải lần đầu render, không clear innerHTML
+    if (isInitial) {
+      listEl.innerHTML = "";
+    }
 
     if (!items.length) {
       statusEl.textContent = "Không tìm thấy ngân hàng phù hợp.";
+      if (!isInitial) {
+        // Ẩn tất cả items thay vì xóa
+        const allItems = listEl.querySelectorAll(".bank-item");
+        allItems.forEach((item) => (item.style.display = "none"));
+      }
       return;
     }
 
     statusEl.textContent = "";
 
-    items.forEach((bank) => {
-      const button = document.createElement("button");
-      button.type = "button";
-      button.className = "bank-item";
-      button.setAttribute("role", "listitem");
+    if (isInitial) {
+      // Lần đầu tiên: tạo tất cả items
+      items.forEach((bank) => {
+        const button = document.createElement("button");
+        button.type = "button";
+        button.className = "bank-item";
+        button.setAttribute("role", "listitem");
+        button.setAttribute("data-app-id", bank.appId);
 
-      const fallbackSource = bank.appName || bank.bankName || bank.appId;
-      const fallbackText =
-        fallbackSource
-          .split(/\s+/)
-          .filter((word) => word && /[a-zA-Z0-9]/.test(word))
-          .map((word) => word[0])
-          .join("")
-          .slice(0, 2)
-          .toUpperCase() || bank.appId.slice(0, 2).toUpperCase();
+        const fallbackSource = bank.appName || bank.bankName || bank.appId;
+        const fallbackText =
+          fallbackSource
+            .split(/\s+/)
+            .filter((word) => word && /[a-zA-Z0-9]/.test(word))
+            .map((word) => word[0])
+            .join("")
+            .slice(0, 2)
+            .toUpperCase() || bank.appId.slice(0, 2).toUpperCase();
 
-      const logoMarkup = bank.appLogo
-        ? `<img src="${bank.appLogo}" alt="${bank.bankName}" loading="lazy" />`
-        : `<div class="bank-logo-fallback">${fallbackText}</div>`;
+        const logoMarkup = bank.appLogo
+          ? `<img src="${bank.appLogo}" alt="${bank.bankName}" loading="lazy" />`
+          : `<div class="bank-logo-fallback">${fallbackText}</div>`;
 
-      button.innerHTML = `
-        ${logoMarkup}
-        <div class="bank-item-text">
-          <span class="bank-name">${bank.appName}</span>
-          <span class="bank-desc">${bank.bankName}</span>
-        </div>
-      `;
+        button.innerHTML = `
+          ${logoMarkup}
+          <div class="bank-item-text">
+            <span class="bank-name">${bank.appName}</span>
+            <span class="bank-desc">${bank.bankName}</span>
+          </div>
+        `;
 
-      button.addEventListener("click", () => {
-        const url = buildDeeplink(bank.deeplink);
-        closeModal();
-        window.location.href = url;
+        button.addEventListener("click", () => {
+          const url = buildDeeplink(bank.deeplink);
+          closeModal();
+          window.location.href = url;
+        });
+
+        listEl.appendChild(button);
       });
+    } else {
+      // Khi filter: chỉ ẩn/hiện items, KHÔNG tạo lại DOM
+      const allItems = listEl.querySelectorAll(".bank-item");
+      const visibleIds = new Set(items.map((bank) => bank.appId));
 
-      listEl.appendChild(button);
-    });
+      allItems.forEach((item) => {
+        const appId = item.getAttribute("data-app-id");
+        item.style.display = visibleIds.has(appId) ? "" : "none";
+      });
+    }
   }
 
   function filterBanks(term) {
     const normalized = normalizeText(term.trim());
     if (!normalized) {
-      renderList(bankData);
+      // Hiện tất cả items
+      const allItems = listEl.querySelectorAll(".bank-item");
+      allItems.forEach((item) => (item.style.display = ""));
+      statusEl.textContent = "";
       return;
     }
 
@@ -686,7 +710,7 @@ function initBankSelector() {
       );
     });
 
-    renderList(filtered);
+    renderList(filtered, false);
   }
 
   function openModal() {
@@ -736,11 +760,17 @@ function initBankSelector() {
   function updateViewportHeight() {
     const height = viewport ? viewport.height : window.innerHeight;
     root.style.setProperty("--modal-viewport-height", `${height}px`);
+
+    // Xử lý đặc biệt cho iOS Safari khi bàn phím bật
+    if (/iPhone|iPad|iPod/i.test(navigator.userAgent)) {
+      document.body.style.height = `${height}px`;
+    }
   }
 
   function attachViewportListeners() {
     if (!viewport) {
       window.addEventListener("resize", updateViewportHeight);
+      window.addEventListener("orientationchange", updateViewportHeight);
       return;
     }
 
@@ -751,20 +781,23 @@ function initBankSelector() {
   function detachViewportListeners() {
     if (!viewport) {
       window.removeEventListener("resize", updateViewportHeight);
+      window.removeEventListener("orientationchange", updateViewportHeight);
+      document.body.style.height = "";
       return;
     }
 
     viewport.removeEventListener("resize", updateViewportHeight);
     viewport.removeEventListener("scroll", updateViewportHeight);
+    document.body.style.height = "";
   }
 
-  renderList(bankData);
+  renderList(bankData, true);
 
   fetch("https://api.vietqr.io/v2/android-app-deeplinks")
     .then((response) => response.json())
     .then((data) => {
       if (!data || !Array.isArray(data.apps)) {
-        renderList(bankData);
+        renderList(bankData, true);
         return;
       }
 
@@ -794,11 +827,11 @@ function initBankSelector() {
           return remoteEntry || fallbackEntry;
         }).filter(Boolean);
 
-        renderList(bankData);
+        renderList(bankData, true);
       }
     })
     .catch(() => {
-      renderList(bankData);
+      renderList(bankData, true);
     });
 }
 
