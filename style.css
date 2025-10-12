@@ -880,10 +880,10 @@ section {
 
 .bank-modal-content {
   position: relative;
-  width: min(520px, 100%);
-  height: auto;
-  min-height: 500px;
-  max-height: 90vh;
+  width: 520px;
+  max-width: calc(100vw - 32px);
+  height: 600px;
+  max-height: 85vh;
   background: linear-gradient(
     160deg,
     rgba(100, 67, 255, 0.92),
@@ -898,11 +898,12 @@ section {
   flex-direction: column;
   justify-content: flex-start;
   border: 1px solid rgba(255, 255, 255, 0.12);
+  flex-shrink: 0;
 }
 
 @supports (height: 100dvh) {
   .bank-modal-content {
-    max-height: 90dvh;
+    max-height: 85dvh;
   }
 }
 
@@ -987,16 +988,15 @@ section {
 
 .bank-list {
   overflow: visible;
-  padding: clamp(8px, 2vw, 12px);
+  padding: 12px;
   display: flex !important;
   flex-direction: column;
   align-items: center;
-  gap: clamp(8px, 2vw, 12px);
-  margin: 0 auto clamp(14px, 4vw, 18px);
+  gap: 10px;
+  margin: 0 auto 16px;
   flex: 0 0 auto;
   box-sizing: border-box;
   width: 100%;
-  max-width: 520px;
   visibility: visible !important;
   opacity: 1 !important;
 }
@@ -1004,20 +1004,19 @@ section {
 .bank-item {
   display: flex;
   align-items: center;
-  gap: clamp(8px, 2.4vw, 12px);
+  gap: 12px;
   width: 100%;
-  max-width: 480px;
-  padding: clamp(10px, 3vw, 14px) clamp(12px, 3vw, 16px);
+  height: 68px;
+  padding: 12px 16px;
   border: none;
-  border-radius: clamp(12px, 3vw, 14px);
+  border-radius: 14px;
   background: rgba(255, 255, 255, 0.12);
   color: #fff;
   cursor: pointer;
   text-align: left;
   transition: background 0.2s ease, box-shadow 0.2s ease, filter 0.2s ease;
-  min-height: clamp(60px, 18vw, 72px);
   box-sizing: border-box;
-  margin: 0 auto;
+  margin: 0;
   word-wrap: break-word;
   flex-shrink: 0;
 }
@@ -1031,18 +1030,18 @@ section {
 }
 
 .bank-item img {
-  width: clamp(34px, 10vw, 42px);
-  height: clamp(34px, 10vw, 42px);
+  width: 40px;
+  height: 40px;
   border-radius: 12px;
   object-fit: cover;
   background: rgba(255, 255, 255, 0.95);
-  padding: clamp(3px, 1vw, 4px);
+  padding: 4px;
   flex-shrink: 0;
 }
 
 .bank-item .bank-logo-fallback {
-  width: clamp(34px, 10vw, 42px);
-  height: clamp(34px, 10vw, 42px);
+  width: 40px;
+  height: 40px;
   border-radius: 12px;
   background: linear-gradient(
     160deg,
@@ -1051,7 +1050,7 @@ section {
   );
   color: #fff;
   font-weight: 600;
-  font-size: clamp(11px, 3vw, 13px);
+  font-size: 12px;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -1070,14 +1069,14 @@ section {
 }
 
 .bank-item .bank-name {
-  font-size: clamp(14px, 4vw, 15px);
+  font-size: 15px;
   font-weight: 600;
   color: #fff;
   line-height: 1.25;
 }
 
 .bank-item .bank-desc {
-  font-size: clamp(11px, 3.5vw, 12px);
+  font-size: 12px;
   color: rgba(255, 255, 255, 0.65);
   line-height: 1.3;
 }
@@ -1086,47 +1085,63 @@ section {
   .bank-modal {
     align-items: flex-start;
     justify-content: flex-start;
-    padding: 8px;
-    padding-top: calc(8px + env(safe-area-inset-top, 0px));
-    padding-bottom: calc(8px + env(safe-area-inset-bottom, 0px));
+    padding: 12px;
+    padding-top: calc(12px + env(safe-area-inset-top, 0px));
+    padding-bottom: calc(12px + env(safe-area-inset-bottom, 0px));
   }
 
   .bank-modal-content {
-    padding: 20px 16px;
     width: 100%;
-    margin: 0;
-    min-height: auto;
-    max-height: none;
+    max-width: 100%;
     height: auto;
+    max-height: calc(100vh - 24px);
+    padding: 24px 18px;
+    margin: 0;
   }
 
   .bank-list {
-    padding: clamp(6px, 2.5vw, 10px);
-    gap: clamp(6px, 2.5vw, 10px);
+    padding: 10px;
+    gap: 8px;
   }
 
   .bank-item {
-    max-width: 100%;
-    padding: clamp(8px, 3vw, 12px);
-    gap: clamp(6px, 2.5vw, 10px);
-    border-radius: clamp(10px, 4vw, 12px);
-    min-height: clamp(56px, 20vw, 66px);
+    width: 100%;
+    height: 64px;
+    padding: 10px 14px;
+    gap: 10px;
+    border-radius: 12px;
   }
 
   @supports (height: 100dvh) {
     .bank-modal-content {
-      height: auto;
-      min-height: auto;
-      max-height: none;
+      max-height: calc(100dvh - 24px);
     }
   }
 }
 
 @media (max-width: 380px) {
+  .bank-modal-content {
+    padding: 20px 14px;
+  }
+
   .bank-item {
+    height: 60px;
+    padding: 8px 12px;
+    gap: 8px;
+  }
+
+  .bank-item img,
+  .bank-item .bank-logo-fallback {
+    width: 36px;
+    height: 36px;
+  }
+
+  .bank-item .bank-name {
     font-size: 14px;
-    padding: clamp(8px, 3.5vw, 10px);
-    min-height: clamp(54px, 22vw, 60px);
+  }
+
+  .bank-item .bank-desc {
+    font-size: 11px;
   }
 }
 
