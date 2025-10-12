@@ -435,11 +435,16 @@ function initBankSelector() {
     "ocb",
     "tpb",
     "vba",
-    "vib",
+    "vib-2",
     "lpb",
     "shb",
     "hdb",
     "cake",
+    "seab",
+    "scb",
+    "eib",
+    "timo",
+    "shbvn",
   ];
 
   const fallbackBanks = [
@@ -514,10 +519,10 @@ function initBankSelector() {
       appLogo: "",
     },
     {
-      appId: "vib",
+      appId: "vib-2",
       appName: "MyVIB 2.0",
       bankName: "Ngân hàng TMCP Quốc tế Việt Nam",
-      deeplink: "https://dl.vietqr.io/pay?app=vib",
+      deeplink: "https://dl.vietqr.io/pay?app=vib-2",
       appLogo: "",
     },
     {
@@ -546,6 +551,41 @@ function initBankSelector() {
       appName: "CAKE by VPBank",
       bankName: "Ngân hàng số CAKE by VPBank",
       deeplink: "https://dl.vietqr.io/pay?app=cake",
+      appLogo: "",
+    },
+    {
+      appId: "seab",
+      appName: "SeAMobile",
+      bankName: "Ngân hàng TMCP Đông Nam Á",
+      deeplink: "https://dl.vietqr.io/pay?app=seab",
+      appLogo: "",
+    },
+    {
+      appId: "scb",
+      appName: "SCB Mobile Banking",
+      bankName: "Ngân hàng TMCP Sài Gòn",
+      deeplink: "https://dl.vietqr.io/pay?app=scb",
+      appLogo: "",
+    },
+    {
+      appId: "eib",
+      appName: "Eximbank Mobile Banking",
+      bankName: "Ngân hàng TMCP Xuất Nhập khẩu Việt Nam",
+      deeplink: "https://dl.vietqr.io/pay?app=eib",
+      appLogo: "",
+    },
+    {
+      appId: "timo",
+      appName: "Timo Digital Bank",
+      bankName: "Ngân hàng TMCP Bản Việt (Timo)",
+      deeplink: "https://dl.vietqr.io/pay?app=timo",
+      appLogo: "",
+    },
+    {
+      appId: "shbvn",
+      appName: "Shinhan Bank SOL",
+      bankName: "Ngân hàng TNHH MTV Shinhan Việt Nam",
+      deeplink: "https://dl.vietqr.io/pay?app=shbvn",
       appLogo: "",
     },
   ];
@@ -579,9 +619,19 @@ function initBankSelector() {
       button.className = "bank-item";
       button.setAttribute("role", "listitem");
 
+      const fallbackSource = bank.appName || bank.bankName || bank.appId;
+      const fallbackText =
+        fallbackSource
+          .split(/\s+/)
+          .filter((word) => word && /[a-zA-Z0-9]/.test(word))
+          .map((word) => word[0])
+          .join("")
+          .slice(0, 2)
+          .toUpperCase() || bank.appId.slice(0, 2).toUpperCase();
+
       const logoMarkup = bank.appLogo
         ? `<img src="${bank.appLogo}" alt="${bank.bankName}" loading="lazy" />`
-        : `<div class="bank-logo-fallback">${bank.appId.substring(0, 3)}</div>`;
+        : `<div class="bank-logo-fallback">${fallbackText}</div>`;
 
       button.innerHTML = `
         ${logoMarkup}
