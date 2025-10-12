@@ -1011,15 +1011,15 @@ section {
   color: #fff;
   cursor: pointer;
   text-align: left;
-  transition: background 0.2s ease, transform 0.2s ease, box-shadow 0.2s ease;
+  transition: background 0.2s ease, box-shadow 0.2s ease, filter 0.2s ease;
+  min-height: 72px;
 }
 
 .bank-item:hover,
 .bank-item:focus {
   background: rgba(255, 255, 255, 0.22);
-  transform: translateY(-2px);
   outline: none;
-  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.25);
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
 }
 
 .bank-item img {
