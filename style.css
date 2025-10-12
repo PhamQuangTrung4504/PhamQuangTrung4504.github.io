@@ -998,8 +998,8 @@ section {
   gap: clamp(8px, 2vw, 12px);
   margin: 0 auto clamp(14px, 4vw, 18px);
   -webkit-overflow-scrolling: touch;
-  flex: 1;
-  min-height: 0;
+  flex: 1 1 auto;
+  min-height: fit-content;
   box-sizing: border-box;
   width: 100%;
   max-width: 520px;
@@ -1007,7 +1007,7 @@ section {
 
 .bank-item {
   display: flex;
-  align-items: flex-start;
+  align-items: center;
   gap: clamp(8px, 2.4vw, 12px);
   width: 100%;
   max-width: 480px;
@@ -1023,6 +1023,7 @@ section {
   box-sizing: border-box;
   margin: 0 auto;
   word-wrap: break-word;
+  flex-shrink: 0;
 }
 
 .bank-item:hover,
@@ -1040,7 +1041,7 @@ section {
   object-fit: cover;
   background: rgba(255, 255, 255, 0.95);
   padding: clamp(3px, 1vw, 4px);
-  align-self: center;
+  flex-shrink: 0;
 }
 
 .bank-item .bank-logo-fallback {
@@ -1060,7 +1061,7 @@ section {
   justify-content: center;
   text-transform: uppercase;
   border: 1px solid rgba(255, 255, 255, 0.2);
-  align-self: center;
+  flex-shrink: 0;
 }
 
 .bank-item .bank-item-text {
