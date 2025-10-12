@@ -989,14 +989,16 @@ section {
 
 .bank-list {
   overflow-y: auto;
-  padding-right: 6px;
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
-  gap: 12px;
+  padding: 10px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 10px;
   margin-bottom: 16px;
   -webkit-overflow-scrolling: touch;
   flex: 1;
   min-height: 0;
+  box-sizing: border-box;
 }
 
 .bank-item {
@@ -1004,6 +1006,7 @@ section {
   align-items: center;
   gap: 12px;
   width: 100%;
+  max-width: 480px;
   padding: 12px 14px;
   border: none;
   border-radius: 14px;
@@ -1013,13 +1016,17 @@ section {
   text-align: left;
   transition: background 0.2s ease, box-shadow 0.2s ease, filter 0.2s ease;
   min-height: 72px;
+  box-sizing: border-box;
+  margin: 0 auto;
+  word-wrap: break-word;
 }
 
 .bank-item:hover,
 .bank-item:focus {
-  background: rgba(255, 255, 255, 0.22);
+  background: rgba(255, 255, 255, 0.2);
   outline: none;
-  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
+  filter: brightness(1.05);
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.18);
 }
 
 .bank-item img {
@@ -1054,6 +1061,8 @@ section {
   display: flex;
   flex-direction: column;
   gap: 4px;
+  min-width: 0;
+  word-break: break-word;
 }
 
 .bank-item .bank-name {
@@ -1086,7 +1095,16 @@ section {
   }
 
   .bank-list {
-    grid-template-columns: 1fr;
+    padding: 8px;
+    gap: 8px;
+  }
+
+  .bank-item {
+    max-width: 100%;
+    padding: 10px 12px;
+    gap: 8px;
+    border-radius: 10px;
+    min-height: 64px;
   }
 
   .bank-item img {
@@ -1101,6 +1119,14 @@ section {
           env(safe-area-inset-top, 0px) - env(safe-area-inset-bottom, 0px)
       );
     }
+  }
+}
+
+@media (max-width: 380px) {
+  .bank-item {
+    font-size: 14px;
+    padding: 8px 10px;
+    min-height: 60px;
   }
 }
 
