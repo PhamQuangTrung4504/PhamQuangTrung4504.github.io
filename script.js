@@ -424,6 +424,100 @@ function initBankSelector() {
     tn: "Ung ho Pham Quang Trung",
   };
 
+  // Link tải app từ Store (iOS và Android)
+  const APP_STORE_LINKS = {
+    vcb: {
+      ios: "https://apps.apple.com/vn/app/vcb-dinh/id561433133",
+      android: "https://play.google.com/store/apps/details?id=com.VCB",
+    },
+    bidv: {
+      ios: "https://apps.apple.com/vn/app/bidv-smartbanking/id1035419724",
+      android: "https://play.google.com/store/apps/details?id=com.vnpay.bidv",
+    },
+    icb: {
+      ios: "https://apps.apple.com/vn/app/vietinbank-ipay/id1182487139",
+      android:
+        "https://play.google.com/store/apps/details?id=com.vietinbank.ipay",
+    },
+    mb: {
+      ios: "https://apps.apple.com/vn/app/mb-bank/id1095916656",
+      android: "https://play.google.com/store/apps/details?id=com.mbmobile",
+    },
+    tcb: {
+      ios: "https://apps.apple.com/vn/app/techcombank-mobile/id1156489632",
+      android:
+        "https://play.google.com/store/apps/details?id=com.techcombank.bb.app",
+    },
+    vpb: {
+      ios: "https://apps.apple.com/vn/app/vpbank-neo/id1459650088",
+      android:
+        "https://play.google.com/store/apps/details?id=com.vnpay.vpbankonline",
+    },
+    acb: {
+      ios: "https://apps.apple.com/vn/app/acb-one/id950141024",
+      android:
+        "https://play.google.com/store/apps/details?id=mobile.acb.com.vn",
+    },
+    ocb: {
+      ios: "https://apps.apple.com/vn/app/ocb-omni/id1445413585",
+      android: "https://play.google.com/store/apps/details?id=vn.com.ocb.omni",
+    },
+    tpb: {
+      ios: "https://apps.apple.com/vn/app/tpbank-mobile/id983526167",
+      android:
+        "https://play.google.com/store/apps/details?id=com.tpb.mb.gprsandroid",
+    },
+    vba: {
+      ios: "https://apps.apple.com/vn/app/agribank-e-mobile-banking/id1092719126",
+      android:
+        "https://play.google.com/store/apps/details?id=com.vnpay.Agribank3g",
+    },
+    "vib-2": {
+      ios: "https://apps.apple.com/vn/app/myvib-2-0/id1470240051",
+      android: "https://play.google.com/store/apps/details?id=com.vib.myvib2",
+    },
+    lpb: {
+      ios: "https://apps.apple.com/vn/app/lienviet24h/id1094733241",
+      android: "https://play.google.com/store/apps/details?id=com.lpb.mbanking",
+    },
+    shb: {
+      ios: "https://apps.apple.com/vn/app/shb-mobile-banking/id1023197266",
+      android: "https://play.google.com/store/apps/details?id=vn.shb.mbanking",
+    },
+    hdb: {
+      ios: "https://apps.apple.com/vn/app/hdbank/id1165312606",
+      android: "https://play.google.com/store/apps/details?id=com.hdbank",
+    },
+    cake: {
+      ios: "https://apps.apple.com/vn/app/cake-by-vpbank/id1457357069",
+      android: "https://play.google.com/store/apps/details?id=vn.cake.app",
+    },
+    seab: {
+      ios: "https://apps.apple.com/vn/app/seamobile/id974392018",
+      android:
+        "https://play.google.com/store/apps/details?id=vn.com.seabank.mb",
+    },
+    scb: {
+      ios: "https://apps.apple.com/vn/app/scb-mobile-banking/id1047026868",
+      android:
+        "https://play.google.com/store/apps/details?id=com.scb.mobilebanking",
+    },
+    eib: {
+      ios: "https://apps.apple.com/vn/app/eximbank/id1446885348",
+      android:
+        "https://play.google.com/store/apps/details?id=com.eximbank.mobile",
+    },
+    timo: {
+      ios: "https://apps.apple.com/vn/app/timo-digital-bank/id1055295111",
+      android: "https://play.google.com/store/apps/details?id=com.timo.vn",
+    },
+    shbvn: {
+      ios: "https://apps.apple.com/vn/app/shinhan-bank-sol/id1475698024",
+      android:
+        "https://play.google.com/store/apps/details?id=kr.co.shinhansec.mgts",
+    },
+  };
+
   const POPULAR_BANK_IDS = [
     "vcb",
     "bidv",
@@ -619,6 +713,56 @@ function initBankSelector() {
     }
   }
 
+  // Detect thiết bị để lấy link store phù hợp
+  function getStoreLink(appId) {
+    const storeLinks = APP_STORE_LINKS[appId];
+    if (!storeLinks) return null;
+
+    // Detect iOS
+    const isIOS = /iPhone|iPad|iPod/i.test(navigator.userAgent);
+    // Detect Android
+    const isAndroid = /Android/i.test(navigator.userAgent);
+
+    if (isIOS) {
+      return storeLinks.ios;
+    } else if (isAndroid) {
+      return storeLinks.android;
+    }
+    // Fallback cho desktop hoặc unknown - mặc định Android
+    return storeLinks.android;
+  }
+
+  // Mở app với fallback tự động đến store
+  function openBankApp(bank) {
+    const deeplinkUrl = buildDeeplink(bank.deeplink);
+    const storeLink = getStoreLink(bank.appId);
+
+    // Đóng modal
+    closeModal();
+
+    // Thử mở deeplink
+    const startTime = Date.now();
+    window.location.href = deeplinkUrl;
+
+    // Nếu sau 2.5s không chuyển được (app chưa cài), mở store
+    setTimeout(() => {
+      const elapsed = Date.now() - startTime;
+      // Kiểm tra nếu user vẫn trên trang (app không mở được)
+      if (document.hasFocus() && elapsed >= 2500) {
+        if (storeLink) {
+          // Tự động chuyển đến store để tải app
+          window.location.href = storeLink;
+        } else {
+          // Nếu không có store link, hiện thông báo
+          alert(
+            `Không thể mở ${bank.appName}.\n\n` +
+              `Vui lòng tải ứng dụng từ App Store hoặc CH Play.`
+          );
+        }
+      }
+    }, 2500);
+  }
+
   function renderList(items, isInitial = false) {
     // Nếu không phải lần đầu render, không clear innerHTML
     if (isInitial) {
@@ -669,9 +813,7 @@ function initBankSelector() {
         `;
 
         button.addEventListener("click", () => {
-          const url = buildDeeplink(bank.deeplink);
-          closeModal();
-          window.location.href = url;
+          openBankApp(bank);
         });
 
         listEl.appendChild(button);
