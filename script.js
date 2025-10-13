@@ -725,31 +725,27 @@ function initBankSelector() {
     const deeplinkUrl = buildDeeplink(bank.deeplink);
     const storeLink = getStoreLink(bank.appId);
 
-    // Đóng modal
-    closeModal();
-
     // Detect iOS và browser
     const isIOS = /iPhone|iPad|iPod/i.test(navigator.userAgent);
     const isAndroid = /Android/i.test(navigator.userAgent);
 
     // Xử lý riêng cho iOS (Safari và Chrome đều dùng WebKit trên iOS)
     if (isIOS) {
-      // iOS Strategy: Phát hiện app mở bằng cách kiểm tra document focus
+      // QUAN TRỌNG: Mở deeplink TRƯỚC KHI đóng modal để giữ user action context
       let timeoutId = null;
-      let checkIntervalId = null;
       let appOpened = false;
-      let blurDetected = false;
+      let iframe = null;
 
       const startTime = Date.now();
 
-      // Cleanup listeners
+      // Cleanup
       const cleanup = () => {
         if (timeoutId) clearTimeout(timeoutId);
-        if (checkIntervalId) clearInterval(checkIntervalId);
         document.removeEventListener("visibilitychange", onVisibilityChange);
         window.removeEventListener("pagehide", onPageHide);
-        window.removeEventListener("blur", onBlur);
-        window.removeEventListener("focus", onFocus);
+        if (iframe && iframe.parentNode) {
+          document.body.removeChild(iframe);
+        }
       };
 
       // Phát hiện app đã mở
@@ -765,55 +761,49 @@ function initBankSelector() {
         cleanup();
       };
 
-      const onBlur = () => {
-        blurDetected = true;
-      };
-
-      const onFocus = () => {
-        const elapsedTime = Date.now() - startTime;
-        // Nếu blur quá nhanh (< 300ms) => app không mở
-        // Nếu blur lâu (> 300ms) => app đã mở
-        if (blurDetected && elapsedTime > 300) {
-          appOpened = true;
-          cleanup();
-        }
-      };
-
       // Lắng nghe events
       document.addEventListener("visibilitychange", onVisibilityChange);
       window.addEventListener("pagehide", onPageHide);
-      window.addEventListener("blur", onBlur);
-      window.addEventListener("focus", onFocus);
 
-      // Kiểm tra liên tục xem document có bị hidden không (mỗi 100ms)
-      checkIntervalId = setInterval(() => {
-        if (document.hidden || !document.hasFocus()) {
-          appOpened = true;
-          cleanup();
-        }
+      // Tạo iframe ẩn và thử mở deeplink NGAY LẬP TỨC (trong context của user click)
+      iframe = document.createElement("iframe");
+      iframe.style.display = "none";
+      iframe.style.width = "1px";
+      iframe.style.height = "1px";
+      iframe.style.position = "absolute";
+      iframe.style.top = "-9999px";
+      iframe.style.left = "-9999px";
+      document.body.appendChild(iframe);
+
+      try {
+        iframe.src = deeplinkUrl;
+      } catch (e) {
+        // Bỏ qua
+      }
+
+      // Đóng modal sau một chút để deeplink có thời gian trigger
+      setTimeout(() => {
+        closeModal();
       }, 100);
 
-      // Thử mở app bằng window.location (cách tốt nhất cho iOS)
-      window.location.href = deeplinkUrl;
-
-      // Sau 2500ms kiểm tra (tăng timeout cho iOS)
+      // Sau 2000ms kiểm tra xem app có mở không
       timeoutId = setTimeout(() => {
         cleanup();
 
-        // Chỉ redirect store nếu CHẮC CHẮN app không mở
-        // Kiểm tra: appOpened = false VÀ document vẫn visible VÀ vẫn có focus
-        if (!appOpened && !document.hidden && document.hasFocus()) {
+        // Nếu app không mở (user vẫn trên trang)
+        if (!appOpened && !document.hidden) {
           if (storeLink) {
-            // Tự động redirect đến App Store
+            // Redirect đến App Store
             window.location.href = storeLink;
           }
         }
-        // Nếu không chắc chắn (appOpened = false nhưng document hidden/blur)
-        // => Không làm gì, có thể app đang mở
-      }, 2500);
+      }, 2000);
 
       return;
     }
+
+    // Đóng modal cho Android/Desktop
+    closeModal();
 
     // Android và Desktop: Dùng strategy cũ
     let appOpened = false;
