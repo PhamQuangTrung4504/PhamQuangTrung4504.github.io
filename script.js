@@ -728,13 +728,68 @@ function initBankSelector() {
     // Đóng modal
     closeModal();
 
-    // Detect Safari
-    const isSafari = /^((?!chrome|android).)*safari/i.test(navigator.userAgent);
+    // Detect iOS và browser
     const isIOS = /iPhone|iPad|iPod/i.test(navigator.userAgent);
+    const isAndroid = /Android/i.test(navigator.userAgent);
 
+    // Xử lý riêng cho iOS (Safari và Chrome đều dùng WebKit trên iOS)
+    if (isIOS) {
+      // iOS Strategy: Thử mở app trước, nếu không được thì hỏi user
+      let timeoutId = null;
+      let appOpened = false;
+
+      const startTime = Date.now();
+
+      // Cleanup listeners
+      const cleanup = () => {
+        if (timeoutId) clearTimeout(timeoutId);
+        document.removeEventListener("visibilitychange", onVisibilityChange);
+        window.removeEventListener("pagehide", onPageHide);
+      };
+
+      // Phát hiện app đã mở
+      const onVisibilityChange = () => {
+        if (document.hidden) {
+          appOpened = true;
+          cleanup();
+        }
+      };
+
+      const onPageHide = () => {
+        appOpened = true;
+        cleanup();
+      };
+
+      // Lắng nghe events
+      document.addEventListener("visibilitychange", onVisibilityChange);
+      window.addEventListener("pagehide", onPageHide);
+
+      // Thử mở app bằng window.location (cách tốt nhất cho iOS)
+      window.location.href = deeplinkUrl;
+
+      // Sau 1500ms kiểm tra
+      timeoutId = setTimeout(() => {
+        cleanup();
+
+        // Nếu vẫn còn trên trang => app không mở được
+        if (!appOpened && !document.hidden) {
+          // Hỏi user có muốn đến App Store không
+          const userWantsStore = confirm(
+            `Không tìm thấy ứng dụng ${bank.appName}.\n\nBạn có muốn tải ứng dụng từ App Store không?`
+          );
+
+          if (userWantsStore && storeLink) {
+            window.location.href = storeLink;
+          }
+        }
+      }, 1500);
+
+      return;
+    }
+
+    // Android và Desktop: Dùng strategy cũ
     let appOpened = false;
     let timeoutId = null;
-    let deeplinkWindow = null;
 
     // Cleanup function
     const cleanup = () => {
@@ -742,16 +797,6 @@ function initBankSelector() {
       window.removeEventListener("blur", onBlur);
       window.removeEventListener("pagehide", onPageHide);
       document.removeEventListener("visibilitychange", onVisibilityChange);
-      window.removeEventListener("focus", onFocus);
-
-      // Đóng cửa sổ deeplink nếu có (cho Safari)
-      if (deeplinkWindow && !deeplinkWindow.closed) {
-        try {
-          deeplinkWindow.close();
-        } catch (e) {
-          // Bỏ qua lỗi
-        }
-      }
     };
 
     // Event handlers - Phát hiện app đã mở
@@ -772,66 +817,26 @@ function initBankSelector() {
       }
     };
 
-    // Event khi quay lại trang (cho Safari)
-    const onFocus = () => {
-      const elapsedTime = Date.now() - startTime;
-
-      // Nếu blur rất nhanh (< 500ms) => app không mở được
-      if (elapsedTime < 500) {
-        appOpened = false;
-      } else {
-        // Blur > 500ms => app đã mở
-        appOpened = true;
-        cleanup();
-      }
-    };
-
-    // Lắng nghe events để phát hiện app mở
+    // Lắng nghe events
     window.addEventListener("blur", onBlur);
     window.addEventListener("pagehide", onPageHide);
     document.addEventListener("visibilitychange", onVisibilityChange);
-    window.addEventListener("focus", onFocus);
 
     // Lưu thời điểm bắt đầu
     const startTime = Date.now();
 
-    // Xử lý đặc biệt cho Safari iOS
-    if (isSafari && isIOS) {
-      // Safari iOS: Dùng iframe ẩn để thử mở app TRƯỚC
-      const iframe = document.createElement("iframe");
-      iframe.style.display = "none";
-      iframe.style.width = "0";
-      iframe.style.height = "0";
-      iframe.style.border = "none";
-      document.body.appendChild(iframe);
-
+    // Thử mở app
+    try {
+      window.location.href = deeplinkUrl;
+    } catch (e) {
       try {
-        iframe.src = deeplinkUrl;
-      } catch (e) {
-        // Bỏ qua
-      }
-
-      // Sau 300ms, remove iframe
-      setTimeout(() => {
-        if (iframe.parentNode) {
-          document.body.removeChild(iframe);
-        }
-      }, 300);
-    } else {
-      // Chrome hoặc Safari desktop: Dùng window.location.href
-      try {
-        window.location.href = deeplinkUrl;
-      } catch (e) {
-        // Nếu lỗi, thử dùng window.open
-        try {
-          window.open(deeplinkUrl, "_self");
-        } catch (err) {
-          // Bỏ qua lỗi
-        }
+        window.open(deeplinkUrl, "_self");
+      } catch (err) {
+        // Bỏ qua lỗi
       }
     }
 
-    // Set timeout để kiểm tra sau 2000ms (tăng lên cho Safari)
+    // Set timeout để kiểm tra sau 1500ms
     timeoutId = setTimeout(() => {
       cleanup();
 
@@ -840,19 +845,18 @@ function initBankSelector() {
         const elapsedTime = Date.now() - startTime;
 
         // Đảm bảo đã đợi đủ lâu trước khi chuyển store
-        if (elapsedTime >= 1900) {
+        if (elapsedTime >= 1400) {
           if (storeLink) {
-            // Chuyển trực tiếp đến store
+            // Chuyển trực tiếp đến store (Android tự động)
             window.location.href = storeLink;
           } else {
-            // Fallback nếu không có store link
             alert(
               `Vui lòng tải ${bank.appName} từ App Store hoặc CH Play để sử dụng tính năng này.`
             );
           }
         }
       }
-    }, 2000); // Tăng từ 1500ms lên 2000ms cho Safari
+    }, 1500);
   }
   function renderList(items, isInitial = false) {
     // Nếu không phải lần đầu render, không clear innerHTML
