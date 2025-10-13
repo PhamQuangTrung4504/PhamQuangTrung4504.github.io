@@ -734,17 +734,22 @@ function initBankSelector() {
 
     // Xử lý riêng cho iOS (Safari và Chrome đều dùng WebKit trên iOS)
     if (isIOS) {
-      // iOS Strategy: Thử mở app trước, nếu không được thì hỏi user
+      // iOS Strategy: Phát hiện app mở bằng cách kiểm tra document focus
       let timeoutId = null;
+      let checkIntervalId = null;
       let appOpened = false;
+      let blurDetected = false;
 
       const startTime = Date.now();
 
       // Cleanup listeners
       const cleanup = () => {
         if (timeoutId) clearTimeout(timeoutId);
+        if (checkIntervalId) clearInterval(checkIntervalId);
         document.removeEventListener("visibilitychange", onVisibilityChange);
         window.removeEventListener("pagehide", onPageHide);
+        window.removeEventListener("blur", onBlur);
+        window.removeEventListener("focus", onFocus);
       };
 
       // Phát hiện app đã mở
@@ -760,29 +765,52 @@ function initBankSelector() {
         cleanup();
       };
 
+      const onBlur = () => {
+        blurDetected = true;
+      };
+
+      const onFocus = () => {
+        const elapsedTime = Date.now() - startTime;
+        // Nếu blur quá nhanh (< 300ms) => app không mở
+        // Nếu blur lâu (> 300ms) => app đã mở
+        if (blurDetected && elapsedTime > 300) {
+          appOpened = true;
+          cleanup();
+        }
+      };
+
       // Lắng nghe events
       document.addEventListener("visibilitychange", onVisibilityChange);
       window.addEventListener("pagehide", onPageHide);
+      window.addEventListener("blur", onBlur);
+      window.addEventListener("focus", onFocus);
+
+      // Kiểm tra liên tục xem document có bị hidden không (mỗi 100ms)
+      checkIntervalId = setInterval(() => {
+        if (document.hidden || !document.hasFocus()) {
+          appOpened = true;
+          cleanup();
+        }
+      }, 100);
 
       // Thử mở app bằng window.location (cách tốt nhất cho iOS)
       window.location.href = deeplinkUrl;
 
-      // Sau 1500ms kiểm tra
+      // Sau 2500ms kiểm tra (tăng timeout cho iOS)
       timeoutId = setTimeout(() => {
         cleanup();
 
-        // Nếu vẫn còn trên trang => app không mở được
-        if (!appOpened && !document.hidden) {
-          // Hỏi user có muốn đến App Store không
-          const userWantsStore = confirm(
-            `Không tìm thấy ứng dụng ${bank.appName}.\n\nBạn có muốn tải ứng dụng từ App Store không?`
-          );
-
-          if (userWantsStore && storeLink) {
+        // Chỉ redirect store nếu CHẮC CHẮN app không mở
+        // Kiểm tra: appOpened = false VÀ document vẫn visible VÀ vẫn có focus
+        if (!appOpened && !document.hidden && document.hasFocus()) {
+          if (storeLink) {
+            // Tự động redirect đến App Store
             window.location.href = storeLink;
           }
         }
-      }, 1500);
+        // Nếu không chắc chắn (appOpened = false nhưng document hidden/blur)
+        // => Không làm gì, có thể app đang mở
+      }, 2500);
 
       return;
     }
