@@ -1,0 +1,237 @@
+<!DOCTYPE html>
+<html lang="vi">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Test Bank Deeplink</title>
+    <style>
+      body {
+        font-family: Arial, sans-serif;
+        max-width: 600px;
+        margin: 50px auto;
+        padding: 20px;
+      }
+      .test-section {
+        margin: 20px 0;
+        padding: 15px;
+        border: 1px solid #ddd;
+        border-radius: 8px;
+      }
+      button {
+        padding: 10px 20px;
+        margin: 5px;
+        cursor: pointer;
+        border: none;
+        border-radius: 5px;
+        background: #007bff;
+        color: white;
+        font-size: 14px;
+      }
+      button:hover {
+        background: #0056b3;
+      }
+      .info {
+        background: #f8f9fa;
+        padding: 10px;
+        border-radius: 5px;
+        margin: 10px 0;
+        font-size: 12px;
+      }
+      .log {
+        background: #f0f0f0;
+        padding: 10px;
+        margin: 10px 0;
+        border-radius: 5px;
+        max-height: 200px;
+        overflow-y: auto;
+        font-family: monospace;
+        font-size: 11px;
+      }
+    </style>
+  </head>
+  <body>
+    <h1>🏦 Test Bank Deeplink</h1>
+
+    <div class="info">
+      <strong>Thông tin thiết bị:</strong><br />
+      User Agent: <span id="userAgent"></span><br />
+      Platform: <span id="platform"></span><br />
+      Device Type: <span id="deviceType"></span>
+    </div>
+
+    <div class="test-section">
+      <h3>Test các ngân hàng phổ biến:</h3>
+      <button onclick="testBank('vcb', 'https://dl.vietqr.io/pay?app=vcb')">
+        Test Vietcombank
+      </button>
+      <button onclick="testBank('tpb', 'https://dl.vietqr.io/pay?app=tpb')">
+        Test TPBank
+      </button>
+      <button onclick="testBank('mb', 'https://dl.vietqr.io/pay?app=mb')">
+        Test MB Bank
+      </button>
+      <button onclick="testBank('tcb', 'https://dl.vietqr.io/pay?app=tcb')">
+        Test Techcombank
+      </button>
+    </div>
+
+    <div class="test-section">
+      <h3>Console Log:</h3>
+      <div id="log" class="log"></div>
+      <button onclick="clearLog()">Clear Log</button>
+    </div>
+
+    <script>
+      // Hiển thị thông tin thiết bị
+      document.getElementById("userAgent").textContent = navigator.userAgent;
+      document.getElementById("platform").textContent = navigator.platform;
+
+      const isIOS = /iPhone|iPad|iPod/i.test(navigator.userAgent);
+      const isAndroid = /Android/i.test(navigator.userAgent);
+      let deviceType = "Desktop/Unknown";
+      if (isIOS) deviceType = "iOS";
+      else if (isAndroid) deviceType = "Android";
+      document.getElementById("deviceType").textContent = deviceType;
+
+      // Store links cho testing
+      const APP_STORE_LINKS = {
+        vcb: {
+          ios: "https://apps.apple.com/vn/app/vcb-dinh/id561433133",
+          android: "https://play.google.com/store/apps/details?id=com.VCB",
+        },
+        tpb: {
+          ios: "https://apps.apple.com/vn/app/tpbank-mobile/id450464147?l=vi",
+          android:
+            "https://play.google.com/store/apps/details?id=com.tpb.mb.gprsandroid",
+        },
+        mb: {
+          ios: "https://apps.apple.com/vn/app/mb-bank/id1205807363?l=vi",
+          android: "https://play.google.com/store/apps/details?id=com.mbmobile",
+        },
+        tcb: {
+          ios: "https://apps.apple.com/vn/app/techcombank-mobile/id1548623362?l=vi",
+          android:
+            "https://play.google.com/store/apps/details?id=vn.com.techcombank.bb.app",
+        },
+      };
+
+      function log(message) {
+        const logDiv = document.getElementById("log");
+        const timestamp = new Date().toLocaleTimeString();
+        logDiv.innerHTML += `[${timestamp}] ${message}<br>`;
+        logDiv.scrollTop = logDiv.scrollHeight;
+        console.log(message);
+      }
+
+      function clearLog() {
+        document.getElementById("log").innerHTML = "";
+      }
+
+      function getStoreLink(appId) {
+        const storeLinks = APP_STORE_LINKS[appId];
+        if (!storeLinks) return null;
+
+        if (isIOS && storeLinks.ios) {
+          return storeLinks.ios;
+        } else if (isAndroid && storeLinks.android) {
+          return storeLinks.android;
+        }
+        return storeLinks.android || storeLinks.ios;
+      }
+
+      function testBank(bankId, deeplink) {
+        log(`🏦 Testing ${bankId}...`);
+
+        const storeLink = getStoreLink(bankId);
+        log(`📱 Store link: ${storeLink}`);
+
+        // Build full deeplink with params
+        const fullDeeplink = `${deeplink}?ba=45404052004@TPB&tn=Ung ho Pham Quang Trung`;
+        log(`🔗 Deeplink: ${fullDeeplink}`);
+
+        let appOpened = false;
+        const startTime = Date.now();
+
+        // Event listeners
+        const onVisibilityChange = () => {
+          if (document.hidden) {
+            appOpened = true;
+            log(`✅ App opened! (visibility change)`);
+          }
+        };
+
+        const onBlur = () => {
+          setTimeout(() => {
+            if (document.hidden || !document.hasFocus()) {
+              appOpened = true;
+              log(`✅ App opened! (blur)`);
+            }
+          }, 200);
+        };
+
+        document.addEventListener("visibilitychange", onVisibilityChange);
+        window.addEventListener("blur", onBlur);
+
+        // Attempt to open
+        log(`⏳ Attempting to open deeplink...`);
+        try {
+          // Method 1: Hidden link (best for mobile)
+          const link = document.createElement("a");
+          link.href = fullDeeplink;
+          link.style.cssText = "display:none;position:absolute;";
+          link.setAttribute("target", "_blank");
+          document.body.appendChild(link);
+          link.click();
+
+          setTimeout(() => {
+            if (document.body.contains(link)) {
+              document.body.removeChild(link);
+            }
+          }, 100);
+
+          log(`📤 Deeplink triggered`);
+        } catch (e) {
+          log(`❌ Error: ${e.message}`);
+        }
+
+        // Check timeout
+        setTimeout(
+          () => {
+            document.removeEventListener(
+              "visibilitychange",
+              onVisibilityChange
+            );
+            window.removeEventListener("blur", onBlur);
+
+            const elapsed = Date.now() - startTime;
+            log(`⏱️ Elapsed time: ${elapsed}ms`);
+
+            if (!appOpened && !document.hidden) {
+              log(`⚠️ App did not open`);
+
+              if (storeLink) {
+                const openStore = confirm(
+                  `Không thể mở app ${bankId}.\n\nBạn có muốn mở cửa hàng ứng dụng không?`
+                );
+
+                if (openStore) {
+                  log(`🏪 Opening store: ${storeLink}`);
+                  window.location.href = storeLink;
+                } else {
+                  log(`🚫 User cancelled store redirect`);
+                }
+              }
+            } else {
+              log(`✅ Test completed successfully`);
+            }
+
+            log(`─────────────────────────────`);
+          },
+          isIOS ? 3500 : 2500
+        );
+      }
+
+      log("📋 Test page loaded. Click buttons to test banks.");
+    </script>
+  </body>
+</html>
