@@ -431,25 +431,25 @@ function initBankSelector() {
       android: "https://play.google.com/store/apps/details?id=com.VCB",
     },
     bidv: {
-      ios: "https://apps.apple.com/vn/app/bidv-smartbanking/id1035419724",
+      ios: "https://apps.apple.com/vn/app/bidv-smartbanking/id1061867449?l=vi",
       android: "https://play.google.com/store/apps/details?id=com.vnpay.bidv",
     },
     icb: {
-      ios: "https://apps.apple.com/vn/app/vietinbank-ipay/id1182487139",
+      ios: "https://apps.apple.com/vn/app/vietinbank-ipay/id689963454?l=vi",
       android:
         "https://play.google.com/store/apps/details?id=com.vietinbank.ipay",
     },
     mb: {
-      ios: "https://apps.apple.com/vn/app/mb-bank/id1095916656",
+      ios: "https://apps.apple.com/vn/app/mb-bank/id1205807363?l=vi",
       android: "https://play.google.com/store/apps/details?id=com.mbmobile",
     },
     tcb: {
-      ios: "https://apps.apple.com/vn/app/techcombank-mobile/id1156489632",
+      ios: "https://apps.apple.com/vn/app/techcombank-mobile/id1548623362?l=vi",
       android:
-        "https://play.google.com/store/apps/details?id=com.techcombank.bb.app",
+        "https://play.google.com/store/apps/details?id=vn.com.techcombank.bb.app",
     },
     vpb: {
-      ios: "https://apps.apple.com/vn/app/vpbank-neo/id1459650088",
+      ios: "https://apps.apple.com/vn/app/vpbank-neo/id1209349510?l=vi",
       android:
         "https://play.google.com/store/apps/details?id=com.vnpay.vpbankonline",
     },
@@ -459,62 +459,58 @@ function initBankSelector() {
         "https://play.google.com/store/apps/details?id=mobile.acb.com.vn",
     },
     ocb: {
-      ios: "https://apps.apple.com/vn/app/ocb-omni/id1445413585",
-      android: "https://play.google.com/store/apps/details?id=vn.com.ocb.omni",
+      ios: "https://apps.apple.com/vn/app/ocb-omni/id6472261202?l=vi",
+      android: "https://play.google.com/store/apps/details?id=vn.com.ocb.awe",
     },
     tpb: {
-      ios: "https://apps.apple.com/vn/app/tpbank-mobile/id983526167",
+      ios: "https://apps.apple.com/vn/app/tpbank-mobile/id450464147?l=vi",
       android:
         "https://play.google.com/store/apps/details?id=com.tpb.mb.gprsandroid",
     },
     vba: {
-      ios: "https://apps.apple.com/vn/app/agribank-e-mobile-banking/id1092719126",
+      ios: "https://apps.apple.com/vn/app/agribank-plus/id935944952?l=vi",
       android:
         "https://play.google.com/store/apps/details?id=com.vnpay.Agribank3g",
     },
     "vib-2": {
-      ios: "https://apps.apple.com/vn/app/myvib-2-0/id1470240051",
+      ios: "https://apps.apple.com/vn/app/myvib/id1626624790?l=vi",
       android: "https://play.google.com/store/apps/details?id=com.vib.myvib2",
     },
     lpb: {
-      ios: "https://apps.apple.com/vn/app/lienviet24h/id1094733241",
-      android: "https://play.google.com/store/apps/details?id=com.lpb.mbanking",
+      ios: "https://apps.apple.com/vn/app/lpbank/id1488794748?l=vi",
+      android: "https://play.google.com/store/apps/details?id=vn.com.lpb.lienviet24h",
     },
     shb: {
-      ios: "https://apps.apple.com/vn/app/shb-mobile-banking/id1023197266",
+      ios: "https://apps.apple.com/vn/app/shb-mobile/id538278798?l=vi",
       android: "https://play.google.com/store/apps/details?id=vn.shb.mbanking",
     },
     hdb: {
-      ios: "https://apps.apple.com/vn/app/hdbank/id1165312606",
-      android: "https://play.google.com/store/apps/details?id=com.hdbank",
+      ios: "https://apps.apple.com/vn/app/hdbank/id1461658565?l=vi",
+      android: "https://play.google.com/store/apps/details?id=com.vnpay.hdbank",
     },
     cake: {
-      ios: "https://apps.apple.com/vn/app/cake-by-vpbank/id1457357069",
-      android: "https://play.google.com/store/apps/details?id=vn.cake.app",
+      ios: "https://apps.apple.com/vn/app/cake-ng%C3%A2n-h%C3%A0ng-s%E1%BB%91/id1551907051?l=vi",
+      android: "https://play.google.com/store/apps/details?id=xyz.be.cake",
     },
     seab: {
-      ios: "https://apps.apple.com/vn/app/seamobile/id974392018",
+      ios: "https://apps.apple.com/vn/app/seamobile/id846407152?l=vi",
       android:
-        "https://play.google.com/store/apps/details?id=vn.com.seabank.mb",
+        "https://play.google.com/store/apps/details?id=vn.com.seabank.mb1",
     },
     scb: {
-      ios: "https://apps.apple.com/vn/app/scb-mobile-banking/id1047026868",
+      ios: "https://apps.apple.com/vn/app/scb-mobile-banking/id954973621?l=vi",
       android:
-        "https://play.google.com/store/apps/details?id=com.scb.mobilebanking",
+        "https://play.google.com/store/apps/details?id=com.vnpay.SCB",
     },
     eib: {
-      ios: "https://apps.apple.com/vn/app/eximbank/id1446885348",
+      ios: "https://apps.apple.com/vn/app/eximbank-edigi/id1571427361?l=vi",
       android:
-        "https://play.google.com/store/apps/details?id=com.eximbank.mobile",
+        "https://play.google.com/store/apps/details?id=com.vnpay.EximBankOmni",
     },
     timo: {
-      ios: "https://apps.apple.com/vn/app/timo-digital-bank/id1055295111",
-      android: "https://play.google.com/store/apps/details?id=com.timo.vn",
-    },
-    shbvn: {
-      ios: "https://apps.apple.com/vn/app/shinhan-bank-sol/id1475698024",
+      ios: "https://apps.apple.com/vn/app/timo-ng%C3%A2n-h%C3%A0ng-s%E1%BB%91-by-bvbank/id1521230347?l=vi",
       android:
-        "https://play.google.com/store/apps/details?id=kr.co.shinhansec.mgts",
+        "https://play.google.com/store/apps/details?id=io.lifestyle.plus",
     },
   };
 
@@ -538,7 +534,6 @@ function initBankSelector() {
     "scb",
     "eib",
     "timo",
-    "shbvn",
   ];
 
   const fallbackBanks = [
@@ -673,13 +668,6 @@ function initBankSelector() {
       appName: "Timo Digital Bank",
       bankName: "Ngân hàng TMCP Bản Việt (Timo)",
       deeplink: "https://dl.vietqr.io/pay?app=timo",
-      appLogo: "",
-    },
-    {
-      appId: "shbvn",
-      appName: "Shinhan Bank SOL",
-      bankName: "Ngân hàng TNHH MTV Shinhan Việt Nam",
-      deeplink: "https://dl.vietqr.io/pay?app=shbvn",
       appLogo: "",
     },
   ];
