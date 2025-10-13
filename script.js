@@ -720,7 +720,7 @@ function initBankSelector() {
     return storeLinks.android;
   }
 
-  // Mở app với fallback tự động đến store (Tối ưu độ trễ thấp)
+  // Mở app với fallback tự động đến store
   function openBankApp(bank) {
     const deeplinkUrl = buildDeeplink(bank.deeplink);
     const storeLink = getStoreLink(bank.appId);
@@ -737,12 +737,9 @@ function initBankSelector() {
       window.removeEventListener("blur", onBlur);
       window.removeEventListener("pagehide", onPageHide);
       document.removeEventListener("visibilitychange", onVisibilityChange);
-      if (iframe && iframe.parentNode) {
-        document.body.removeChild(iframe);
-      }
     };
 
-    // Event handlers - App đã mở
+    // Event handlers - Phát hiện app đã mở
     const onBlur = () => {
       appOpened = true;
       cleanup();
@@ -760,43 +757,50 @@ function initBankSelector() {
       }
     };
 
-    // Tạo iframe ẩn để thử mở deeplink (KHÔNG hiển thị lỗi)
-    const iframe = document.createElement("iframe");
-    iframe.style.display = "none";
-    iframe.style.width = "0";
-    iframe.style.height = "0";
-    iframe.style.border = "none";
-    document.body.appendChild(iframe);
-
-    // Lắng nghe nhiều events để phát hiện app mở nhanh hơn
+    // Lắng nghe events để phát hiện app mở
     window.addEventListener("blur", onBlur);
     window.addEventListener("pagehide", onPageHide);
     document.addEventListener("visibilitychange", onVisibilityChange);
 
-    // Thử mở app qua iframe
+    // Lưu thời điểm bắt đầu
+    const startTime = Date.now();
+
+    // Thử mở app bằng window.location.href (cách tốt nhất)
     try {
-      iframe.src = deeplinkUrl;
+      window.location.href = deeplinkUrl;
     } catch (e) {
-      // Bỏ qua lỗi
+      // Nếu lỗi, thử dùng window.open
+      try {
+        window.open(deeplinkUrl, "_self");
+      } catch (err) {
+        // Bỏ qua lỗi
+      }
     }
 
-    // Giảm timeout xuống 800ms để phản hồi nhanh hơn
+    // Set timeout để kiểm tra sau 1500ms
     timeoutId = setTimeout(() => {
       cleanup();
 
-      // Nếu app không mở được (user vẫn trên trang)
+      // Kiểm tra xem app có mở được không
+      // Nếu user vẫn còn trên trang (không blur/hide) sau 1500ms
+      // => App không cài hoặc không mở được => Chuyển đến store
       if (!appOpened) {
-        if (storeLink) {
-          // Chuyển trực tiếp đến store
-          window.location.href = storeLink;
-        } else {
-          // Fallback nếu không có store link
-          alert(
-            `Vui lòng tải ${bank.appName} từ App Store hoặc CH Play để sử dụng tính năng này.`
-          );
+        const elapsedTime = Date.now() - startTime;
+
+        // Đảm bảo đã đợi đủ lâu trước khi chuyển store
+        if (elapsedTime >= 1400) {
+          if (storeLink) {
+            // Chuyển trực tiếp đến store
+            window.location.href = storeLink;
+          } else {
+            // Fallback nếu không có store link
+            alert(
+              `Vui lòng tải ${bank.appName} từ App Store hoặc CH Play để sử dụng tính năng này.`
+            );
+          }
         }
       }
-    }, 800); // Giảm từ 1500ms xuống 800ms
+    }, 1500);
   }
   function renderList(items, isInitial = false) {
     // Nếu không phải lần đầu render, không clear innerHTML
