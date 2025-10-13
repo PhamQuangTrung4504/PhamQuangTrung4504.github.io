@@ -478,7 +478,8 @@ function initBankSelector() {
     },
     lpb: {
       ios: "https://apps.apple.com/vn/app/lpbank/id1488794748?l=vi",
-      android: "https://play.google.com/store/apps/details?id=vn.com.lpb.lienviet24h",
+      android:
+        "https://play.google.com/store/apps/details?id=vn.com.lpb.lienviet24h",
     },
     shb: {
       ios: "https://apps.apple.com/vn/app/shb-mobile/id538278798?l=vi",
@@ -499,8 +500,7 @@ function initBankSelector() {
     },
     scb: {
       ios: "https://apps.apple.com/vn/app/scb-mobile-banking/id954973621?l=vi",
-      android:
-        "https://play.google.com/store/apps/details?id=com.vnpay.SCB",
+      android: "https://play.google.com/store/apps/details?id=com.vnpay.SCB",
     },
     eib: {
       ios: "https://apps.apple.com/vn/app/eximbank-edigi/id1571427361?l=vi",
@@ -720,7 +720,7 @@ function initBankSelector() {
     return storeLinks.android;
   }
 
-  // Mở app với fallback tự động đến store (KHÔNG gây lỗi)
+  // Mở app với fallback tự động đến store (Tối ưu độ trễ thấp)
   function openBankApp(bank) {
     const deeplinkUrl = buildDeeplink(bank.deeplink);
     const storeLink = getStoreLink(bank.appId);
@@ -729,15 +729,49 @@ function initBankSelector() {
     closeModal();
 
     let appOpened = false;
-    const startTime = Date.now();
+    let timeoutId = null;
 
-    // Tạo iframe ẩn để thử mở deeplink (KHÔNG hiển thị lỗi cho user)
+    // Cleanup function
+    const cleanup = () => {
+      if (timeoutId) clearTimeout(timeoutId);
+      window.removeEventListener("blur", onBlur);
+      window.removeEventListener("pagehide", onPageHide);
+      document.removeEventListener("visibilitychange", onVisibilityChange);
+      if (iframe && iframe.parentNode) {
+        document.body.removeChild(iframe);
+      }
+    };
+
+    // Event handlers - App đã mở
+    const onBlur = () => {
+      appOpened = true;
+      cleanup();
+    };
+
+    const onPageHide = () => {
+      appOpened = true;
+      cleanup();
+    };
+
+    const onVisibilityChange = () => {
+      if (document.hidden) {
+        appOpened = true;
+        cleanup();
+      }
+    };
+
+    // Tạo iframe ẩn để thử mở deeplink (KHÔNG hiển thị lỗi)
     const iframe = document.createElement("iframe");
     iframe.style.display = "none";
     iframe.style.width = "0";
     iframe.style.height = "0";
     iframe.style.border = "none";
     document.body.appendChild(iframe);
+
+    // Lắng nghe nhiều events để phát hiện app mở nhanh hơn
+    window.addEventListener("blur", onBlur);
+    window.addEventListener("pagehide", onPageHide);
+    document.addEventListener("visibilitychange", onVisibilityChange);
 
     // Thử mở app qua iframe
     try {
@@ -746,23 +780,8 @@ function initBankSelector() {
       // Bỏ qua lỗi
     }
 
-    // Lắng nghe sự kiện blur (user rời khỏi trang = app đã mở)
-    const onBlur = () => {
-      appOpened = true;
-      cleanup();
-    };
-    window.addEventListener("blur", onBlur);
-
-    // Cleanup function
-    const cleanup = () => {
-      window.removeEventListener("blur", onBlur);
-      if (iframe && iframe.parentNode) {
-        document.body.removeChild(iframe);
-      }
-    };
-
-    // Sau 1.5 giây kiểm tra xem app có mở không
-    setTimeout(() => {
+    // Giảm timeout xuống 800ms để phản hồi nhanh hơn
+    timeoutId = setTimeout(() => {
       cleanup();
 
       // Nếu app không mở được (user vẫn trên trang)
@@ -777,7 +796,7 @@ function initBankSelector() {
           );
         }
       }
-    }, 1500);
+    }, 800); // Giảm từ 1500ms xuống 800ms
   }
   function renderList(items, isInitial = false) {
     // Nếu không phải lần đầu render, không clear innerHTML
