@@ -730,13 +730,13 @@ function initBankSelector() {
     const isAndroid = /Android/i.test(navigator.userAgent);
 
     // Strategy mới cho TẤT CẢ platforms: Không đóng modal trước
-    let timeoutId = null;
+    let fallbackTimerId = null;
     let appOpened = false;
     const startTime = Date.now();
 
     // Cleanup
     const cleanup = () => {
-      if (timeoutId) clearTimeout(timeoutId);
+      if (fallbackTimerId) clearTimeout(fallbackTimerId);
       document.removeEventListener("visibilitychange", onVisibilityChange);
       window.removeEventListener("pagehide", onPageHide);
       window.removeEventListener("blur", onBlur);
@@ -779,26 +779,36 @@ function initBankSelector() {
     }
 
     // MỞ DEEPLINK NGAY LẬP TỨC (vẫn còn user action context, modal vẫn mở)
-    try {
-      window.location.href = deeplinkUrl;
-    } catch (e) {
-      // Fallback
+    // Hàm thử mở deeplink, fallback qua anchor ẩn nếu cần
+    function attemptOpen() {
       try {
-        const link = document.createElement("a");
-        link.href = deeplinkUrl;
-        link.style.display = "none";
-        document.body.appendChild(link);
-        link.click();
-        document.body.removeChild(link);
-      } catch (err) {
-        // Bỏ qua
+        window.location.href = deeplinkUrl;
+      } catch (e) {
+        // Fallback qua thẻ anchor ẩn
+        try {
+          const link = document.createElement("a");
+          link.href = deeplinkUrl;
+          link.style.display = "none";
+          document.body.appendChild(link);
+          link.click();
+          document.body.removeChild(link);
+        } catch (err) {
+          // Bỏ qua lỗi
+        }
       }
     }
 
-    // Timeout để kiểm tra app có mở không
-    const timeoutDuration = isIOS ? 2500 : 1500;
+    // Một số trình duyệt (như Safari iOS) cần bọc trong requestAnimationFrame để giữ gesture
+    if (typeof window.requestAnimationFrame === "function") {
+      window.requestAnimationFrame(() => attemptOpen());
+    } else {
+      attemptOpen();
+    }
 
-    timeoutId = setTimeout(() => {
+    // Timeout để kiểm tra app có mở không
+    const timeoutDuration = isIOS ? 3500 : 2000;
+
+    fallbackTimerId = setTimeout(() => {
       cleanup();
 
       // Nếu app không mở được (user vẫn ở trang, không có blur/hidden)
@@ -806,11 +816,24 @@ function initBankSelector() {
         // Đóng modal trước khi redirect
         closeModal();
 
-        // Sau đó redirect đến store
+        // Sau đó hỏi người dùng có muốn đến store không để tránh redirect nhầm
         if (storeLink) {
-          setTimeout(() => {
-            window.location.href = storeLink;
-          }, 100);
+          const elapsed = Date.now() - startTime;
+          const shouldOpenStore = confirm(
+            `Không thể mở ${bank.appName}.\n\nBạn có muốn mở chợ ứng dụng để tải hoặc cập nhật không?`
+          );
+
+          if (shouldOpenStore) {
+            // Chờ 100ms để modal đóng hẳn
+            setTimeout(() => {
+              window.location.href = storeLink;
+            }, 100);
+          } else {
+            // Nếu user từ chối, focus lại vào danh sách để họ thử lại
+            setTimeout(() => {
+              searchInput.focus({ preventScroll: true });
+            }, 200);
+          }
         }
       } else if (appOpened) {
         // App đã mở, đảm bảo modal đóng
