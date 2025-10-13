@@ -731,7 +731,7 @@ function initBankSelector() {
     // Detect Safari
     const isSafari = /^((?!chrome|android).)*safari/i.test(navigator.userAgent);
     const isIOS = /iPhone|iPad|iPod/i.test(navigator.userAgent);
-    
+
     let appOpened = false;
     let timeoutId = null;
     let deeplinkWindow = null;
@@ -743,7 +743,7 @@ function initBankSelector() {
       window.removeEventListener("pagehide", onPageHide);
       document.removeEventListener("visibilitychange", onVisibilityChange);
       window.removeEventListener("focus", onFocus);
-      
+
       // Đóng cửa sổ deeplink nếu có (cho Safari)
       if (deeplinkWindow && !deeplinkWindow.closed) {
         try {
@@ -775,7 +775,7 @@ function initBankSelector() {
     // Event khi quay lại trang (cho Safari)
     const onFocus = () => {
       const elapsedTime = Date.now() - startTime;
-      
+
       // Nếu blur rất nhanh (< 500ms) => app không mở được
       if (elapsedTime < 500) {
         appOpened = false;
@@ -804,20 +804,19 @@ function initBankSelector() {
       iframe.style.height = "0";
       iframe.style.border = "none";
       document.body.appendChild(iframe);
-      
+
       try {
         iframe.src = deeplinkUrl;
       } catch (e) {
         // Bỏ qua
       }
-      
+
       // Sau 300ms, remove iframe
       setTimeout(() => {
         if (iframe.parentNode) {
           document.body.removeChild(iframe);
         }
       }, 300);
-      
     } else {
       // Chrome hoặc Safari desktop: Dùng window.location.href
       try {
@@ -839,7 +838,7 @@ function initBankSelector() {
       // Kiểm tra xem app có mở được không
       if (!appOpened) {
         const elapsedTime = Date.now() - startTime;
-        
+
         // Đảm bảo đã đợi đủ lâu trước khi chuyển store
         if (elapsedTime >= 1900) {
           if (storeLink) {
