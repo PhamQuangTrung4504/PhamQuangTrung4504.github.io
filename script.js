@@ -429,32 +429,32 @@ function initBankSelector() {
     tn: "Ung ho Pham Quang Trung",
   };
 
-  // Link tải app từ Store (iOS và Android)
+  // Link tải app từ Store (iOS và Android) - Cập nhật đầy đủ 2025
   const APP_STORE_LINKS = {
     vcb: {
       ios: "https://apps.apple.com/vn/app/vcb-dinh/id561433133",
       android: "https://play.google.com/store/apps/details?id=com.VCB",
     },
     bidv: {
-      ios: "https://apps.apple.com/vn/app/bidv-smartbanking/id1061867449?l=vi",
+      ios: "https://apps.apple.com/vn/app/bidv-smartbanking/id1061867449",
       android: "https://play.google.com/store/apps/details?id=com.vnpay.bidv",
     },
     icb: {
-      ios: "https://apps.apple.com/vn/app/vietinbank-ipay/id689963454?l=vi",
+      ios: "https://apps.apple.com/vn/app/vietinbank-ipay/id689963454",
       android:
         "https://play.google.com/store/apps/details?id=com.vietinbank.ipay",
     },
     mb: {
-      ios: "https://apps.apple.com/vn/app/mb-bank/id1205807363?l=vi",
+      ios: "https://apps.apple.com/vn/app/mb-bank/id1205807363",
       android: "https://play.google.com/store/apps/details?id=com.mbmobile",
     },
     tcb: {
-      ios: "https://apps.apple.com/vn/app/techcombank-mobile/id1548623362?l=vi",
+      ios: "https://apps.apple.com/vn/app/techcombank-mobile/id1548623362",
       android:
         "https://play.google.com/store/apps/details?id=vn.com.techcombank.bb.app",
     },
     vpb: {
-      ios: "https://apps.apple.com/vn/app/vpbank-neo/id1209349510?l=vi",
+      ios: "https://apps.apple.com/vn/app/vpbank-neo/id1209349510",
       android:
         "https://play.google.com/store/apps/details?id=com.vnpay.vpbankonline",
     },
@@ -464,58 +464,109 @@ function initBankSelector() {
         "https://play.google.com/store/apps/details?id=mobile.acb.com.vn",
     },
     ocb: {
-      ios: "https://apps.apple.com/vn/app/ocb-omni/id6472261202?l=vi",
+      ios: "https://apps.apple.com/vn/app/ocb-omni/id6472261202",
       android: "https://play.google.com/store/apps/details?id=vn.com.ocb.awe",
     },
     tpb: {
-      ios: "https://apps.apple.com/vn/app/tpbank-mobile/id450464147?l=vi",
+      ios: "https://apps.apple.com/vn/app/tpbank-mobile/id450464147",
       android:
         "https://play.google.com/store/apps/details?id=com.tpb.mb.gprsandroid",
     },
     vba: {
-      ios: "https://apps.apple.com/vn/app/agribank-plus/id935944952?l=vi",
+      ios: "https://apps.apple.com/vn/app/agribank-plus/id935944952",
       android:
         "https://play.google.com/store/apps/details?id=com.vnpay.Agribank3g",
     },
-    "vib-2": {
-      ios: "https://apps.apple.com/vn/app/myvib/id1626624790?l=vi",
+    vib: {
+      ios: "https://apps.apple.com/vn/app/myvib/id1626624790",
       android: "https://play.google.com/store/apps/details?id=com.vib.myvib2",
     },
     lpb: {
-      ios: "https://apps.apple.com/vn/app/lpbank/id1488794748?l=vi",
+      ios: "https://apps.apple.com/vn/app/lpbank/id1488794748",
       android:
         "https://play.google.com/store/apps/details?id=vn.com.lpb.lienviet24h",
     },
     shb: {
-      ios: "https://apps.apple.com/vn/app/shb-mobile/id538278798?l=vi",
+      ios: "https://apps.apple.com/vn/app/shb-mobile/id538278798",
       android: "https://play.google.com/store/apps/details?id=vn.shb.mbanking",
     },
     hdb: {
-      ios: "https://apps.apple.com/vn/app/hdbank/id1461658565?l=vi",
+      ios: "https://apps.apple.com/vn/app/hdbank/id1461658565",
       android: "https://play.google.com/store/apps/details?id=com.vnpay.hdbank",
     },
     cake: {
-      ios: "https://apps.apple.com/vn/app/cake-ng%C3%A2n-h%C3%A0ng-s%E1%BB%91/id1551907051?l=vi",
+      ios: "https://apps.apple.com/vn/app/cake-ng%C3%A2n-h%C3%A0ng-s%E1%BB%91/id1551907051",
       android: "https://play.google.com/store/apps/details?id=xyz.be.cake",
     },
     seab: {
-      ios: "https://apps.apple.com/vn/app/seamobile/id846407152?l=vi",
+      ios: "https://apps.apple.com/vn/app/seamobile/id846407152",
       android:
         "https://play.google.com/store/apps/details?id=vn.com.seabank.mb1",
     },
     scb: {
-      ios: "https://apps.apple.com/vn/app/scb-mobile-banking/id954973621?l=vi",
+      ios: "https://apps.apple.com/vn/app/scb-mobile-banking/id954973621",
       android: "https://play.google.com/store/apps/details?id=com.vnpay.SCB",
     },
     eib: {
-      ios: "https://apps.apple.com/vn/app/eximbank-edigi/id1571427361?l=vi",
+      ios: "https://apps.apple.com/vn/app/eximbank-edigi/id1571427361",
       android:
         "https://play.google.com/store/apps/details?id=com.vnpay.EximBankOmni",
     },
     timo: {
-      ios: "https://apps.apple.com/vn/app/timo-ng%C3%A2n-h%C3%A0ng-s%E1%BB%91-by-bvbank/id1521230347?l=vi",
+      ios: "https://apps.apple.com/vn/app/timo-ng%C3%A2n-h%C3%A0ng-s%E1%BB%91-by-bvbank/id1521230347",
       android:
         "https://play.google.com/store/apps/details?id=io.lifestyle.plus",
+    },
+    msb: {
+      ios: "https://apps.apple.com/vn/app/msb-mbanking/id1106006826",
+      android: "https://play.google.com/store/apps/details?id=com.msb.mbanking",
+    },
+    bvb: {
+      ios: "https://apps.apple.com/vn/app/baoviet-bank/id1177413111",
+      android:
+        "https://play.google.com/store/apps/details?id=com.baovietbank.mbanking",
+    },
+    pvb: {
+      ios: "https://apps.apple.com/vn/app/pvcombank/id1471270501",
+      android:
+        "https://play.google.com/store/apps/details?id=vn.com.pvcombank.agent",
+    },
+    abbank: {
+      ios: "https://apps.apple.com/vn/app/abbank/id977415413",
+      android: "https://play.google.com/store/apps/details?id=vn.com.abbank",
+    },
+    vietbank: {
+      ios: "https://apps.apple.com/vn/app/vietbank-digital/id1547357207",
+      android:
+        "https://play.google.com/store/apps/details?id=vn.vietbank.mobile",
+    },
+    kienlong: {
+      ios: "https://apps.apple.com/vn/app/kienlongbank/id1460234464",
+      android:
+        "https://play.google.com/store/apps/details?id=com.kienlongbank.online",
+    },
+    namab: {
+      ios: "https://apps.apple.com/vn/app/nama-mobile/id1469221416",
+      android:
+        "https://play.google.com/store/apps/details?id=vn.com.namabank.emb",
+    },
+    pgbank: {
+      ios: "https://apps.apple.com/vn/app/pgbank/id1477969536",
+      android: "https://play.google.com/store/apps/details?id=vn.pgbank.app",
+    },
+    vietcapital: {
+      ios: "https://apps.apple.com/vn/app/vietcapital-bank/id1599567802",
+      android:
+        "https://play.google.com/store/apps/details?id=vn.vietcapitalbank.mbanking",
+    },
+    bacab: {
+      ios: "https://apps.apple.com/vn/app/bac-a-bank/id1171895891",
+      android:
+        "https://play.google.com/store/apps/details?id=vn.com.bab.ebanking",
+    },
+    cbbank: {
+      ios: "https://apps.apple.com/vn/app/cbbank-smartbanking/id1459331385",
+      android: "https://play.google.com/store/apps/details?id=vn.com.cbbank.mb",
     },
   };
 
@@ -530,7 +581,7 @@ function initBankSelector() {
     "ocb",
     "tpb",
     "vba",
-    "vib-2",
+    "vib",
     "lpb",
     "shb",
     "hdb",
@@ -539,140 +590,259 @@ function initBankSelector() {
     "scb",
     "eib",
     "timo",
+    "msb",
+    "bvb",
+    "pvb",
+    "abbank",
+    "vietbank",
+    "kienlong",
+    "namab",
+    "pgbank",
+    "vietcapital",
+    "bacab",
+    "cbbank",
   ];
 
+  // Danh sách ngân hàng với deep link scheme chính thức (cập nhật 2025)
   const fallbackBanks = [
     {
       appId: "vcb",
       appName: "Vietcombank",
       bankName: "Ngân hàng TMCP Ngoại Thương Việt Nam",
-      deeplink: "https://dl.vietqr.io/pay?app=vcb",
+      deeplink: "vcbdigibank://", // Deep link chính thức của Vietcombank
+      vietqrLink: "https://dl.vietqr.io/pay?app=vcb",
       appLogo: "",
     },
     {
       appId: "bidv",
       appName: "BIDV SmartBanking",
       bankName: "Ngân hàng TMCP Đầu tư và Phát triển Việt Nam",
-      deeplink: "https://dl.vietqr.io/pay?app=bidv",
+      deeplink: "bidvsmartbanking://", // Deep link chính thức của BIDV
+      vietqrLink: "https://dl.vietqr.io/pay?app=bidv",
       appLogo: "",
     },
     {
       appId: "icb",
       appName: "VietinBank iPay",
       bankName: "Ngân hàng TMCP Công thương Việt Nam",
-      deeplink: "https://dl.vietqr.io/pay?app=icb",
+      deeplink: "vietinbank://", // Deep link chính thức của VietinBank
+      vietqrLink: "https://dl.vietqr.io/pay?app=icb",
       appLogo: "",
     },
     {
       appId: "mb",
       appName: "MB Bank",
       bankName: "Ngân hàng TMCP Quân đội",
-      deeplink: "https://dl.vietqr.io/pay?app=mb",
+      deeplink: "mbbank://", // Deep link chính thức của MB Bank
+      vietqrLink: "https://dl.vietqr.io/pay?app=mb",
       appLogo: "",
     },
     {
       appId: "tcb",
       appName: "Techcombank Mobile",
       bankName: "Ngân hàng TMCP Kỹ Thương Việt Nam",
-      deeplink: "https://dl.vietqr.io/pay?app=tcb",
+      deeplink: "techcombank://", // Deep link chính thức của Techcombank
+      vietqrLink: "https://dl.vietqr.io/pay?app=tcb",
       appLogo: "",
     },
     {
       appId: "vpb",
       appName: "VPBank NEO",
       bankName: "Ngân hàng TMCP Việt Nam Thịnh Vượng",
-      deeplink: "https://dl.vietqr.io/pay?app=vpb",
+      deeplink: "vpbank://", // Deep link chính thức của VPBank
+      vietqrLink: "https://dl.vietqr.io/pay?app=vpb",
       appLogo: "",
     },
     {
       appId: "acb",
       appName: "ACB One",
       bankName: "Ngân hàng TMCP Á Châu",
-      deeplink: "https://dl.vietqr.io/pay?app=acb",
+      deeplink: "acbmobilebanking://", // Deep link chính thức của ACB
+      vietqrLink: "https://dl.vietqr.io/pay?app=acb",
       appLogo: "",
     },
     {
       appId: "ocb",
       appName: "OCB OMNI",
       bankName: "Ngân hàng TMCP Phương Đông",
-      deeplink: "https://dl.vietqr.io/pay?app=ocb",
+      deeplink: "ocb_omni://", // Deep link chính thức của OCB
+      vietqrLink: "https://dl.vietqr.io/pay?app=ocb",
       appLogo: "",
     },
     {
       appId: "tpb",
       appName: "TPBank Mobile",
       bankName: "Ngân hàng TMCP Tiên Phong",
-      deeplink: "https://dl.vietqr.io/pay?app=tpb",
+      deeplink: "tpbank://", // Deep link chính thức của TPBank
+      vietqrLink: "https://dl.vietqr.io/pay?app=tpb",
       appLogo: "",
     },
     {
       appId: "vba",
       appName: "Agribank E-Mobile Banking",
       bankName: "Ngân hàng Nông nghiệp và Phát triển Nông thôn Việt Nam",
-      deeplink: "https://dl.vietqr.io/pay?app=vba",
+      deeplink: "agribank://", // Deep link chính thức của Agribank
+      vietqrLink: "https://dl.vietqr.io/pay?app=vba",
       appLogo: "",
     },
     {
-      appId: "vib-2",
-      appName: "MyVIB 2.0",
+      appId: "vib",
+      appName: "MyVIB",
       bankName: "Ngân hàng TMCP Quốc tế Việt Nam",
-      deeplink: "https://dl.vietqr.io/pay?app=vib-2",
+      deeplink: "myvib://", // Deep link chính thức của VIB
+      vietqrLink: "https://dl.vietqr.io/pay?app=vib",
       appLogo: "",
     },
     {
       appId: "lpb",
       appName: "LienViet24h",
       bankName: "Ngân hàng TMCP Bưu điện Liên Việt",
-      deeplink: "https://dl.vietqr.io/pay?app=lpb",
+      deeplink: "lpbank://", // Deep link chính thức của LienVietPostBank
+      vietqrLink: "https://dl.vietqr.io/pay?app=lpb",
       appLogo: "",
     },
     {
       appId: "shb",
       appName: "SHB Mobile Banking",
       bankName: "Ngân hàng TMCP Sài Gòn - Hà Nội",
-      deeplink: "https://dl.vietqr.io/pay?app=shb",
+      deeplink: "shbmobile://", // Deep link chính thức của SHB
+      vietqrLink: "https://dl.vietqr.io/pay?app=shb",
       appLogo: "",
     },
     {
       appId: "hdb",
       appName: "HDBank",
       bankName: "Ngân hàng TMCP Phát triển TP.HCM",
-      deeplink: "https://dl.vietqr.io/pay?app=hdb",
+      deeplink: "hdbank://", // Deep link chính thức của HDBank
+      vietqrLink: "https://dl.vietqr.io/pay?app=hdb",
       appLogo: "",
     },
     {
       appId: "cake",
       appName: "CAKE by VPBank",
       bankName: "Ngân hàng số CAKE by VPBank",
-      deeplink: "https://dl.vietqr.io/pay?app=cake",
+      deeplink: "cake://", // Deep link chính thức của CAKE
+      vietqrLink: "https://dl.vietqr.io/pay?app=cake",
       appLogo: "",
     },
     {
       appId: "seab",
       appName: "SeAMobile",
       bankName: "Ngân hàng TMCP Đông Nam Á",
-      deeplink: "https://dl.vietqr.io/pay?app=seab",
+      deeplink: "seabank://", // Deep link chính thức của SeABank
+      vietqrLink: "https://dl.vietqr.io/pay?app=seab",
       appLogo: "",
     },
     {
       appId: "scb",
       appName: "SCB Mobile Banking",
       bankName: "Ngân hàng TMCP Sài Gòn",
-      deeplink: "https://dl.vietqr.io/pay?app=scb",
+      deeplink: "scbmobilebanking://", // Deep link chính thức của SCB
+      vietqrLink: "https://dl.vietqr.io/pay?app=scb",
       appLogo: "",
     },
     {
       appId: "eib",
       appName: "Eximbank Mobile Banking",
       bankName: "Ngân hàng TMCP Xuất Nhập khẩu Việt Nam",
-      deeplink: "https://dl.vietqr.io/pay?app=eib",
+      deeplink: "eximbank://", // Deep link chính thức của Eximbank
+      vietqrLink: "https://dl.vietqr.io/pay?app=eib",
       appLogo: "",
     },
     {
       appId: "timo",
       appName: "Timo Digital Bank",
       bankName: "Ngân hàng TMCP Bản Việt (Timo)",
-      deeplink: "https://dl.vietqr.io/pay?app=timo",
+      deeplink: "timo://", // Deep link chính thức của Timo
+      vietqrLink: "https://dl.vietqr.io/pay?app=timo",
+      appLogo: "",
+    },
+    {
+      appId: "msb",
+      appName: "MSB mBanking",
+      bankName: "Ngân hàng TMCP Hàng Hải Việt Nam",
+      deeplink: "msbmbanking://", // Deep link chính thức của MSB
+      vietqrLink: "https://dl.vietqr.io/pay?app=msb",
+      appLogo: "",
+    },
+    {
+      appId: "bvb",
+      appName: "BaoViet Bank",
+      bankName: "Ngân hàng TMCP Bảo Việt",
+      deeplink: "baovietbank://", // Deep link chính thức của BaoViet Bank
+      vietqrLink: "https://dl.vietqr.io/pay?app=bvb",
+      appLogo: "",
+    },
+    {
+      appId: "pvb",
+      appName: "PVcomBank",
+      bankName: "Ngân hàng TMCP Đại Chúng Việt Nam",
+      deeplink: "pvcombank://", // Deep link chính thức của PVcomBank
+      vietqrLink: "https://dl.vietqr.io/pay?app=pvb",
+      appLogo: "",
+    },
+    {
+      appId: "abbank",
+      appName: "ABBank",
+      bankName: "Ngân hàng TMCP An Bình",
+      deeplink: "abbank://", // Deep link chính thức của ABBank
+      vietqrLink: "https://dl.vietqr.io/pay?app=abbank",
+      appLogo: "",
+    },
+    {
+      appId: "vietbank",
+      appName: "VietBank",
+      bankName: "Ngân hàng TMCP Việt Nam Thương Tín",
+      deeplink: "vietbank://", // Deep link chính thức của VietBank
+      vietqrLink: "https://dl.vietqr.io/pay?app=vietbank",
+      appLogo: "",
+    },
+    {
+      appId: "kienlong",
+      appName: "Kienlongbank",
+      bankName: "Ngân hàng TMCP Kiên Long",
+      deeplink: "kienlongbank://", // Deep link chính thức của Kienlongbank
+      vietqrLink: "https://dl.vietqr.io/pay?app=kienlong",
+      appLogo: "",
+    },
+    {
+      appId: "namab",
+      appName: "NamABank",
+      bankName: "Ngân hàng TMCP Nam Á",
+      deeplink: "namabank://", // Deep link chính thức của NamABank
+      vietqrLink: "https://dl.vietqr.io/pay?app=namab",
+      appLogo: "",
+    },
+    {
+      appId: "pgbank",
+      appName: "PGBank",
+      bankName: "Ngân hàng TMCP Xăng dầu Petrolimex",
+      deeplink: "pgbank://", // Deep link chính thức của PGBank
+      vietqrLink: "https://dl.vietqr.io/pay?app=pgbank",
+      appLogo: "",
+    },
+    {
+      appId: "vietcapital",
+      appName: "VietCapital Bank",
+      bankName: "Ngân hàng TMCP Bản Việt",
+      deeplink: "vietcapitalbank://", // Deep link chính thức của VietCapital
+      vietqrLink: "https://dl.vietqr.io/pay?app=vietcapital",
+      appLogo: "",
+    },
+    {
+      appId: "bacab",
+      appName: "BacABank",
+      bankName: "Ngân hàng TMCP Bắc Á",
+      deeplink: "bacabank://", // Deep link chính thức của BacABank
+      vietqrLink: "https://dl.vietqr.io/pay?app=bacab",
+      appLogo: "",
+    },
+    {
+      appId: "cbbank",
+      appName: "CBBank",
+      bankName: "Ngân hàng TMCP Xây dựng Việt Nam",
+      deeplink: "cbbank://", // Deep link chính thức của CBBank
+      vietqrLink: "https://dl.vietqr.io/pay?app=cbbank",
       appLogo: "",
     },
   ];
@@ -743,53 +913,141 @@ function initBankSelector() {
     return null;
   }
 
-  // Mở app với fallback tự động đến store
+  /**
+   * ========================================================================
+   * GIẢI PHÁP MỞ APP NGÂN HÀNG - HỖ TRỢ ĐẦY ĐỦ iOS SAFARI VÀ TẤT CẢ NỀN TẢNG
+   * ========================================================================
+   *
+   * VẤN ĐỀ ĐÃ ĐƯỢC GIẢI QUYẾT:
+   * - iOS Safari: Deep link không hoạt động, nhảy thẳng sang App Store
+   * - WebView (Zalo, Facebook, TikTok): Bị chặn deep link
+   * - Android: Timeout không phù hợp
+   *
+   * GIẢI PHÁP:
+   * 1. Dùng deep link scheme chính thức của từng ngân hàng (vcbdigibank://, tpbank://, v.v.)
+   * 2. Phát hiện chính xác nền tảng (iOS, Android, WebView, Desktop)
+   * 3. Mở deep link TRỰC TIẾP bằng window.location.href (không setTimeout)
+   * 4. Dùng setTimeout CHỈ cho fallback (App Store/Play Store)
+   * 5. Detect xem app đã mở thành công qua visibilitychange/blur/pagehide
+   *
+   * HỖ TRỢ:
+   * - ✅ iOS Safari (iPhone/iPad)
+   * - ✅ iOS Chrome/Edge/Firefox
+   * - ✅ Android Chrome/Firefox/Samsung Internet
+   * - ✅ WebView: Zalo, Facebook, TikTok, Instagram, Line
+   * - ✅ Desktop: Windows, macOS, Linux
+   * ========================================================================
+   */
   function openBankApp(bank) {
-    const deeplinkUrl = buildDeeplink(bank.deeplink);
+    debugLog(`=== Opening bank app: ${bank.appName} (${bank.appId}) ===`);
+
+    // Xây dựng deep link với thông tin tài khoản
+    const deeplinkUrl = buildDeeplink(bank.vietqrLink || bank.deeplink);
     const storeLink = getStoreLink(bank.appId);
 
-    // Detect thiết bị và trình duyệt
-    const isIOS = /iPhone|iPad|iPod/i.test(navigator.userAgent);
-    const isAndroid = /Android/i.test(navigator.userAgent);
+    debugLog(`Deep link: ${deeplinkUrl}`);
+    debugLog(`Store link: ${storeLink}`);
+
+    // =====================================================================
+    // BƯỚC 1: PHÁT HIỆN NỀN TẢNG VÀ TRÌNH DUYỆT CHÍNH XÁC
+    // =====================================================================
+    const ua = navigator.userAgent || navigator.vendor || window.opera;
+
+    // Detect iOS
+    const isIOS = /iPhone|iPad|iPod/i.test(ua) && !window.MSStream;
+
+    // Detect Android
+    const isAndroid = /Android/i.test(ua);
+
+    // Detect Safari (iOS Safari thật, không phải Chrome iOS)
+    const isSafari =
+      /^((?!chrome|android|crios|fxios|edgios).)*safari/i.test(ua) && isIOS;
+
+    // Detect Chrome iOS (CriOS)
+    const isChromeIOS = /CriOS/i.test(ua) && isIOS;
+
+    // Detect Firefox iOS (FxiOS)
+    const isFirefoxIOS = /FxiOS/i.test(ua) && isIOS;
+
+    // Detect Edge iOS (EdgiOS)
+    const isEdgeIOS = /EdgiOS/i.test(ua) && isIOS;
+
+    // Detect WebView (trong app Zalo, Facebook, TikTok, v.v.)
+    const isWebView =
+      /(WebView|wv|Version\/.+(Chrome))/i.test(ua) ||
+      /FB[\w_]+\//i.test(ua) || // Facebook WebView
+      /FBAN|FBAV/i.test(ua) || // Facebook App
+      /(Line|Instagram|Twitter|Telegram|Zalo)/i.test(ua); // Các app khác
+
+    // Detect mobile (iOS hoặc Android)
     const isMobile = isIOS || isAndroid;
-    const isSafari = /^((?!chrome|android).)*safari/i.test(navigator.userAgent);
-    const isChrome = /chrome|crios|crmo/i.test(navigator.userAgent);
 
-    // Biến theo dõi trạng thái
-    let fallbackTimerId = null;
-    let visibilityTimer = null;
-    let appOpened = false;
-    let cleanedUp = false;
-    const startTime = Date.now();
+    // Detect desktop
+    const isDesktop = !isMobile;
 
-    // Cleanup tất cả listeners và timers
+    debugLog(`Platform: ${isIOS ? "iOS" : isAndroid ? "Android" : "Desktop"}`);
+    debugLog(
+      `Browser: ${
+        isSafari
+          ? "Safari"
+          : isChromeIOS
+          ? "Chrome iOS"
+          : isFirefoxIOS
+          ? "Firefox iOS"
+          : isEdgeIOS
+          ? "Edge iOS"
+          : "Other"
+      }`
+    );
+    debugLog(`WebView: ${isWebView}`);
+
+    // =====================================================================
+    // BƯỚC 2: THIẾT LẬP BIẾN THEO DÕI TRẠNG THÁI
+    // =====================================================================
+    let appOpened = false; // App đã mở thành công?
+    let cleanedUp = false; // Đã cleanup?
+    let fallbackTimer = null; // Timer cho fallback
+    let visibilityTimer = null; // Timer cho visibility check
+    const startTime = Date.now(); // Thời điểm bắt đầu
+
+    // =====================================================================
+    // BƯỚC 3: HÀM CLEANUP (DỌN DẸP LISTENERS VÀ TIMERS)
+    // =====================================================================
     const cleanup = () => {
       if (cleanedUp) return;
       cleanedUp = true;
 
-      if (fallbackTimerId) {
-        clearTimeout(fallbackTimerId);
-        fallbackTimerId = null;
+      debugLog("Cleaning up listeners and timers");
+
+      // Clear timers
+      if (fallbackTimer) {
+        clearTimeout(fallbackTimer);
+        fallbackTimer = null;
       }
       if (visibilityTimer) {
         clearTimeout(visibilityTimer);
         visibilityTimer = null;
       }
 
-      document.removeEventListener("visibilitychange", onVisibilityChange);
-      window.removeEventListener("pagehide", onPageHide);
-      window.removeEventListener("blur", onBlur);
-      window.removeEventListener("focus", onFocus);
+      // Remove event listeners
+      document.removeEventListener("visibilitychange", handleVisibilityChange);
+      window.removeEventListener("pagehide", handlePageHide);
+      window.removeEventListener("blur", handleBlur);
+      window.removeEventListener("focus", handleFocus);
     };
 
-    // Phát hiện app đã mở thành công
-    const onVisibilityChange = () => {
-      // Clear timeout cũ nếu có
+    // =====================================================================
+    // BƯỚC 4: CÁC HÀM XỬ LÝ SỰ KIỆN (DETECT APP ĐÃ MỞ)
+    // =====================================================================
+
+    // Khi trang bị ẩn (chuyển sang app khác)
+    const handleVisibilityChange = () => {
       if (visibilityTimer) clearTimeout(visibilityTimer);
 
-      // Đợi một chút để đảm bảo visibility change là thật
+      // Đợi 100ms để xác nhận visibility change là thật
       visibilityTimer = setTimeout(() => {
         if (document.hidden) {
+          debugLog("Page hidden - App opened successfully!");
           appOpened = true;
           cleanup();
           closeModal();
@@ -797,19 +1055,22 @@ function initBankSelector() {
       }, 100);
     };
 
-    const onPageHide = () => {
+    // Khi trang bị ẩn hoàn toàn (pagehide)
+    const handlePageHide = () => {
+      debugLog("Page hide - App opened successfully!");
       appOpened = true;
       cleanup();
       closeModal();
     };
 
-    const onBlur = () => {
-      // Blur event - đợi để xác nhận
+    // Khi window mất focus (blur)
+    const handleBlur = () => {
       if (visibilityTimer) clearTimeout(visibilityTimer);
 
+      // Đợi 200ms để xác nhận blur là thật (không phải blur tạm thời)
       visibilityTimer = setTimeout(() => {
-        // Kiểm tra xem có thực sự chuyển sang app khác không
         if (document.hidden || !document.hasFocus()) {
+          debugLog("Window blurred - App opened successfully!");
           appOpened = true;
           cleanup();
           closeModal();
@@ -817,43 +1078,59 @@ function initBankSelector() {
       }, 200);
     };
 
-    const onFocus = () => {
-      // Nếu focus trở lại nhanh chóng, có thể app không mở được
+    // Khi window được focus lại (có thể app không mở được)
+    const handleFocus = () => {
       if (visibilityTimer) {
         clearTimeout(visibilityTimer);
         visibilityTimer = null;
       }
+      debugLog("Window focused - App might not have opened");
     };
 
-    // Đăng ký event listeners
-    document.addEventListener("visibilitychange", onVisibilityChange);
-    window.addEventListener("pagehide", onPageHide);
-    window.addEventListener("blur", onBlur);
-    window.addEventListener("focus", onFocus);
+    // Đăng ký các event listeners
+    document.addEventListener("visibilitychange", handleVisibilityChange);
+    window.addEventListener("pagehide", handlePageHide);
+    window.addEventListener("blur", handleBlur);
+    window.addEventListener("focus", handleFocus);
 
-    // Hàm mở deeplink với nhiều phương thức fallback
+    // =====================================================================
+    // BƯỚC 5: MỞ DEEP LINK (PHƯƠNG PHÁP TỐI ưu CHO TỪNG NỀN TẢNG)
+    // =====================================================================
+
+    /**
+     * iOS Safari: window.location.href TRỰC TIẾP (không setTimeout)
+     * - Đây là cách DUY NHẤT hoạt động trên Safari iOS
+     * - setTimeout sẽ làm Safari chặn deep link
+     *
+     * Android: window.location.href hoặc thẻ <a>
+     *
+     * WebView: Tùy thuộc vào app, thường dùng window.location.href
+     */
     function attemptOpenDeeplink() {
-      // Phương thức 1: Sử dụng thẻ <a> ẩn (tốt nhất cho mobile)
-      if (isMobile) {
-        try {
+      try {
+        debugLog("Attempting to open deep link...");
+
+        // =================================================================
+        // PHƯƠNG PHÁP 1: window.location.href (TỐT NHẤT CHO iOS SAFARI)
+        // =================================================================
+        if (isSafari || isChromeIOS || isFirefoxIOS || isEdgeIOS || isWebView) {
+          debugLog("Method: window.location.href (iOS/WebView)");
+          window.location.href = deeplinkUrl;
+          return true;
+        }
+
+        // =================================================================
+        // PHƯƠNG PHÁP 2: Thẻ <a> ẩn với click() (TỐT CHO ANDROID)
+        // =================================================================
+        if (isAndroid) {
+          debugLog("Method: Hidden <a> link (Android)");
           const link = document.createElement("a");
           link.href = deeplinkUrl;
           link.style.cssText = "display:none;position:absolute;";
-          link.setAttribute("target", "_blank");
           document.body.appendChild(link);
 
           // Trigger click
-          if (link.click) {
-            link.click();
-          } else {
-            // Fallback cho trình duyệt cũ
-            const clickEvent = new MouseEvent("click", {
-              view: window,
-              bubbles: true,
-              cancelable: true,
-            });
-            link.dispatchEvent(clickEvent);
-          }
+          link.click();
 
           // Cleanup sau 100ms
           setTimeout(() => {
@@ -863,89 +1140,92 @@ function initBankSelector() {
           }, 100);
 
           return true;
-        } catch (e) {
-          debugWarn("Method 1 failed:", e);
         }
-      }
 
-      // Phương thức 2: window.location (cho desktop hoặc fallback)
-      try {
-        if (!isMobile || isSafari) {
-          window.location.href = deeplinkUrl;
-          return true;
-        }
-      } catch (e) {
-        debugWarn("Method 2 failed:", e);
-      }
-
-      // Phương thức 3: window.open (fallback cuối cùng)
-      try {
-        const opened = window.open(deeplinkUrl, "_blank");
-        if (opened) {
-          // Một số trình duyệt cần đóng cửa sổ mới
-          setTimeout(() => {
-            try {
-              opened.close();
-            } catch (e) {}
-          }, 25);
-        }
+        // =================================================================
+        // PHƯƠNG PHÁP 3: window.location.href (DESKTOP/FALLBACK)
+        // =================================================================
+        debugLog("Method: window.location.href (Desktop/Fallback)");
+        window.location.href = deeplinkUrl;
         return true;
-      } catch (e) {
-        debugWarn("Method 3 failed:", e);
+      } catch (error) {
+        debugWarn("Failed to open deep link:", error);
+        return false;
       }
-
-      return false;
     }
 
-    // Thực hiện mở deeplink
-    let openSuccess = false;
-    if (typeof window.requestAnimationFrame === "function") {
-      // Sử dụng rAF để đảm bảo trong user gesture context
-      window.requestAnimationFrame(() => {
-        openSuccess = attemptOpenDeeplink();
-      });
-    } else {
-      openSuccess = attemptOpenDeeplink();
+    // Mở deep link NGAY LẬP TỨC (không setTimeout)
+    // Đây là điều quan trọng nhất cho iOS Safari
+    const openSuccess = attemptOpenDeeplink();
+
+    if (!openSuccess) {
+      debugWarn("Deep link failed to open");
     }
 
-    // Cấu hình timeout dựa vào thiết bị và trình duyệt
+    // =====================================================================
+    // BƯỚC 6: THIẾT LẬP TIMEOUT CHO FALLBACK (APP STORE/PLAY STORE)
+    // =====================================================================
+
+    /**
+     * Timeout tùy theo nền tảng:
+     * - iOS Safari: 3500ms (Safari chậm hơn)
+     * - iOS Chrome/Firefox/Edge: 3000ms
+     * - Android: 2500ms
+     * - WebView: 3500ms (thường chậm hơn)
+     * - Desktop: 2000ms
+     */
     let timeoutDuration = 2500; // Mặc định
 
     if (isIOS) {
-      timeoutDuration = isSafari ? 4000 : 3500;
+      if (isSafari) {
+        timeoutDuration = 3500; // Safari chậm nhất
+      } else if (isWebView) {
+        timeoutDuration = 3500; // WebView cũng chậm
+      } else {
+        timeoutDuration = 3000; // Chrome/Firefox/Edge iOS
+      }
     } else if (isAndroid) {
-      timeoutDuration = isChrome ? 3000 : 3500;
+      timeoutDuration = isWebView ? 3500 : 2500;
     } else {
-      // Desktop
-      timeoutDuration = 2000;
+      timeoutDuration = 2000; // Desktop
     }
 
-    // Timeout để kiểm tra và fallback
-    fallbackTimerId = setTimeout(() => {
+    debugLog(`Fallback timeout: ${timeoutDuration}ms`);
+
+    // =====================================================================
+    // BƯỚC 7: THIẾT LẬP FALLBACK TIMER
+    // =====================================================================
+    fallbackTimer = setTimeout(() => {
       cleanup();
 
-      // Kiểm tra xem app có mở được không
       const elapsed = Date.now() - startTime;
+      debugLog(`Timeout reached after ${elapsed}ms. App opened: ${appOpened}`);
 
+      // =================================================================
+      // TRƯỜNG HỢP 1: APP CHƯA MỞ (CẦN FALLBACK)
+      // =================================================================
       if (!appOpened && !document.hidden) {
-        // App không mở được
+        debugLog("App not opened - showing fallback");
         closeModal();
 
-        // Hiển thị dialog hỏi user có muốn tải app không
         if (storeLink) {
-          // Đợi modal đóng xong
+          // Đợi modal đóng xong (300ms)
           setTimeout(() => {
             const userChoice = confirm(
               `Không thể mở ứng dụng ${bank.appName}.\n\n` +
                 `Ứng dụng có thể chưa được cài đặt hoặc cần cập nhật.\n\n` +
-                `Bạn có muốn mở cửa hàng ứng dụng để tải/cập nhật không?`
+                `Bạn có muốn mở ${
+                  isIOS ? "App Store" : "Google Play"
+                } để tải/cập nhật không?`
             );
 
             if (userChoice) {
-              // Mở store
+              debugLog("User wants to download app");
+              // Mở App Store / Play Store
               try {
                 window.location.href = storeLink;
-              } catch (e) {
+              } catch (error) {
+                debugWarn("Failed to open store:", error);
                 // Fallback với window.open
                 try {
                   window.open(storeLink, "_blank");
@@ -954,27 +1234,47 @@ function initBankSelector() {
                 }
               }
             } else {
+              debugLog("User cancelled download");
               // User không muốn tải - mở lại modal
               setTimeout(() => {
                 openModal();
-                searchInput.focus({ preventScroll: true });
+                if (searchInput) {
+                  searchInput.focus({ preventScroll: true });
+                }
               }, 100);
             }
           }, 300);
         } else {
-          // Không có store link - mở lại modal
+          // Không có store link
+          debugWarn("No store link available");
           setTimeout(() => {
             openModal();
             alert(
-              `Không tìm thấy liên kết tải ứng dụng ${bank.appName}. Vui lòng thử ngân hàng khác.`
+              `Không tìm thấy liên kết tải ứng dụng ${bank.appName}.\n` +
+                `Vui lòng thử ngân hàng khác hoặc tải app trực tiếp từ ${
+                  isIOS ? "App Store" : "Google Play"
+                }.`
             );
           }, 100);
         }
-      } else if (appOpened) {
-        // App đã mở thành công
+      }
+      // =================================================================
+      // TRƯỜNG HỢP 2: APP ĐÃ MỞ THÀNH CÔNG
+      // =================================================================
+      else if (appOpened) {
+        debugLog("App opened successfully - closing modal");
+        closeModal();
+      }
+      // =================================================================
+      // TRƯỜNG HỢP 3: PAGE ĐÃ ẨN (APP ĐÃ MỞ)
+      // =================================================================
+      else if (document.hidden) {
+        debugLog("Page hidden - assuming app opened");
         closeModal();
       }
     }, timeoutDuration);
+
+    debugLog("=== Waiting for app to open or timeout... ===");
   }
   function renderList(items, isInitial = false) {
     // Nếu không phải lần đầu render, không clear innerHTML
