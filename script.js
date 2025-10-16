@@ -517,57 +517,6 @@ function initBankSelector() {
       android:
         "https://play.google.com/store/apps/details?id=io.lifestyle.plus",
     },
-    msb: {
-      ios: "https://apps.apple.com/vn/app/msb-mbanking/id1106006826",
-      android: "https://play.google.com/store/apps/details?id=com.msb.mbanking",
-    },
-    bvb: {
-      ios: "https://apps.apple.com/vn/app/baoviet-bank/id1177413111",
-      android:
-        "https://play.google.com/store/apps/details?id=com.baovietbank.mbanking",
-    },
-    pvb: {
-      ios: "https://apps.apple.com/vn/app/pvcombank/id1471270501",
-      android:
-        "https://play.google.com/store/apps/details?id=vn.com.pvcombank.agent",
-    },
-    abbank: {
-      ios: "https://apps.apple.com/vn/app/abbank/id977415413",
-      android: "https://play.google.com/store/apps/details?id=vn.com.abbank",
-    },
-    vietbank: {
-      ios: "https://apps.apple.com/vn/app/vietbank-digital/id1547357207",
-      android:
-        "https://play.google.com/store/apps/details?id=vn.vietbank.mobile",
-    },
-    kienlong: {
-      ios: "https://apps.apple.com/vn/app/kienlongbank/id1460234464",
-      android:
-        "https://play.google.com/store/apps/details?id=com.kienlongbank.online",
-    },
-    namab: {
-      ios: "https://apps.apple.com/vn/app/nama-mobile/id1469221416",
-      android:
-        "https://play.google.com/store/apps/details?id=vn.com.namabank.emb",
-    },
-    pgbank: {
-      ios: "https://apps.apple.com/vn/app/pgbank/id1477969536",
-      android: "https://play.google.com/store/apps/details?id=vn.pgbank.app",
-    },
-    vietcapital: {
-      ios: "https://apps.apple.com/vn/app/vietcapital-bank/id1599567802",
-      android:
-        "https://play.google.com/store/apps/details?id=vn.vietcapitalbank.mbanking",
-    },
-    bacab: {
-      ios: "https://apps.apple.com/vn/app/bac-a-bank/id1171895891",
-      android:
-        "https://play.google.com/store/apps/details?id=vn.com.bab.ebanking",
-    },
-    cbbank: {
-      ios: "https://apps.apple.com/vn/app/cbbank-smartbanking/id1459331385",
-      android: "https://play.google.com/store/apps/details?id=vn.com.cbbank.mb",
-    },
   };
 
   const POPULAR_BANK_IDS = [
@@ -590,17 +539,6 @@ function initBankSelector() {
     "scb",
     "eib",
     "timo",
-    "msb",
-    "bvb",
-    "pvb",
-    "abbank",
-    "vietbank",
-    "kienlong",
-    "namab",
-    "pgbank",
-    "vietcapital",
-    "bacab",
-    "cbbank",
   ];
 
   // Danh sách ngân hàng với deep link scheme chính thức (cập nhật 2025)
@@ -755,94 +693,6 @@ function initBankSelector() {
       bankName: "Ngân hàng TMCP Bản Việt (Timo)",
       deeplink: "timo://", // Deep link chính thức của Timo
       vietqrLink: "https://dl.vietqr.io/pay?app=timo",
-      appLogo: "",
-    },
-    {
-      appId: "msb",
-      appName: "MSB mBanking",
-      bankName: "Ngân hàng TMCP Hàng Hải Việt Nam",
-      deeplink: "msbmbanking://", // Deep link chính thức của MSB
-      vietqrLink: "https://dl.vietqr.io/pay?app=msb",
-      appLogo: "",
-    },
-    {
-      appId: "bvb",
-      appName: "BaoViet Bank",
-      bankName: "Ngân hàng TMCP Bảo Việt",
-      deeplink: "baovietbank://", // Deep link chính thức của BaoViet Bank
-      vietqrLink: "https://dl.vietqr.io/pay?app=bvb",
-      appLogo: "",
-    },
-    {
-      appId: "pvb",
-      appName: "PVcomBank",
-      bankName: "Ngân hàng TMCP Đại Chúng Việt Nam",
-      deeplink: "pvcombank://", // Deep link chính thức của PVcomBank
-      vietqrLink: "https://dl.vietqr.io/pay?app=pvb",
-      appLogo: "",
-    },
-    {
-      appId: "abbank",
-      appName: "ABBank",
-      bankName: "Ngân hàng TMCP An Bình",
-      deeplink: "abbank://", // Deep link chính thức của ABBank
-      vietqrLink: "https://dl.vietqr.io/pay?app=abbank",
-      appLogo: "",
-    },
-    {
-      appId: "vietbank",
-      appName: "VietBank",
-      bankName: "Ngân hàng TMCP Việt Nam Thương Tín",
-      deeplink: "vietbank://", // Deep link chính thức của VietBank
-      vietqrLink: "https://dl.vietqr.io/pay?app=vietbank",
-      appLogo: "",
-    },
-    {
-      appId: "kienlong",
-      appName: "Kienlongbank",
-      bankName: "Ngân hàng TMCP Kiên Long",
-      deeplink: "kienlongbank://", // Deep link chính thức của Kienlongbank
-      vietqrLink: "https://dl.vietqr.io/pay?app=kienlong",
-      appLogo: "",
-    },
-    {
-      appId: "namab",
-      appName: "NamABank",
-      bankName: "Ngân hàng TMCP Nam Á",
-      deeplink: "namabank://", // Deep link chính thức của NamABank
-      vietqrLink: "https://dl.vietqr.io/pay?app=namab",
-      appLogo: "",
-    },
-    {
-      appId: "pgbank",
-      appName: "PGBank",
-      bankName: "Ngân hàng TMCP Xăng dầu Petrolimex",
-      deeplink: "pgbank://", // Deep link chính thức của PGBank
-      vietqrLink: "https://dl.vietqr.io/pay?app=pgbank",
-      appLogo: "",
-    },
-    {
-      appId: "vietcapital",
-      appName: "VietCapital Bank",
-      bankName: "Ngân hàng TMCP Bản Việt",
-      deeplink: "vietcapitalbank://", // Deep link chính thức của VietCapital
-      vietqrLink: "https://dl.vietqr.io/pay?app=vietcapital",
-      appLogo: "",
-    },
-    {
-      appId: "bacab",
-      appName: "BacABank",
-      bankName: "Ngân hàng TMCP Bắc Á",
-      deeplink: "bacabank://", // Deep link chính thức của BacABank
-      vietqrLink: "https://dl.vietqr.io/pay?app=bacab",
-      appLogo: "",
-    },
-    {
-      appId: "cbbank",
-      appName: "CBBank",
-      bankName: "Ngân hàng TMCP Xây dựng Việt Nam",
-      deeplink: "cbbank://", // Deep link chính thức của CBBank
-      vietqrLink: "https://dl.vietqr.io/pay?app=cbbank",
       appLogo: "",
     },
   ];
