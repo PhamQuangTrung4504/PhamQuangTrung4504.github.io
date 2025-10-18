@@ -763,7 +763,7 @@ section {
   display: flex;
   align-items: center;
   gap: 0.5rem;
-  padding: 1rem;
+  padding: 0.92rem;
   background: rgba(255, 255, 255, 0.1);
   border: 2px solid rgba(255, 255, 255, 0.2);
   border-radius: 10px;
@@ -779,7 +779,7 @@ section {
 }
 
 .social-btn i {
-  font-size: 1.2rem;
+  font-size: 1.14rem;
 }
 
 /* QR Payment Section */
