@@ -1211,89 +1211,24 @@ function initBankSelector() {
     }, 300);
 
     // =====================================================================
-    // BƯỚC 5: THIẾT LẬP TIMEOUT - HỎI USER THAY VÌ GIẢ ĐỊNH
+    // BƯỚC 5: KHÔNG DÙNG TIMEOUT - ĐỂ USER TỰ XỬ LÝ
     // =====================================================================
-    // Tăng timeout lên 2000ms (2 giây) để app có thời gian mở
-    const timeoutDuration = 2000; // 2 giây
+    // ⚠️ QUAN TRỌNG: Trên iOS, khi dùng iframe mở deeplink:
+    //    - App MỞ ĐƯỢC nhưng KHÔNG che browser
+    //    - User phải TỰ CHUYỂN sang app
+    //    - Page vẫn visible → không thể detect tự động
+    //
+    // GIẢI PHÁP: KHÔNG hiện modal tự động!
+    // User đã click "Mở app" → app sẽ mở → user tự chuyển sang app
+    // KHÔNG cần thông báo gì thêm!
 
-    debugLog(`Fallback timeout: ${timeoutDuration}ms`);
+    debugLog("✅ Deeplink triggered - letting user handle app switching");
 
-    fallbackTimer = setTimeout(() => {
-      const elapsed = Date.now() - startTime;
-      const currentlyHidden = document.hidden;
-      const visibilityState = document.visibilityState;
-
-      debugLog(`=== TIMEOUT CALLBACK (${elapsed}ms) ===`);
-      debugLog(`- appOpened flag: ${appOpened}`);
-      debugLog(`- wasHidden flag: ${wasHidden}`);
-      debugLog(`- document.hidden: ${currentlyHidden}`);
-      debugLog(`- document.visibilityState: ${visibilityState}`);
-      debugLog(`- document.hasFocus(): ${document.hasFocus()}`);
-
-      // Kiểm tra lần cuối: nếu page đang hidden HOẶC đã từng bị hidden thì app đã mở
-      if (currentlyHidden || visibilityState === "hidden" || wasHidden) {
-        debugLog(
-          "✅ FINAL CHECK: App was opened (page hidden or was hidden before)"
-        );
-        appOpened = true;
-      }
-
+    // Chỉ cleanup listeners sau 3 giây (không hiện modal)
+    setTimeout(() => {
       cleanup();
-
-      // LOGIC MỚI: CHỈ hiện modal nếu user VẪN ĐANG trên trang sau 2 giây
-      // Nếu app mở thành công, user sẽ không còn trên browser nữa
-      // Kiểm tra: page visible VÀ có focus VÀ chưa bao giờ bị hidden
-      const userStillOnPage =
-        !currentlyHidden && document.hasFocus() && !wasHidden;
-
-      if (userStillOnPage) {
-        debugLog(
-          "⚠️ FINAL RESULT: User still on page after 2s - app likely not opened"
-        );
-
-        showNotification(
-          "Ứng dụng không mở?",
-          `Nếu ${bank.appName} không tự động mở, có thể bạn chưa cài đặt ứng dụng.\n\n` +
-            `Bạn có muốn tải ứng dụng từ ${
-              isIOS ? "App Store" : "Google Play"
-            } không?`,
-          "info",
-          [
-            {
-              text: "Tải ứng dụng",
-              primary: true,
-              callback: () => {
-                debugLog("User wants to download app");
-                if (storeLink) {
-                  window.open(storeLink, "_blank");
-                } else {
-                  showNotification(
-                    "Link cửa hàng không khả dụng",
-                    `Không tìm thấy link cửa hàng cho ${bank.appName}.\n\n` +
-                      `Vui lòng tìm kiếm "${bank.appName}" trong ${
-                        isIOS ? "App Store" : "Google Play"
-                      }.`,
-                    "warning"
-                  );
-                }
-              },
-            },
-            {
-              text: "Ứng dụng đã mở",
-              primary: false,
-              callback: () => {
-                debugLog("User confirmed app opened");
-                // Không làm gì - user đã vào app thành công
-              },
-            },
-          ]
-        );
-      } else {
-        debugLog(
-          "✅ FINAL RESULT: App opened or user left page - no modal needed"
-        );
-      }
-    }, timeoutDuration);
+      debugLog("Cleanup completed after 3s - user has handled app switching");
+    }, 3000);
   }
 
   function renderList(items, isInitial = false) {
