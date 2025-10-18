@@ -983,6 +983,9 @@ function initBankSelector() {
    */
   function attemptOpenBankApp(bank, deeplinkUrl, storeLink, isIOS, isAndroid) {
     debugLog("=== Attempting to open app (after user confirmation) ===");
+    debugLog(`Bank: ${bank.appName}`);
+    debugLog(`Deeplink: ${deeplinkUrl}`);
+    debugLog(`Platform: ${isIOS ? "iOS" : isAndroid ? "Android" : "Unknown"}`);
 
     // =====================================================================
     // BƯỚC 1: THIẾT LẬP BIẾN THEO DÕI TRẠNG THÁI
@@ -992,6 +995,8 @@ function initBankSelector() {
     let fallbackTimer = null; // Timer cho fallback
     let visibilityTimer = null; // Timer cho visibility check
     const startTime = Date.now(); // Thời điểm bắt đầu
+
+    debugLog(`Start time: ${startTime}`);
 
     // =====================================================================
     // BƯỚC 2: HÀM CLEANUP (DỌN DẸP LISTENERS VÀ TIMERS)
@@ -1029,45 +1034,49 @@ function initBankSelector() {
 
       // Check ngay lập tức nếu page đã hidden
       if (document.hidden) {
-        debugLog("Page hidden immediately - App opened successfully!");
+        const elapsed = Date.now() - startTime;
+        debugLog(
+          `✅ DETECTED: Page hidden after ${elapsed}ms - App opened successfully!`
+        );
         appOpened = true;
         cleanup();
-        closeModal();
         return;
       }
 
-      // Đợi 50ms để xác nhận visibility change là thật
+      // Đợi 25ms để xác nhận visibility change là thật (giảm từ 50ms)
       visibilityTimer = setTimeout(() => {
         if (document.hidden) {
-          debugLog("Page hidden after delay - App opened successfully!");
+          const elapsed = Date.now() - startTime;
+          debugLog(
+            `✅ DETECTED: Page hidden (delayed) after ${elapsed}ms - App opened!`
+          );
           appOpened = true;
           cleanup();
-          closeModal();
         }
-      }, 50);
+      }, 25);
     };
 
     // Khi trang bị ẩn hoàn toàn (pagehide)
     const handlePageHide = () => {
-      debugLog("Page hide - App opened successfully!");
+      const elapsed = Date.now() - startTime;
+      debugLog(`✅ DETECTED: Page hide after ${elapsed}ms - App opened!`);
       appOpened = true;
       cleanup();
-      closeModal();
     };
 
     // Khi window mất focus (blur)
     const handleBlur = () => {
       if (visibilityTimer) clearTimeout(visibilityTimer);
 
-      // Đợi 100ms để xác nhận blur là thật (giảm từ 200ms)
+      // Đợi 50ms để xác nhận blur là thật
       visibilityTimer = setTimeout(() => {
         if (document.hidden || !document.hasFocus()) {
-          debugLog("Window blurred - App opened successfully!");
+          const elapsed = Date.now() - startTime;
+          debugLog(`✅ DETECTED: Window blur after ${elapsed}ms - App opened!`);
           appOpened = true;
           cleanup();
-          closeModal();
         }
-      }, 100);
+      }, 50);
     };
 
     // Khi window được focus lại (có thể app không mở được)
@@ -1076,7 +1085,10 @@ function initBankSelector() {
         clearTimeout(visibilityTimer);
         visibilityTimer = null;
       }
-      debugLog("Window focused - App might not have opened");
+      const elapsed = Date.now() - startTime;
+      debugLog(
+        `⚠️ Window focused after ${elapsed}ms - checking if app opened: ${appOpened}`
+      );
     };
 
     // Đăng ký các event listeners
@@ -1086,29 +1098,69 @@ function initBankSelector() {
     window.addEventListener("focus", handleFocus);
 
     // =====================================================================
-    // BƯỚC 4: MỞ DEEP LINK - CHỈ DÙNG IFRAME (TRÁNH LỖI BROWSER)
+    // BƯỚC 4: MỞ DEEP LINK VỚI PHÁT HIỆN THÔNG MINH
     // =====================================================================
 
     /**
-     * iOS: IFRAME ẨN (KHÔNG dùng window.location.href để tránh popup browser)
-     * Android: Thẻ <a> ẩn
+     * iOS: Dùng IFRAME + ĐO THỜI GIAN để phát hiện app installed
+     * - Nếu app installed: Browser mất focus khi chuyển sang app (detect qua document.hidden)
+     * - Nếu app KHÔNG installed: Iframe load fail nhưng KHÔNG show lỗi
+     *
+     * Android: Thẻ <a> ẩn với event detection
      */
     function attemptOpenDeeplink() {
       try {
-        debugLog("Attempting to open deep link using silent method...");
+        debugLog("Attempting to open deep link with smart detection...");
 
         // =================================================================
-        // iOS: CHỈ DÙNG IFRAME ẨN (TRÁNH POPUP "Mở app trong")
+        // iOS: IFRAME + WINDOW.LOCATION (ĐỂ TRIGGER EVENTS)
         // =================================================================
         if (isIOS) {
-          debugLog("iOS: Using ONLY iframe (silent method)");
+          debugLog("iOS: Using iframe + window.location hybrid");
 
-          // Tạo iframe ẩn
+          // Bước 1: Tạo iframe ẩn (tránh hiển thị lỗi)
           const iframe = document.createElement("iframe");
           iframe.style.cssText =
             "display:none;width:0;height:0;border:none;position:absolute;top:-1000px;left:-1000px;";
+
+          // Set src để trigger load
           iframe.src = deeplinkUrl;
           document.body.appendChild(iframe);
+
+          // Bước 2: Sau 50ms, dùng window.location để trigger visibility events
+          // (Cần thiết để iOS Safari phát hiện app mở)
+          setTimeout(() => {
+            if (!appOpened && !document.hidden) {
+              debugLog("iOS: Triggering window.location for event detection");
+
+              // Dùng try-catch để bắt lỗi nhưng KHÔNG hiển thị cho user
+              try {
+                // Tạo thẻ <a> ẩn thay vì window.location trực tiếp
+                // Cách này ít bị browser block hơn
+                const link = document.createElement("a");
+                link.href = deeplinkUrl;
+                link.style.display = "none";
+                link.rel = "noopener noreferrer";
+                document.body.appendChild(link);
+
+                debugLog("iOS: Clicking hidden <a> link to trigger events");
+                link.click();
+
+                const clickTime = Date.now() - startTime;
+                debugLog(`iOS: Link clicked at ${clickTime}ms`);
+
+                // Cleanup link
+                setTimeout(() => {
+                  if (document.body.contains(link)) {
+                    document.body.removeChild(link);
+                    debugLog("iOS: Hidden <a> link removed");
+                  }
+                }, 100);
+              } catch (e) {
+                debugWarn("iOS: Link click failed (may be expected):", e);
+              }
+            }
+          }, 50);
 
           // Cleanup iframe sau 2 giây
           setTimeout(() => {
@@ -1158,31 +1210,54 @@ function initBankSelector() {
       debugWarn("Deep link failed to open");
     }
 
-    // Kiểm tra ngay sau khi mở deeplink (200ms)
+    // Kiểm tra sớm sau 100ms (iOS thường chuyển app rất nhanh)
     setTimeout(() => {
       if (document.hidden && !appOpened) {
-        debugLog("Early detection: Page hidden - App opened!");
+        debugLog("Early detection (100ms): Page hidden - App opened!");
         appOpened = true;
         cleanup();
       }
-    }, 200);
+    }, 100);
+
+    // Kiểm tra lần 2 sau 300ms
+    setTimeout(() => {
+      if (document.hidden && !appOpened) {
+        debugLog("Early detection (300ms): Page hidden - App opened!");
+        appOpened = true;
+        cleanup();
+      }
+    }, 300);
 
     // =====================================================================
     // BƯỚC 5: THIẾT LẬP TIMEOUT CHO FALLBACK
     // =====================================================================
-    const timeoutDuration = 1200; // 1.2 giây
+    // Tăng timeout lên 1000ms để có thời gian detect chính xác hơn
+    const timeoutDuration = 1000; // 1 giây
 
     debugLog(`Fallback timeout: ${timeoutDuration}ms`);
 
     fallbackTimer = setTimeout(() => {
+      const elapsed = Date.now() - startTime;
+      const currentlyHidden = document.hidden;
+      const visibilityState = document.visibilityState;
+
+      debugLog(`=== TIMEOUT CALLBACK (${elapsed}ms) ===`);
+      debugLog(`- appOpened flag: ${appOpened}`);
+      debugLog(`- document.hidden: ${currentlyHidden}`);
+      debugLog(`- document.visibilityState: ${visibilityState}`);
+      debugLog(`- document.hasFocus(): ${document.hasFocus()}`);
+
+      // Kiểm tra lần cuối: nếu page đang hidden thì app đã mở
+      if (currentlyHidden || visibilityState === "hidden") {
+        debugLog("✅ FINAL CHECK: Page is hidden - App opened successfully!");
+        appOpened = true;
+      }
+
       cleanup();
 
-      const elapsed = Date.now() - startTime;
-      debugLog(`Timeout reached after ${elapsed}ms. App opened: ${appOpened}`);
-
       // Nếu app chưa mở, hiển thị modal cửa hàng
-      if (!appOpened && !document.hidden) {
-        debugLog("App not opened - showing store modal");
+      if (!appOpened) {
+        debugLog("❌ FINAL RESULT: App not opened - showing store modal");
 
         showNotification(
           "Ứng dụng chưa được cài đặt",
