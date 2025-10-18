@@ -881,7 +881,7 @@ function initBankSelector() {
    *
    * VẤN ĐỀ ĐÃ ĐƯỢC GIẢI QUYẾT:
    * - iOS Safari: Deep link gây lỗi "Địa chỉ không hợp lệ" khi app chưa cài
-   * - iOS các trình duyệt: Hiện lỗi ngay lập tức thay vì kiểm tra timeout
+   * - iOS các trình duyệt: Không detect được khi app đã mở thành công
    * - WebView (Zalo, Facebook, TikTok): Bị chặn deep link
    * - Android: Timeout không phù hợp
    * - Desktop: Hiện thông báo chỉ hỗ trợ thiết bị di động
@@ -889,15 +889,17 @@ function initBankSelector() {
    * GIẢI PHÁP:
    * 1. Dùng deep link scheme chính thức của từng ngân hàng (vcbdigibank://, tpbank://, v.v.)
    * 2. Phát hiện chính xác nền tảng (iOS, Android, WebView, Desktop)
-   * 3. iOS: Dùng IFRAME ẨN để mở deeplink (không gây lỗi hiển thị)
+   * 3. iOS: KẾT HỢP iframe ẩn + window.location.href để detect tốt nhất
+   *    - Iframe: Tránh lỗi hiển thị
+   *    - window.location.href: Trigger visibilitychange events
    * 4. Android: Dùng thẻ <a> ẩn với click()
-   * 5. Timeout 1 giây để kiểm tra app đã mở chưa
+   * 5. Multi-layer detection: Kiểm tra ngay (200ms) + timeout chính (1.2s)
    * 6. Detect xem app đã mở thành công qua visibilitychange/blur/pagehide
    * 7. Desktop: Hiện thông báo tùy chỉnh thay vì lỗi JSON
    *
    * HỖ TRỢ:
-   * - ✅ iOS Safari (iPhone/iPad) - Không còn lỗi "Địa chỉ không hợp lệ"
-   * - ✅ iOS Chrome/Edge/Firefox - Không còn lỗi hiển thị
+   * - ✅ iOS Safari (iPhone/iPad) - Detect chính xác khi app mở
+   * - ✅ iOS Chrome/Edge/Firefox - Detect chính xác khi app mở
    * - ✅ Android Chrome/Firefox/Samsung Internet
    * - ✅ WebView: Zalo, Facebook, TikTok, Instagram, Line
    * - ✅ Desktop: Windows, macOS, Linux (hiện thông báo)
@@ -1026,10 +1028,19 @@ function initBankSelector() {
     const handleVisibilityChange = () => {
       if (visibilityTimer) clearTimeout(visibilityTimer);
 
-      // Đợi 50ms để xác nhận visibility change là thật (giảm từ 100ms)
+      // Check ngay lập tức nếu page đã hidden
+      if (document.hidden) {
+        debugLog("Page hidden immediately - App opened successfully!");
+        appOpened = true;
+        cleanup();
+        closeModal();
+        return;
+      }
+
+      // Đợi 50ms để xác nhận visibility change là thật
       visibilityTimer = setTimeout(() => {
         if (document.hidden) {
-          debugLog("Page hidden - App opened successfully!");
+          debugLog("Page hidden after delay - App opened successfully!");
           appOpened = true;
           cleanup();
           closeModal();
@@ -1080,9 +1091,9 @@ function initBankSelector() {
     // =====================================================================
 
     /**
-     * iOS Safari: Sử dụng IFRAME ẨN để tránh lỗi "Địa chỉ không hợp lệ"
-     * - window.location.href sẽ hiện lỗi nếu app chưa cài
-     * - iframe ẩn sẽ thử mở app mà không gây lỗi hiển thị
+     * iOS Safari: KẾT HỢP IFRAME + WINDOW.LOCATION để detect app mở
+     * - Iframe để tránh lỗi "Địa chỉ không hợp lệ"
+     * - window.location.href để trigger visibilitychange events
      *
      * Android: window.location.href hoặc thẻ <a>
      *
@@ -1093,20 +1104,31 @@ function initBankSelector() {
         debugLog("Attempting to open deep link...");
 
         // =================================================================
-        // PHƯƠNG PHÁP 1: IFRAME ẨN (TỐT NHẤT CHO iOS - KHÔNG GÂY LỖI)
+        // PHƯƠNG PHÁP 1: IFRAME + WINDOW.LOCATION (iOS - DETECT TỐT NHẤT)
         // =================================================================
         if (isIOS || isWebView) {
-          debugLog("Method: Hidden iframe (iOS/WebView - no error display)");
+          debugLog("Method: Iframe + window.location (iOS/WebView)");
 
-          // Tạo iframe ẩn
+          // Bước 1: Tạo iframe ẩn để tránh lỗi hiển thị
           const iframe = document.createElement("iframe");
           iframe.style.cssText =
             "display:none;width:0;height:0;border:none;position:absolute;top:-1000px;left:-1000px;";
           iframe.src = deeplinkUrl;
-
           document.body.appendChild(iframe);
 
-          // Cleanup sau 2 giây
+          // Bước 2: Sau 100ms, thử window.location.href để trigger events
+          setTimeout(() => {
+            if (!appOpened && !document.hidden) {
+              debugLog("Trying window.location.href to trigger events");
+              try {
+                window.location.href = deeplinkUrl;
+              } catch (e) {
+                debugWarn("window.location.href failed:", e);
+              }
+            }
+          }, 100);
+
+          // Cleanup iframe sau 2 giây
           setTimeout(() => {
             if (document.body.contains(iframe)) {
               document.body.removeChild(iframe);
@@ -1160,17 +1182,27 @@ function initBankSelector() {
       debugWarn("Deep link failed to open");
     }
 
+    // Kiểm tra ngay sau khi mở deeplink (cho iOS)
+    setTimeout(() => {
+      if (document.hidden && !appOpened) {
+        debugLog("Early detection: Page hidden - App opened!");
+        appOpened = true;
+        cleanup();
+        closeModal();
+      }
+    }, 200);
+
     // =====================================================================
     // BƯỚC 6: THIẾT LẬP TIMEOUT CHO FALLBACK (APP STORE/PLAY STORE)
     // =====================================================================
 
     /**
      * Timeout tùy theo nền tảng:
-     * - iOS: 1500ms (1.5 giây - iframe cần thời gian xử lý)
+     * - iOS: 1200ms (1.2 giây - đủ để detect app opened)
      * - Android: 1500ms
      * - WebView: 1500ms
      */
-    let timeoutDuration = 1500; // iOS mặc định 1.5 giây (iframe cần thêm thời gian)
+    let timeoutDuration = 1200; // iOS mặc định 1.2 giây
 
     if (isAndroid) {
       timeoutDuration = 1500; // Android 1.5 giây
