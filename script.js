@@ -1113,75 +1113,40 @@ function initBankSelector() {
     window.addEventListener("focus", handleFocus);
 
     // =====================================================================
-    // BƯỚC 4: MỞ DEEP LINK VỚI PHÁT HIỆN THÔNG MINH
+    // BƯỚC 4: MỞ DEEP LINK - PHƯƠNG PHÁP ĐƠN GIẢN VÀ HIỆU QUẢ
     // =====================================================================
 
     /**
-     * iOS: Dùng IFRAME + ĐO THỜI GIAN để phát hiện app installed
-     * - Nếu app installed: Browser mất focus khi chuyển sang app (detect qua document.hidden)
-     * - Nếu app KHÔNG installed: Iframe load fail nhưng KHÔNG show lỗi
-     *
-     * Android: Thẻ <a> ẩn với event detection
+     * GIẢI PHÁP CUỐI CÙNG:
+     * - iOS: Dùng IFRAME (không show lỗi) + GIẢM TIMEOUT + LUÔN CHO PHÉP RETRY
+     * - Thay vì báo "chưa cài", cho user tự quyết định
+     * - Timeout ngắn (500ms) để không làm user chờ lâu
      */
     function attemptOpenDeeplink() {
       try {
-        debugLog("Attempting to open deep link with smart detection...");
+        debugLog("Attempting to open deep link...");
+        const attemptTime = Date.now() - startTime;
+        debugLog(`Attempt at ${attemptTime}ms`);
 
         // =================================================================
-        // iOS: IFRAME + WINDOW.LOCATION (ĐỂ TRIGGER EVENTS)
+        // iOS: IFRAME ẨN (KHÔNG SHOW LỖI)
         // =================================================================
         if (isIOS) {
-          debugLog("iOS: Using iframe + window.location hybrid");
+          debugLog("iOS: Using iframe (silent method)");
 
-          // Bước 1: Tạo iframe ẩn (tránh hiển thị lỗi)
           const iframe = document.createElement("iframe");
           iframe.style.cssText =
             "display:none;width:0;height:0;border:none;position:absolute;top:-1000px;left:-1000px;";
-
-          // Set src để trigger load
           iframe.src = deeplinkUrl;
           document.body.appendChild(iframe);
 
-          // Bước 2: Sau 50ms, dùng window.location để trigger visibility events
-          // (Cần thiết để iOS Safari phát hiện app mở)
-          setTimeout(() => {
-            if (!appOpened && !document.hidden) {
-              debugLog("iOS: Triggering window.location for event detection");
-
-              // Dùng try-catch để bắt lỗi nhưng KHÔNG hiển thị cho user
-              try {
-                // Tạo thẻ <a> ẩn thay vì window.location trực tiếp
-                // Cách này ít bị browser block hơn
-                const link = document.createElement("a");
-                link.href = deeplinkUrl;
-                link.style.display = "none";
-                link.rel = "noopener noreferrer";
-                document.body.appendChild(link);
-
-                debugLog("iOS: Clicking hidden <a> link to trigger events");
-                link.click();
-
-                const clickTime = Date.now() - startTime;
-                debugLog(`iOS: Link clicked at ${clickTime}ms`);
-
-                // Cleanup link
-                setTimeout(() => {
-                  if (document.body.contains(link)) {
-                    document.body.removeChild(link);
-                    debugLog("iOS: Hidden <a> link removed");
-                  }
-                }, 100);
-              } catch (e) {
-                debugWarn("iOS: Link click failed (may be expected):", e);
-              }
-            }
-          }, 50);
+          debugLog("iOS: iframe created and src set");
 
           // Cleanup iframe sau 2 giây
           setTimeout(() => {
             if (document.body.contains(iframe)) {
               document.body.removeChild(iframe);
-              debugLog("Iframe removed");
+              debugLog("iOS: iframe removed");
             }
           }, 2000);
 
@@ -1246,10 +1211,10 @@ function initBankSelector() {
     }, 300);
 
     // =====================================================================
-    // BƯỚC 5: THIẾT LẬP TIMEOUT CHO FALLBACK
+    // BƯỚC 5: THIẾT LẬP TIMEOUT - HỎI USER THAY VÌ GIẢ ĐỊNH
     // =====================================================================
-    // Tăng timeout lên 1000ms để có thời gian detect chính xác hơn
-    const timeoutDuration = 1000; // 1 giây
+    // Giảm timeout xuống 500ms để nhanh hơn
+    const timeoutDuration = 500; // 0.5 giây
 
     debugLog(`Fallback timeout: ${timeoutDuration}ms`);
 
@@ -1275,47 +1240,52 @@ function initBankSelector() {
 
       cleanup();
 
-      // CHỈ hiện modal nếu app CHƯA BAO GIỜ mở (không hidden lần nào)
-      if (!appOpened && !wasHidden) {
-        debugLog("❌ FINAL RESULT: App never opened - showing store modal");
-
-        showNotification(
-          "Ứng dụng chưa được cài đặt",
-          `Có vẻ bạn chưa cài đặt ${bank.appName}.\n\n` +
-            `Bạn có muốn tải ứng dụng từ ${
-              isIOS ? "App Store" : "Google Play"
-            } không?`,
-          "warning",
-          [
-            {
-              text: isIOS ? "Đi tới App Store" : "Đi tới Google Play",
-              primary: true,
-              callback: () => {
-                debugLog("User wants to download app");
-                if (storeLink) {
-                  window.open(storeLink, "_blank");
-                } else {
-                  showNotification(
-                    "Link cửa hàng không khả dụng",
-                    `Không tìm thấy link cửa hàng cho ${bank.appName}.\n\n` +
-                      `Vui lòng tìm kiếm "${bank.appName}" trong ${
-                        isIOS ? "App Store" : "Google Play"
-                      }.`,
-                    "warning"
-                  );
-                }
-              },
-            },
-            {
-              text: "Để sau",
-              primary: false,
-              callback: null,
-            },
-          ]
-        );
-      } else {
-        debugLog("✅ App opened successfully - no fallback needed");
+      // TRƯỜNG HỢP 1: App chắc chắn đã mở (page bị hidden)
+      if (appOpened || wasHidden) {
+        debugLog("✅ FINAL RESULT: App opened successfully!");
+        return; // Không làm gì cả
       }
+
+      // TRƯỜNG HỢP 2: Không chắc chắn - HỎI USER
+      debugLog("⚠️ FINAL RESULT: Cannot detect - asking user");
+
+      showNotification(
+        "Ứng dụng không mở?",
+        `Nếu ${bank.appName} không tự động mở, có thể bạn chưa cài đặt ứng dụng.\n\n` +
+          `Bạn có muốn tải ứng dụng từ ${
+            isIOS ? "App Store" : "Google Play"
+          } không?`,
+        "info",
+        [
+          {
+            text: "Tải ứng dụng",
+            primary: true,
+            callback: () => {
+              debugLog("User wants to download app");
+              if (storeLink) {
+                window.open(storeLink, "_blank");
+              } else {
+                showNotification(
+                  "Link cửa hàng không khả dụng",
+                  `Không tìm thấy link cửa hàng cho ${bank.appName}.\n\n` +
+                    `Vui lòng tìm kiếm "${bank.appName}" trong ${
+                      isIOS ? "App Store" : "Google Play"
+                    }.`,
+                  "warning"
+                );
+              }
+            },
+          },
+          {
+            text: "Ứng dụng đã mở",
+            primary: false,
+            callback: () => {
+              debugLog("User confirmed app opened");
+              // Không làm gì - user đã vào app thành công
+            },
+          },
+        ]
+      );
     }, timeoutDuration);
   }
 
