@@ -17,16 +17,17 @@ document.addEventListener("DOMContentLoaded", function () {
   initBankSelector();
 });
 
-// Loading Screen
+// Loading Screen - Optimized for faster loading
 function initLoader() {
   window.addEventListener("load", function () {
+    // Giảm từ 1000ms xuống 300ms để tăng tốc
     setTimeout(() => {
       const loader = document.getElementById("loader");
       loader.classList.add("hidden");
       setTimeout(() => {
         loader.style.display = "none";
-      }, 500);
-    }, 1000);
+      }, 300); // Giảm từ 500ms xuống 300ms
+    }, 300);
   });
 }
 
@@ -1574,7 +1575,7 @@ document.addEventListener("DOMContentLoaded", function () {
   });
 });
 
-// Performance optimizations
+// Performance optimizations - Throttled scroll handler
 let ticking = false;
 
 function updateScrollEffects() {
@@ -1582,12 +1583,16 @@ function updateScrollEffects() {
   ticking = false;
 }
 
-window.addEventListener("scroll", function () {
-  if (!ticking) {
-    requestAnimationFrame(updateScrollEffects);
-    ticking = true;
-  }
-});
+window.addEventListener(
+  "scroll",
+  function () {
+    if (!ticking) {
+      requestAnimationFrame(updateScrollEffects);
+      ticking = true;
+    }
+  },
+  { passive: true }
+); // Passive listener để tăng performance
 
 // Add some fun easter eggs
 let clickCount = 0;

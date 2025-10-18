@@ -12,8 +12,18 @@
     <title>Phạm Quang Trung</title>
     <link rel="icon" type="image/png" href="avatar/avt.png" />
     <link rel="apple-touch-icon" href="avatar/avt.png" />
+
+    <!-- Preload critical resources -->
+    <link rel="preload" href="avatar/avt.png" as="image" />
+    <link rel="preload" href="style.css?v=2.2" as="style" />
+    <link rel="preload" href="script.js" as="script" />
+
+    <!-- DNS prefetch for external resources -->
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link rel="preconnect" href="https://cdnjs.cloudflare.com" />
+    <link rel="dns-prefetch" href="https://api.vietqr.io" />
+
     <link
       href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap"
       rel="stylesheet"
@@ -22,7 +32,7 @@
       rel="stylesheet"
       href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css"
     />
-    <link rel="stylesheet" href="style.css?v=2.1" />
+    <link rel="stylesheet" href="style.css?v=2.2" />
   </head>
   <body>
     <!-- Loading Screen -->
@@ -1253,6 +1263,6 @@
       </div>
     </div>
 
-    <script src="script.js?v=2.1"></script>
+    <script src="script.js?v=2.2" defer></script>
   </body>
 </html>
