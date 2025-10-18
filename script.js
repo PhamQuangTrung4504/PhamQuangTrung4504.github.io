@@ -880,7 +880,8 @@ function initBankSelector() {
    * ========================================================================
    *
    * VẤN ĐỀ ĐÃ ĐƯỢC GIẢI QUYẾT:
-   * - iOS Safari: Deep link không hoạt động, nhảy thẳng sang App Store
+   * - iOS Safari: Deep link gây lỗi "Địa chỉ không hợp lệ" khi app chưa cài
+   * - iOS các trình duyệt: Hiện lỗi ngay lập tức thay vì kiểm tra timeout
    * - WebView (Zalo, Facebook, TikTok): Bị chặn deep link
    * - Android: Timeout không phù hợp
    * - Desktop: Hiện thông báo chỉ hỗ trợ thiết bị di động
@@ -888,14 +889,15 @@ function initBankSelector() {
    * GIẢI PHÁP:
    * 1. Dùng deep link scheme chính thức của từng ngân hàng (vcbdigibank://, tpbank://, v.v.)
    * 2. Phát hiện chính xác nền tảng (iOS, Android, WebView, Desktop)
-   * 3. Mở deep link TRỰC TIẾP bằng window.location.href (không setTimeout)
-   * 4. Dùng setTimeout CHỈ cho fallback (App Store/Play Store)
-   * 5. Detect xem app đã mở thành công qua visibilitychange/blur/pagehide
-   * 6. Desktop: Hiện thông báo tùy chỉnh thay vì lỗi JSON
+   * 3. iOS: Dùng IFRAME ẨN để mở deeplink (không gây lỗi hiển thị)
+   * 4. Android: Dùng thẻ <a> ẩn với click()
+   * 5. Timeout 1 giây để kiểm tra app đã mở chưa
+   * 6. Detect xem app đã mở thành công qua visibilitychange/blur/pagehide
+   * 7. Desktop: Hiện thông báo tùy chỉnh thay vì lỗi JSON
    *
    * HỖ TRỢ:
-   * - ✅ iOS Safari (iPhone/iPad)
-   * - ✅ iOS Chrome/Edge/Firefox
+   * - ✅ iOS Safari (iPhone/iPad) - Không còn lỗi "Địa chỉ không hợp lệ"
+   * - ✅ iOS Chrome/Edge/Firefox - Không còn lỗi hiển thị
    * - ✅ Android Chrome/Firefox/Samsung Internet
    * - ✅ WebView: Zalo, Facebook, TikTok, Instagram, Line
    * - ✅ Desktop: Windows, macOS, Linux (hiện thông báo)
@@ -1078,24 +1080,40 @@ function initBankSelector() {
     // =====================================================================
 
     /**
-     * iOS Safari: window.location.href TRỰC TIẾP (không setTimeout)
-     * - Đây là cách DUY NHẤT hoạt động trên Safari iOS
-     * - setTimeout sẽ làm Safari chặn deep link
+     * iOS Safari: Sử dụng IFRAME ẨN để tránh lỗi "Địa chỉ không hợp lệ"
+     * - window.location.href sẽ hiện lỗi nếu app chưa cài
+     * - iframe ẩn sẽ thử mở app mà không gây lỗi hiển thị
      *
      * Android: window.location.href hoặc thẻ <a>
      *
-     * WebView: Tùy thuộc vào app, thường dùng window.location.href
+     * WebView: Tùy thuộc vào app, ưu tiên iframe
      */
     function attemptOpenDeeplink() {
       try {
         debugLog("Attempting to open deep link...");
 
         // =================================================================
-        // PHƯƠNG PHÁP 1: window.location.href (TỐT NHẤT CHO iOS SAFARI)
+        // PHƯƠNG PHÁP 1: IFRAME ẨN (TỐT NHẤT CHO iOS - KHÔNG GÂY LỖI)
         // =================================================================
-        if (isSafari || isChromeIOS || isFirefoxIOS || isEdgeIOS || isWebView) {
-          debugLog("Method: window.location.href (iOS/WebView)");
-          window.location.href = deeplinkUrl;
+        if (isIOS || isWebView) {
+          debugLog("Method: Hidden iframe (iOS/WebView - no error display)");
+
+          // Tạo iframe ẩn
+          const iframe = document.createElement("iframe");
+          iframe.style.cssText =
+            "display:none;width:0;height:0;border:none;position:absolute;top:-1000px;left:-1000px;";
+          iframe.src = deeplinkUrl;
+
+          document.body.appendChild(iframe);
+
+          // Cleanup sau 2 giây
+          setTimeout(() => {
+            if (document.body.contains(iframe)) {
+              document.body.removeChild(iframe);
+              debugLog("Iframe removed");
+            }
+          }, 2000);
+
           return true;
         }
 
@@ -1148,11 +1166,11 @@ function initBankSelector() {
 
     /**
      * Timeout tùy theo nền tảng:
-     * - iOS: 1000ms (1 giây - theo yêu cầu)
+     * - iOS: 1500ms (1.5 giây - iframe cần thời gian xử lý)
      * - Android: 1500ms
      * - WebView: 1500ms
      */
-    let timeoutDuration = 1000; // iOS mặc định 1 giây
+    let timeoutDuration = 1500; // iOS mặc định 1.5 giây (iframe cần thêm thời gian)
 
     if (isAndroid) {
       timeoutDuration = 1500; // Android 1.5 giây
