@@ -877,33 +877,20 @@ function initBankSelector() {
 
   /**
    * ========================================================================
-   * GIẢI PHÁP MỞ APP NGÂN HÀNG - HỖ TRỢ ĐẦY ĐỦ iOS SAFARI VÀ TẤT CẢ NỀN TẢNG
+   * GIẢI PHÁP MỞ APP NGÂN HÀNG - KHÔNG TỰ ĐỘNG MỞ DEEPLINK
    * ========================================================================
    *
-   * VẤN ĐỀ ĐÃ ĐƯỢC GIẢI QUYẾT:
-   * - iOS Safari: Deep link gây lỗi "Địa chỉ không hợp lệ" khi app chưa cài
-   * - iOS các trình duyệt: Không detect được khi app đã mở thành công
-   * - WebView (Zalo, Facebook, TikTok): Bị chặn deep link
-   * - Android: Timeout không phù hợp
-   * - Desktop: Hiện thông báo chỉ hỗ trợ thiết bị di động
-   *
-   * GIẢI PHÁP:
-   * 1. Dùng deep link scheme chính thức của từng ngân hàng (vcbdigibank://, tpbank://, v.v.)
-   * 2. Phát hiện chính xác nền tảng (iOS, Android, WebView, Desktop)
-   * 3. iOS: KẾT HỢP iframe ẩn + window.location.href để detect tốt nhất
-   *    - Iframe: Tránh lỗi hiển thị
-   *    - window.location.href: Trigger visibilitychange events
-   * 4. Android: Dùng thẻ <a> ẩn với click()
-   * 5. Multi-layer detection: Kiểm tra ngay (200ms) + timeout chính (1.2s)
-   * 6. Detect xem app đã mở thành công qua visibilitychange/blur/pagehide
-   * 7. Desktop: Hiện thông báo tùy chỉnh thay vì lỗi JSON
+   * GIẢI PHÁP MỚI:
+   * - KHÔNG tự động gọi deeplink (tránh lỗi "Địa chỉ không hợp lệ")
+   * - LUÔN hiện modal hỏi người dùng trước khi mở app
+   * - Người dùng tự quyết định: "Mở app" hoặc "Đi tới cửa hàng"
+   * - Hoàn toàn loại bỏ các lỗi iOS về deeplink
    *
    * HỖ TRỢ:
-   * - ✅ iOS Safari (iPhone/iPad) - Detect chính xác khi app mở
-   * - ✅ iOS Chrome/Edge/Firefox - Detect chính xác khi app mở
-   * - ✅ Android Chrome/Firefox/Samsung Internet
-   * - ✅ WebView: Zalo, Facebook, TikTok, Instagram, Line
-   * - ✅ Desktop: Windows, macOS, Linux (hiện thông báo)
+   * - ✅ iOS Safari (iPhone/iPad) - Không còn lỗi
+   * - ✅ iOS Chrome/Edge/Firefox - Không còn lỗi
+   * - ✅ Android - Hoạt động mượt mà
+   * - ✅ Desktop - Hiện thông báo phù hợp
    * ========================================================================
    */
   function openBankApp(bank) {
@@ -917,66 +904,23 @@ function initBankSelector() {
     debugLog(`Store link: ${storeLink}`);
 
     // =====================================================================
-    // BƯỚC 1: PHÁT HIỆN NỀN TẢNG VÀ TRÌNH DUYỆT CHÍNH XÁC
+    // BƯỚC 1: PHÁT HIỆN NỀN TẢNG
     // =====================================================================
     const ua = navigator.userAgent || navigator.vendor || window.opera;
-
-    // Detect iOS
     const isIOS = /iPhone|iPad|iPod/i.test(ua) && !window.MSStream;
-
-    // Detect Android
     const isAndroid = /Android/i.test(ua);
-
-    // Detect Safari (iOS Safari thật, không phải Chrome iOS)
-    const isSafari =
-      /^((?!chrome|android|crios|fxios|edgios).)*safari/i.test(ua) && isIOS;
-
-    // Detect Chrome iOS (CriOS)
-    const isChromeIOS = /CriOS/i.test(ua) && isIOS;
-
-    // Detect Firefox iOS (FxiOS)
-    const isFirefoxIOS = /FxiOS/i.test(ua) && isIOS;
-
-    // Detect Edge iOS (EdgiOS)
-    const isEdgeIOS = /EdgiOS/i.test(ua) && isIOS;
-
-    // Detect WebView (trong app Zalo, Facebook, TikTok, v.v.)
-    const isWebView =
-      /(WebView|wv|Version\/.+(Chrome))/i.test(ua) ||
-      /FB[\w_]+\//i.test(ua) || // Facebook WebView
-      /FBAN|FBAV/i.test(ua) || // Facebook App
-      /(Line|Instagram|Twitter|Telegram|Zalo)/i.test(ua); // Các app khác
-
-    // Detect mobile (iOS hoặc Android)
     const isMobile = isIOS || isAndroid;
-
-    // Detect desktop
     const isDesktop = !isMobile;
 
     debugLog(`Platform: ${isIOS ? "iOS" : isAndroid ? "Android" : "Desktop"}`);
-    debugLog(
-      `Browser: ${
-        isSafari
-          ? "Safari"
-          : isChromeIOS
-          ? "Chrome iOS"
-          : isFirefoxIOS
-          ? "Firefox iOS"
-          : isEdgeIOS
-          ? "Edge iOS"
-          : "Other"
-      }`
-    );
-    debugLog(`WebView: ${isWebView}`);
 
     // =====================================================================
-    // KIỂM TRA DESKTOP: HIỂN THỊ THÔNG BÁO THAY VÌ LỖI JSON
+    // BƯỚC 2: DESKTOP - HIỂN THỊ THÔNG BÁO
     // =====================================================================
     if (isDesktop) {
       debugLog("Desktop detected - showing mobile-only notification");
       closeModal();
 
-      // Tạo notification modal tùy chỉnh
       showNotification(
         "Chức năng chỉ dành cho thiết bị di động",
         `Tính năng chuyển tiền nhanh qua app ngân hàng chỉ khả dụng trên điện thoại di động (iOS/Android).\n\n` +
@@ -987,7 +931,61 @@ function initBankSelector() {
     }
 
     // =====================================================================
-    // BƯỚC 2: THIẾT LẬP BIẾN THEO DÕI TRẠNG THÁI
+    // BƯỚC 3: MOBILE - HIỂN THỊ MODAL XÁC NHẬN TRƯỚC
+    // =====================================================================
+    debugLog("Mobile detected - showing confirmation modal FIRST");
+    closeModal();
+
+    // HIỂN THỊ MODAL HỎI NGƯỜI DÙNG TRƯỚC KHI MỞ APP
+    showNotification(
+      `Mở ứng dụng ${bank.appName}`,
+      `Bạn có muốn mở ứng dụng ${bank.appName} để chuyển khoản nhanh chóng không?`,
+      "success",
+      [
+        {
+          text: `Mở ${bank.appName}`,
+          primary: true,
+          callback: () => {
+            debugLog("User confirmed - attempting to open app");
+            attemptOpenBankApp(bank, deeplinkUrl, storeLink, isIOS, isAndroid);
+          },
+        },
+        {
+          text: "Đi tới cửa hàng",
+          primary: false,
+          callback: () => {
+            debugLog("User chose to go to store directly");
+            if (storeLink) {
+              window.open(storeLink, "_blank");
+            } else {
+              showNotification(
+                "Link cửa hàng không khả dụng",
+                `Không tìm thấy link cửa hàng cho ${bank.appName}.\n\n` +
+                  `Vui lòng tìm kiếm "${bank.appName}" trong ${
+                    isIOS ? "App Store" : "Google Play"
+                  }.`,
+                "warning"
+              );
+            }
+          },
+        },
+      ]
+    );
+  }
+
+  /**
+   * ========================================================================
+   * THỬ MỞ APP SAU KHI NGƯỜI DÙNG XÁC NHẬN
+   * ========================================================================
+   * Chỉ gọi sau khi người dùng click "Mở app"
+   * Sử dụng iframe ẩn để tránh lỗi browser trên iOS
+   * ========================================================================
+   */
+  function attemptOpenBankApp(bank, deeplinkUrl, storeLink, isIOS, isAndroid) {
+    debugLog("=== Attempting to open app (after user confirmation) ===");
+
+    // =====================================================================
+    // BƯỚC 1: THIẾT LẬP BIẾN THEO DÕI TRẠNG THÁI
     // =====================================================================
     let appOpened = false; // App đã mở thành công?
     let cleanedUp = false; // Đã cleanup?
@@ -996,7 +994,7 @@ function initBankSelector() {
     const startTime = Date.now(); // Thời điểm bắt đầu
 
     // =====================================================================
-    // BƯỚC 3: HÀM CLEANUP (DỌN DẸP LISTENERS VÀ TIMERS)
+    // BƯỚC 2: HÀM CLEANUP (DỌN DẸP LISTENERS VÀ TIMERS)
     // =====================================================================
     const cleanup = () => {
       if (cleanedUp) return;
@@ -1022,7 +1020,7 @@ function initBankSelector() {
     };
 
     // =====================================================================
-    // BƯỚC 4: CÁC HÀM XỬ LÝ SỰ KIỆN (DETECT APP ĐÃ MỞ)
+    // BƯỚC 3: CÁC HÀM XỬ LÝ SỰ KIỆN (DETECT APP ĐÃ MỞ)
     // =====================================================================
 
     // Khi trang bị ẩn (chuyển sang app khác)
@@ -1088,46 +1086,29 @@ function initBankSelector() {
     window.addEventListener("focus", handleFocus);
 
     // =====================================================================
-    // BƯỚC 5: MỞ DEEP LINK (PHƯƠNG PHÁP TỐI ưu CHO TỪNG NỀN TẢNG)
+    // BƯỚC 4: MỞ DEEP LINK - CHỈ DÙNG IFRAME (TRÁNH LỖI BROWSER)
     // =====================================================================
 
     /**
-     * iOS Safari: KẾT HỢP IFRAME + WINDOW.LOCATION để detect app mở
-     * - Iframe để tránh lỗi "Địa chỉ không hợp lệ"
-     * - window.location.href để trigger visibilitychange events
-     *
-     * Android: window.location.href hoặc thẻ <a>
-     *
-     * WebView: Tùy thuộc vào app, ưu tiên iframe
+     * iOS: IFRAME ẨN (KHÔNG dùng window.location.href để tránh popup browser)
+     * Android: Thẻ <a> ẩn
      */
     function attemptOpenDeeplink() {
       try {
-        debugLog("Attempting to open deep link...");
+        debugLog("Attempting to open deep link using silent method...");
 
         // =================================================================
-        // PHƯƠNG PHÁP 1: IFRAME + WINDOW.LOCATION (iOS - DETECT TỐT NHẤT)
+        // iOS: CHỈ DÙNG IFRAME ẨN (TRÁNH POPUP "Mở app trong")
         // =================================================================
-        if (isIOS || isWebView) {
-          debugLog("Method: Iframe + window.location (iOS/WebView)");
+        if (isIOS) {
+          debugLog("iOS: Using ONLY iframe (silent method)");
 
-          // Bước 1: Tạo iframe ẩn để tránh lỗi hiển thị
+          // Tạo iframe ẩn
           const iframe = document.createElement("iframe");
           iframe.style.cssText =
             "display:none;width:0;height:0;border:none;position:absolute;top:-1000px;left:-1000px;";
           iframe.src = deeplinkUrl;
           document.body.appendChild(iframe);
-
-          // Bước 2: Sau 100ms, thử window.location.href để trigger events
-          setTimeout(() => {
-            if (!appOpened && !document.hidden) {
-              debugLog("Trying window.location.href to trigger events");
-              try {
-                window.location.href = deeplinkUrl;
-              } catch (e) {
-                debugWarn("window.location.href failed:", e);
-              }
-            }
-          }, 100);
 
           // Cleanup iframe sau 2 giây
           setTimeout(() => {
@@ -1141,10 +1122,10 @@ function initBankSelector() {
         }
 
         // =================================================================
-        // PHƯƠNG PHÁP 2: Thẻ <a> ẩn với click() (TỐT CHO ANDROID)
+        // ANDROID: THẺ <A> ẨN
         // =================================================================
         if (isAndroid) {
-          debugLog("Method: Hidden <a> link (Android)");
+          debugLog("Android: Using hidden <a> link");
           const link = document.createElement("a");
           link.href = deeplinkUrl;
           link.style.cssText = "display:none;position:absolute;";
@@ -1163,158 +1144,86 @@ function initBankSelector() {
           return true;
         }
 
-        // =================================================================
-        // PHƯƠNG PHÁP 3: window.location.href (DESKTOP/FALLBACK)
-        // =================================================================
-        debugLog("Method: window.location.href (Desktop/Fallback)");
-        window.location.href = deeplinkUrl;
-        return true;
+        return false;
       } catch (error) {
         debugWarn("Failed to open deep link:", error);
         return false;
       }
     }
 
-    // Mở deep link NGAY LẬP TỨC (không setTimeout)
-    // Đây là điều quan trọng nhất cho iOS Safari
+    // Mở deep link NGAY LẬP TỨC
     const openSuccess = attemptOpenDeeplink();
 
     if (!openSuccess) {
       debugWarn("Deep link failed to open");
     }
 
-    // Kiểm tra ngay sau khi mở deeplink (cho iOS)
+    // Kiểm tra ngay sau khi mở deeplink (200ms)
     setTimeout(() => {
       if (document.hidden && !appOpened) {
         debugLog("Early detection: Page hidden - App opened!");
         appOpened = true;
         cleanup();
-        closeModal();
       }
     }, 200);
 
     // =====================================================================
-    // BƯỚC 6: THIẾT LẬP TIMEOUT CHO FALLBACK (APP STORE/PLAY STORE)
+    // BƯỚC 5: THIẾT LẬP TIMEOUT CHO FALLBACK
     // =====================================================================
-
-    /**
-     * Timeout tùy theo nền tảng:
-     * - iOS: 1200ms (1.2 giây - đủ để detect app opened)
-     * - Android: 1500ms
-     * - WebView: 1500ms
-     */
-    let timeoutDuration = 1200; // iOS mặc định 1.2 giây
-
-    if (isAndroid) {
-      timeoutDuration = 1500; // Android 1.5 giây
-    } else if (isWebView) {
-      timeoutDuration = 1500; // WebView 1.5 giây
-    }
+    const timeoutDuration = 1200; // 1.2 giây
 
     debugLog(`Fallback timeout: ${timeoutDuration}ms`);
 
-    // =====================================================================
-    // BƯỚC 7: THIẾT LẬP FALLBACK TIMER
-    // =====================================================================
     fallbackTimer = setTimeout(() => {
       cleanup();
 
       const elapsed = Date.now() - startTime;
       debugLog(`Timeout reached after ${elapsed}ms. App opened: ${appOpened}`);
 
-      // =================================================================
-      // TRƯỜNG HỢP 1: APP CHƯA MỞ (CẦN FALLBACK)
-      // =================================================================
+      // Nếu app chưa mở, hiển thị modal cửa hàng
       if (!appOpened && !document.hidden) {
-        debugLog("App not opened - showing fallback");
-        closeModal();
+        debugLog("App not opened - showing store modal");
 
-        if (storeLink) {
-          // Đợi modal đóng xong (300ms)
-          setTimeout(() => {
-            // Hiển thị thông báo tùy chỉnh với CSS đẹp
-            showNotification(
-              "Ứng dụng chưa được cài đặt",
-              `Ứng dụng ${bank.appName} chưa được cài đặt trên thiết bị của bạn.\n\n` +
-                `Bạn có muốn đi tới ${
-                  isIOS ? "App Store" : "Google Play"
-                } để tải ứng dụng không?`,
-              "warning",
-              [
-                {
-                  text: isIOS ? "Đi tới App Store" : "Đi tới Google Play",
-                  primary: true,
-                  callback: () => {
-                    debugLog("User wants to download app");
-                    // Mở App Store / Play Store
-                    try {
-                      window.location.href = storeLink;
-                    } catch (error) {
-                      debugWarn("Failed to open store:", error);
-                      // Fallback với window.open
-                      try {
-                        window.open(storeLink, "_blank");
-                      } catch (err) {
-                        showNotification(
-                          "Lỗi",
-                          "Không thể mở cửa hàng ứng dụng. Vui lòng thử lại.",
-                          "error"
-                        );
-                      }
-                    }
-                  },
-                },
-                {
-                  text: "Không",
-                  primary: false,
-                  callback: () => {
-                    debugLog("User cancelled download");
-                    // User không muốn tải - mở lại modal
-                    setTimeout(() => {
-                      openModal();
-                      if (searchInput) {
-                        searchInput.focus({ preventScroll: true });
-                      }
-                    }, 100);
-                  },
-                },
-              ]
-            );
-          }, 300);
-        } else {
-          // Không có store link
-          debugWarn("No store link available");
-          setTimeout(() => {
-            openModal();
-            showNotification(
-              "Không tìm thấy liên kết",
-              `Không tìm thấy liên kết tải ứng dụng ${bank.appName}.\n` +
-                `Vui lòng thử ngân hàng khác hoặc tải app trực tiếp từ ${
-                  isIOS ? "App Store" : "Google Play"
-                }.`,
-              "error"
-            );
-          }, 100);
-        }
-      }
-      // =================================================================
-      // TRƯỜNG HỢP 2: APP ĐÃ MỞ THÀNH CÔNG
-      // =================================================================
-      else if (appOpened) {
-        debugLog("App opened successfully - closing modal");
-        closeModal();
-      }
-      // =================================================================
-      // TRƯỜNG HỢP 3: PAGE ĐÃ ẨN (APP ĐÃ MỞ)
-      // =================================================================
-      else if (document.hidden) {
-        debugLog("Page hidden - assuming app opened");
-        closeModal();
+        showNotification(
+          "Ứng dụng chưa được cài đặt",
+          `Có vẻ bạn chưa cài đặt ${bank.appName}.\n\n` +
+            `Bạn có muốn tải ứng dụng từ ${
+              isIOS ? "App Store" : "Google Play"
+            } không?`,
+          "warning",
+          [
+            {
+              text: isIOS ? "Đi tới App Store" : "Đi tới Google Play",
+              primary: true,
+              callback: () => {
+                debugLog("User wants to download app");
+                if (storeLink) {
+                  window.open(storeLink, "_blank");
+                } else {
+                  showNotification(
+                    "Link cửa hàng không khả dụng",
+                    `Không tìm thấy link cửa hàng cho ${bank.appName}.\n\n` +
+                      `Vui lòng tìm kiếm "${bank.appName}" trong ${
+                        isIOS ? "App Store" : "Google Play"
+                      }.`,
+                    "warning"
+                  );
+                }
+              },
+            },
+            {
+              text: "Để sau",
+              primary: false,
+              callback: null,
+            },
+          ]
+        );
+      } else {
+        debugLog("✅ App opened successfully - no fallback needed");
       }
     }, timeoutDuration);
-
-    debugLog("=== Waiting for app to open or timeout... ===");
   }
+
   function renderList(items, isInitial = false) {
     // Nếu không phải lần đầu render, không clear innerHTML
     if (isInitial) {
