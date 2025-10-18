@@ -74,10 +74,10 @@ function initTypedText() {
   const typedElement = document.getElementById("typed-text");
   const texts = [
     "Đam mê công nghệ",
-    "Yêu thích chụp ảnh",
-    "Thích khám phá",
-    "Sinh viên năng động",
-    "Người bạn thân thiện",
+    "Vui vẻ và thân thiện",
+    "Thích chơi game",
+    "Thích khám phá thứ mới mẻ",
+    "Yêu thích sự sáng tạo",
   ];
 
   let textIndex = 0;
