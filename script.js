@@ -420,10 +420,65 @@ function initBankSelector() {
     return;
   }
 
-  // Debug mode - set to false in production to disable console logs
-  const DEBUG_MODE = false;
-  const debugLog = DEBUG_MODE ? console.log.bind(console) : () => {};
-  const debugWarn = DEBUG_MODE ? console.warn.bind(console) : () => {};
+  // Debug mode - enable by adding ?debug=1 to the URL (useful for testing on mobile)
+  const DEBUG_MODE = /[?&]debug=1/.test(window.location.search);
+
+  // Create an on-screen debug overlay when DEBUG_MODE is enabled so mobile users
+  // can capture logs without remote devtools.
+  let debugOverlay = null;
+  if (DEBUG_MODE) {
+    debugOverlay = document.createElement("div");
+    debugOverlay.id = "debug-overlay";
+    Object.assign(debugOverlay.style, {
+      position: "fixed",
+      left: "0",
+      right: "0",
+      bottom: "0",
+      maxHeight: "40vh",
+      overflow: "auto",
+      background: "rgba(0,0,0,0.8)",
+      color: "#b8ffb8",
+      fontFamily: "monospace",
+      fontSize: "12px",
+      lineHeight: "1.3",
+      zIndex: "999999",
+      padding: "8px",
+    });
+    document.body.appendChild(debugOverlay);
+  }
+
+  const formatLogArgs = (args) =>
+    Array.from(args)
+      .map((a) => {
+        try {
+          if (typeof a === "string") return a;
+          return JSON.stringify(a);
+        } catch (e) {
+          return String(a);
+        }
+      })
+      .join(" ");
+
+  const debugLog = (...args) => {
+    console.log(...args);
+    if (DEBUG_MODE && debugOverlay) {
+      const line = document.createElement("div");
+      line.textContent = formatLogArgs(args);
+      debugOverlay.appendChild(line);
+      debugOverlay.scrollTop = debugOverlay.scrollHeight;
+    }
+  };
+
+  const debugWarn = (...args) => {
+    console.warn(...args);
+    if (DEBUG_MODE && debugOverlay) {
+      const line = document.createElement("div");
+      line.style.color = "#ffd08a";
+      line.textContent = "WARN: " + formatLogArgs(args);
+      debugOverlay.appendChild(line);
+      debugOverlay.scrollTop = debugOverlay.scrollHeight;
+    }
+  };
 
   const ACCOUNT_INFO = {
     ba: "45404052004@TPB",
@@ -799,20 +854,30 @@ function initBankSelector() {
     };
 
     // Tạo nút bấm
+    // Support buttons with optional `href` property. If provided, render an
+    // anchor tag so the browser performs a native navigation on click which
+    // tends to be more reliable for deeplinks on mobile (especially iOS).
     let buttonsHTML = "";
     if (buttons && buttons.length > 0) {
       buttonsHTML = '<div class="notification-buttons">';
-      buttons.forEach((btn) => {
+      buttons.forEach((btn, idx) => {
         const btnClass = btn.primary
           ? "notification-btn notification-btn-primary"
           : "notification-btn notification-btn-secondary";
-        buttonsHTML += `<button class="${btnClass}" data-action="${btn.text}">${btn.text}</button>`;
+
+        if (btn.href) {
+          // Render anchor for native navigation
+          // data-callback-index used to wire up optional JS callback after DOM insertion
+          buttonsHTML += `<a class="${btnClass}" data-action="${btn.text}" data-callback-index="${idx}" href="${btn.href}">${btn.text}</a>`;
+        } else {
+          buttonsHTML += `<button class="${btnClass}" data-action="${btn.text}" data-callback-index="${idx}">${btn.text}</button>`;
+        }
       });
       buttonsHTML += "</div>";
     } else {
       // Nút đóng mặc định
       buttonsHTML =
-        '<div class="notification-buttons"><button class="notification-btn notification-btn-primary" data-action="close">Đóng</button></div>';
+        '<div class="notification-buttons"><button class="notification-btn notification-btn-primary" data-action="close" data-callback-index="-1">Đóng</button></div>';
     }
 
     notification.innerHTML = `
@@ -854,15 +919,37 @@ function initBankSelector() {
     const overlay = notification.querySelector(".notification-overlay");
     overlay.addEventListener("click", closeNotification);
 
-    // Click nút
+    // Click nút / anchor
     const btnElements = notification.querySelectorAll(".notification-btn");
-    btnElements.forEach((btn, index) => {
-      btn.addEventListener("click", () => {
-        if (buttons && buttons[index] && buttons[index].callback) {
-          buttons[index].callback();
-        }
-        closeNotification();
-      });
+    btnElements.forEach((el) => {
+      const idx = parseInt(el.getAttribute("data-callback-index"), 10);
+      // If the element is an anchor, call its callback (if any) then allow
+      // the native navigation to proceed. For buttons, call callback then
+      // close the notification.
+      if (el.tagName.toLowerCase() === "a") {
+        el.addEventListener("click", (e) => {
+          // Call callback synchronously before navigation
+          if (buttons && buttons[idx] && buttons[idx].callback) {
+            try {
+              buttons[idx].callback();
+            } catch (err) {
+              debugWarn("Callback error:", err);
+            }
+          }
+          // Let the navigation happen naturally (no preventDefault)
+        });
+      } else {
+        el.addEventListener("click", () => {
+          if (buttons && buttons[idx] && buttons[idx].callback) {
+            try {
+              buttons[idx].callback();
+            } catch (err) {
+              debugWarn("Callback error:", err);
+            }
+          }
+          closeNotification();
+        });
+      }
     });
 
     // ESC để đóng
@@ -897,7 +984,10 @@ function initBankSelector() {
     debugLog(`=== Opening bank app: ${bank.appName} (${bank.appId}) ===`);
 
     // Xây dựng deep link với thông tin tài khoản
-    const deeplinkUrl = buildDeeplink(bank.vietqrLink || bank.deeplink);
+    // NOTE: prefer the bank's custom scheme (bank.deeplink) when available.
+    // Using vietqrLink (https) often doesn't trigger the app open the same
+    // way as the custom scheme on iOS/Android.
+    const deeplinkUrl = buildDeeplink(bank.deeplink || bank.vietqrLink);
     const storeLink = getStoreLink(bank.appId);
 
     debugLog(`Deep link: ${deeplinkUrl}`);
@@ -945,8 +1035,11 @@ function initBankSelector() {
         {
           text: `Mở ${bank.appName}`,
           primary: true,
+          href: deeplinkUrl,
           callback: () => {
-            debugLog("User confirmed - attempting to open app");
+            debugLog("User confirmed - attempting to open app (callback)");
+            // Start detection in background while letting the native anchor
+            // navigation proceed.
             attemptOpenBankApp(bank, deeplinkUrl, storeLink, isIOS, isAndroid);
           },
         },
@@ -1129,39 +1222,73 @@ function initBankSelector() {
         debugLog(`Attempt at ${attemptTime}ms`);
         debugLog(`Deeplink URL: ${deeplinkUrl}`);
 
-        // =================================================================
-        // iOS: WINDOW.LOCATION.HREF (USER-INITIATED ACTION)
-        // =================================================================
-        if (isIOS) {
-          debugLog("iOS: Using window.location.href (user-initiated)");
+        // Try several user-gesture friendly methods synchronously.
+        // Note: these should be executed within the user's click handler
+        // so the browser considers them user-initiated.
 
-          try {
-            // Vì đây là user-initiated action (click button),
-            // iOS CHO PHÉP window.location.href mở deeplink!
-            window.location.href = deeplinkUrl;
-            debugLog("iOS: window.location.href executed successfully");
-            return true;
-          } catch (e) {
-            debugWarn("iOS: window.location.href failed:", e);
-            return false;
-          }
+        // 1) Try direct navigation
+        try {
+          debugLog("Method 1: window.location.href = deeplinkUrl");
+          window.location.href = deeplinkUrl;
+          debugLog("Method 1 executed (may navigate away)");
+          return true;
+        } catch (e) {
+          debugWarn("Method 1 failed:", e);
         }
 
-        // =================================================================
-        // ANDROID: WINDOW.LOCATION.HREF
-        // =================================================================
-        if (isAndroid) {
-          debugLog("Android: Using window.location.href");
-          try {
-            window.location.href = deeplinkUrl;
-            debugLog("Android: window.location.href executed successfully");
-            return true;
-          } catch (e) {
-            debugWarn("Android: window.location.href failed:", e);
-            return false;
-          }
+        // 2) Create an anchor and click it (some browsers treat this well)
+        try {
+          debugLog("Method 2: creating anchor and dispatching click");
+          const a = document.createElement("a");
+          a.href = deeplinkUrl;
+          // Use same window to avoid popup blockers
+          a.target = "_self";
+          a.rel = "noopener";
+          // Some browsers require it to be in DOM
+          a.style.display = "none";
+          document.body.appendChild(a);
+          // Use native click
+          a.click();
+          // remove anchor after click
+          setTimeout(() => a.remove(), 1000);
+          debugLog("Method 2 executed (anchor click)");
+          return true;
+        } catch (e) {
+          debugWarn("Method 2 failed:", e);
         }
 
+        // 3) Try window.open with _self (some engines allow it in user gesture)
+        try {
+          debugLog("Method 3: window.open(deeplinkUrl, '_self')");
+          const win = window.open(deeplinkUrl, "_self");
+          if (win !== null) {
+            debugLog("Method 3 returned a window object (may have navigated)");
+            return true;
+          } else {
+            debugWarn("Method 3 returned null (blocked)");
+          }
+        } catch (e) {
+          debugWarn("Method 3 failed:", e);
+        }
+
+        // 4) Fallback to hidden iframe (last resort)
+        try {
+          debugLog("Method 4: injecting hidden iframe with src");
+          const iframe = document.createElement("iframe");
+          iframe.style.width = "0";
+          iframe.style.height = "0";
+          iframe.style.border = "0";
+          iframe.style.display = "none";
+          iframe.src = deeplinkUrl;
+          document.body.appendChild(iframe);
+          setTimeout(() => iframe.remove(), 2000);
+          debugLog("Method 4 executed (iframe)");
+          return true;
+        } catch (e) {
+          debugWarn("Method 4 failed:", e);
+        }
+
+        debugWarn("All deeplink methods attempted and failed synchronously");
         return false;
       } catch (error) {
         debugWarn("Failed to open deep link:", error);
