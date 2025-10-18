@@ -1118,62 +1118,48 @@ function initBankSelector() {
 
     /**
      * GIẢI PHÁP CUỐI CÙNG:
-     * - iOS: Dùng IFRAME (không show lỗi) + GIẢM TIMEOUT + LUÔN CHO PHÉP RETRY
-     * - Thay vì báo "chưa cài", cho user tự quyết định
-     * - Timeout ngắn (500ms) để không làm user chờ lâu
+     * - iOS: Dùng WINDOW.LOCATION.HREF (user-initiated, hoạt động!)
+     * - Đơn giản, trực tiếp, hiệu quả
+     * - Không cần iframe (iframe bị iOS chặn)
      */
     function attemptOpenDeeplink() {
       try {
         debugLog("Attempting to open deep link...");
         const attemptTime = Date.now() - startTime;
         debugLog(`Attempt at ${attemptTime}ms`);
+        debugLog(`Deeplink URL: ${deeplinkUrl}`);
 
         // =================================================================
-        // iOS: IFRAME ẨN (KHÔNG SHOW LỖI)
+        // iOS: WINDOW.LOCATION.HREF (USER-INITIATED ACTION)
         // =================================================================
         if (isIOS) {
-          debugLog("iOS: Using iframe (silent method)");
+          debugLog("iOS: Using window.location.href (user-initiated)");
 
-          const iframe = document.createElement("iframe");
-          iframe.style.cssText =
-            "display:none;width:0;height:0;border:none;position:absolute;top:-1000px;left:-1000px;";
-          iframe.src = deeplinkUrl;
-          document.body.appendChild(iframe);
-
-          debugLog("iOS: iframe created and src set");
-
-          // Cleanup iframe sau 2 giây
-          setTimeout(() => {
-            if (document.body.contains(iframe)) {
-              document.body.removeChild(iframe);
-              debugLog("iOS: iframe removed");
-            }
-          }, 2000);
-
-          return true;
+          try {
+            // Vì đây là user-initiated action (click button),
+            // iOS CHO PHÉP window.location.href mở deeplink!
+            window.location.href = deeplinkUrl;
+            debugLog("iOS: window.location.href executed successfully");
+            return true;
+          } catch (e) {
+            debugWarn("iOS: window.location.href failed:", e);
+            return false;
+          }
         }
 
         // =================================================================
-        // ANDROID: THẺ <A> ẨN
+        // ANDROID: WINDOW.LOCATION.HREF
         // =================================================================
         if (isAndroid) {
-          debugLog("Android: Using hidden <a> link");
-          const link = document.createElement("a");
-          link.href = deeplinkUrl;
-          link.style.cssText = "display:none;position:absolute;";
-          document.body.appendChild(link);
-
-          // Trigger click
-          link.click();
-
-          // Cleanup sau 100ms
-          setTimeout(() => {
-            if (document.body.contains(link)) {
-              document.body.removeChild(link);
-            }
-          }, 100);
-
-          return true;
+          debugLog("Android: Using window.location.href");
+          try {
+            window.location.href = deeplinkUrl;
+            debugLog("Android: window.location.href executed successfully");
+            return true;
+          } catch (e) {
+            debugWarn("Android: window.location.href failed:", e);
+            return false;
+          }
         }
 
         return false;
