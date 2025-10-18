@@ -1213,8 +1213,8 @@ function initBankSelector() {
     // =====================================================================
     // BƯỚC 5: THIẾT LẬP TIMEOUT - HỎI USER THAY VÌ GIẢ ĐỊNH
     // =====================================================================
-    // Giảm timeout xuống 500ms để nhanh hơn
-    const timeoutDuration = 500; // 0.5 giây
+    // Tăng timeout lên 2000ms (2 giây) để app có thời gian mở
+    const timeoutDuration = 2000; // 2 giây
 
     debugLog(`Fallback timeout: ${timeoutDuration}ms`);
 
@@ -1240,52 +1240,59 @@ function initBankSelector() {
 
       cleanup();
 
-      // TRƯỜNG HỢP 1: App chắc chắn đã mở (page bị hidden)
-      if (appOpened || wasHidden) {
-        debugLog("✅ FINAL RESULT: App opened successfully!");
-        return; // Không làm gì cả
+      // LOGIC MỚI: CHỈ hiện modal nếu user VẪN ĐANG trên trang sau 2 giây
+      // Nếu app mở thành công, user sẽ không còn trên browser nữa
+      // Kiểm tra: page visible VÀ có focus VÀ chưa bao giờ bị hidden
+      const userStillOnPage =
+        !currentlyHidden && document.hasFocus() && !wasHidden;
+
+      if (userStillOnPage) {
+        debugLog(
+          "⚠️ FINAL RESULT: User still on page after 2s - app likely not opened"
+        );
+
+        showNotification(
+          "Ứng dụng không mở?",
+          `Nếu ${bank.appName} không tự động mở, có thể bạn chưa cài đặt ứng dụng.\n\n` +
+            `Bạn có muốn tải ứng dụng từ ${
+              isIOS ? "App Store" : "Google Play"
+            } không?`,
+          "info",
+          [
+            {
+              text: "Tải ứng dụng",
+              primary: true,
+              callback: () => {
+                debugLog("User wants to download app");
+                if (storeLink) {
+                  window.open(storeLink, "_blank");
+                } else {
+                  showNotification(
+                    "Link cửa hàng không khả dụng",
+                    `Không tìm thấy link cửa hàng cho ${bank.appName}.\n\n` +
+                      `Vui lòng tìm kiếm "${bank.appName}" trong ${
+                        isIOS ? "App Store" : "Google Play"
+                      }.`,
+                    "warning"
+                  );
+                }
+              },
+            },
+            {
+              text: "Ứng dụng đã mở",
+              primary: false,
+              callback: () => {
+                debugLog("User confirmed app opened");
+                // Không làm gì - user đã vào app thành công
+              },
+            },
+          ]
+        );
+      } else {
+        debugLog(
+          "✅ FINAL RESULT: App opened or user left page - no modal needed"
+        );
       }
-
-      // TRƯỜNG HỢP 2: Không chắc chắn - HỎI USER
-      debugLog("⚠️ FINAL RESULT: Cannot detect - asking user");
-
-      showNotification(
-        "Ứng dụng không mở?",
-        `Nếu ${bank.appName} không tự động mở, có thể bạn chưa cài đặt ứng dụng.\n\n` +
-          `Bạn có muốn tải ứng dụng từ ${
-            isIOS ? "App Store" : "Google Play"
-          } không?`,
-        "info",
-        [
-          {
-            text: "Tải ứng dụng",
-            primary: true,
-            callback: () => {
-              debugLog("User wants to download app");
-              if (storeLink) {
-                window.open(storeLink, "_blank");
-              } else {
-                showNotification(
-                  "Link cửa hàng không khả dụng",
-                  `Không tìm thấy link cửa hàng cho ${bank.appName}.\n\n` +
-                    `Vui lòng tìm kiếm "${bank.appName}" trong ${
-                      isIOS ? "App Store" : "Google Play"
-                    }.`,
-                  "warning"
-                );
-              }
-            },
-          },
-          {
-            text: "Ứng dụng đã mở",
-            primary: false,
-            callback: () => {
-              debugLog("User confirmed app opened");
-              // Không làm gì - user đã vào app thành công
-            },
-          },
-        ]
-      );
     }, timeoutDuration);
   }
 
