@@ -991,6 +991,7 @@ function initBankSelector() {
     // BƯỚC 1: THIẾT LẬP BIẾN THEO DÕI TRẠNG THÁI
     // =====================================================================
     let appOpened = false; // App đã mở thành công?
+    let wasHidden = false; // Page đã bị hidden ít nhất 1 lần (app đã mở)
     let cleanedUp = false; // Đã cleanup?
     let fallbackTimer = null; // Timer cho fallback
     let visibilityTimer = null; // Timer cho visibility check
@@ -1039,7 +1040,18 @@ function initBankSelector() {
           `✅ DETECTED: Page hidden after ${elapsed}ms - App opened successfully!`
         );
         appOpened = true;
+        wasHidden = true; // Đánh dấu đã bị hidden
         cleanup();
+        return;
+      }
+
+      // Nếu page visible lại SAU KHI đã hidden → user quay lại từ app
+      if (!document.hidden && wasHidden) {
+        const elapsed = Date.now() - startTime;
+        debugLog(
+          `📱 User returned from app after ${elapsed}ms - app was successfully opened`
+        );
+        // Không làm gì cả - app đã mở thành công
         return;
       }
 
@@ -1051,6 +1063,7 @@ function initBankSelector() {
             `✅ DETECTED: Page hidden (delayed) after ${elapsed}ms - App opened!`
           );
           appOpened = true;
+          wasHidden = true; // Đánh dấu đã bị hidden
           cleanup();
         }
       }, 25);
@@ -1061,6 +1074,7 @@ function initBankSelector() {
       const elapsed = Date.now() - startTime;
       debugLog(`✅ DETECTED: Page hide after ${elapsed}ms - App opened!`);
       appOpened = true;
+      wasHidden = true; // Đánh dấu đã bị hidden
       cleanup();
     };
 
@@ -1074,6 +1088,7 @@ function initBankSelector() {
           const elapsed = Date.now() - startTime;
           debugLog(`✅ DETECTED: Window blur after ${elapsed}ms - App opened!`);
           appOpened = true;
+          wasHidden = true; // Đánh dấu đã bị hidden
           cleanup();
         }
       }, 50);
@@ -1215,6 +1230,7 @@ function initBankSelector() {
       if (document.hidden && !appOpened) {
         debugLog("Early detection (100ms): Page hidden - App opened!");
         appOpened = true;
+        wasHidden = true;
         cleanup();
       }
     }, 100);
@@ -1224,6 +1240,7 @@ function initBankSelector() {
       if (document.hidden && !appOpened) {
         debugLog("Early detection (300ms): Page hidden - App opened!");
         appOpened = true;
+        wasHidden = true;
         cleanup();
       }
     }, 300);
@@ -1243,21 +1260,24 @@ function initBankSelector() {
 
       debugLog(`=== TIMEOUT CALLBACK (${elapsed}ms) ===`);
       debugLog(`- appOpened flag: ${appOpened}`);
+      debugLog(`- wasHidden flag: ${wasHidden}`);
       debugLog(`- document.hidden: ${currentlyHidden}`);
       debugLog(`- document.visibilityState: ${visibilityState}`);
       debugLog(`- document.hasFocus(): ${document.hasFocus()}`);
 
-      // Kiểm tra lần cuối: nếu page đang hidden thì app đã mở
-      if (currentlyHidden || visibilityState === "hidden") {
-        debugLog("✅ FINAL CHECK: Page is hidden - App opened successfully!");
+      // Kiểm tra lần cuối: nếu page đang hidden HOẶC đã từng bị hidden thì app đã mở
+      if (currentlyHidden || visibilityState === "hidden" || wasHidden) {
+        debugLog(
+          "✅ FINAL CHECK: App was opened (page hidden or was hidden before)"
+        );
         appOpened = true;
       }
 
       cleanup();
 
-      // Nếu app chưa mở, hiển thị modal cửa hàng
-      if (!appOpened) {
-        debugLog("❌ FINAL RESULT: App not opened - showing store modal");
+      // CHỈ hiện modal nếu app CHƯA BAO GIỜ mở (không hidden lần nào)
+      if (!appOpened && !wasHidden) {
+        debugLog("❌ FINAL RESULT: App never opened - showing store modal");
 
         showNotification(
           "Ứng dụng chưa được cài đặt",
