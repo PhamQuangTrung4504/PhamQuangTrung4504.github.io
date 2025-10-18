@@ -765,6 +765,111 @@ function initBankSelector() {
 
   /**
    * ========================================================================
+   * HÀM HIỂN THỊ THÔNG BÁO TỰ ĐỊNH NGHĨA (THAY THẾ alert/confirm)
+   * ========================================================================
+   * Tạo một modal thông báo đẹp với CSS tùy chỉnh thay vì dùng alert/confirm
+   *
+   * @param {string} title - Tiêu đề thông báo
+   * @param {string} message - Nội dung thông báo
+   * @param {string} type - Loại thông báo: 'info', 'warning', 'error', 'success'
+   * @param {Array} buttons - Mảng các nút bấm {text, primary, callback}
+   */
+  function showNotification(title, message, type = "info", buttons = null) {
+    // Xóa notification cũ nếu có
+    const oldNotification = document.getElementById("custom-notification");
+    if (oldNotification) {
+      oldNotification.remove();
+    }
+
+    // Tạo notification overlay
+    const notification = document.createElement("div");
+    notification.id = "custom-notification";
+    notification.className = `custom-notification ${type}`;
+    notification.setAttribute("role", "dialog");
+    notification.setAttribute("aria-modal", "true");
+    notification.setAttribute("aria-labelledby", "notification-title");
+
+    // Icon theo loại thông báo
+    const icons = {
+      info: '<i class="fas fa-info-circle"></i>',
+      warning: '<i class="fas fa-exclamation-triangle"></i>',
+      error: '<i class="fas fa-times-circle"></i>',
+      success: '<i class="fas fa-check-circle"></i>',
+    };
+
+    // Tạo nút bấm
+    let buttonsHTML = "";
+    if (buttons && buttons.length > 0) {
+      buttonsHTML = '<div class="notification-buttons">';
+      buttons.forEach((btn) => {
+        const btnClass = btn.primary
+          ? "notification-btn notification-btn-primary"
+          : "notification-btn notification-btn-secondary";
+        buttonsHTML += `<button class="${btnClass}" data-action="${btn.text}">${btn.text}</button>`;
+      });
+      buttonsHTML += "</div>";
+    } else {
+      // Nút đóng mặc định
+      buttonsHTML =
+        '<div class="notification-buttons"><button class="notification-btn notification-btn-primary" data-action="close">Đóng</button></div>';
+    }
+
+    notification.innerHTML = `
+      <div class="notification-overlay"></div>
+      <div class="notification-content">
+        <div class="notification-icon ${type}">
+          ${icons[type] || icons.info}
+        </div>
+        <h3 class="notification-title" id="notification-title">${title}</h3>
+        <p class="notification-message">${message.replace(/\n/g, "<br>")}</p>
+        ${buttonsHTML}
+      </div>
+    `;
+
+    document.body.appendChild(notification);
+
+    // Hiện notification với animation
+    setTimeout(() => {
+      notification.classList.add("active");
+    }, 10);
+
+    // Xử lý sự kiện click
+    const closeNotification = () => {
+      notification.classList.remove("active");
+      setTimeout(() => {
+        if (notification.parentNode) {
+          notification.remove();
+        }
+      }, 300);
+    };
+
+    // Click overlay để đóng
+    const overlay = notification.querySelector(".notification-overlay");
+    overlay.addEventListener("click", closeNotification);
+
+    // Click nút
+    const btnElements = notification.querySelectorAll(".notification-btn");
+    btnElements.forEach((btn, index) => {
+      btn.addEventListener("click", () => {
+        if (buttons && buttons[index] && buttons[index].callback) {
+          buttons[index].callback();
+        }
+        closeNotification();
+      });
+    });
+
+    // ESC để đóng
+    const handleEsc = (e) => {
+      if (e.key === "Escape") {
+        closeNotification();
+        document.removeEventListener("keydown", handleEsc);
+      }
+    };
+    document.addEventListener("keydown", handleEsc);
+  }
+
+  /**
+   * ========================================================================
    * GIẢI PHÁP MỞ APP NGÂN HÀNG - HỖ TRỢ ĐẦY ĐỦ iOS SAFARI VÀ TẤT CẢ NỀN TẢNG
    * ========================================================================
    *
@@ -772,6 +877,7 @@ function initBankSelector() {
    * - iOS Safari: Deep link không hoạt động, nhảy thẳng sang App Store
    * - WebView (Zalo, Facebook, TikTok): Bị chặn deep link
    * - Android: Timeout không phù hợp
+   * - Desktop: Hiện thông báo chỉ hỗ trợ thiết bị di động
    *
    * GIẢI PHÁP:
    * 1. Dùng deep link scheme chính thức của từng ngân hàng (vcbdigibank://, tpbank://, v.v.)
@@ -779,13 +885,14 @@ function initBankSelector() {
    * 3. Mở deep link TRỰC TIẾP bằng window.location.href (không setTimeout)
    * 4. Dùng setTimeout CHỈ cho fallback (App Store/Play Store)
    * 5. Detect xem app đã mở thành công qua visibilitychange/blur/pagehide
+   * 6. Desktop: Hiện thông báo tùy chỉnh thay vì lỗi JSON
    *
    * HỖ TRỢ:
    * - ✅ iOS Safari (iPhone/iPad)
    * - ✅ iOS Chrome/Edge/Firefox
    * - ✅ Android Chrome/Firefox/Samsung Internet
    * - ✅ WebView: Zalo, Facebook, TikTok, Instagram, Line
-   * - ✅ Desktop: Windows, macOS, Linux
+   * - ✅ Desktop: Windows, macOS, Linux (hiện thông báo)
    * ========================================================================
    */
   function openBankApp(bank) {
@@ -850,6 +957,23 @@ function initBankSelector() {
       }`
     );
     debugLog(`WebView: ${isWebView}`);
+
+    // =====================================================================
+    // KIỂM TRA DESKTOP: HIỂN THỊ THÔNG BÁO THAY VÌ LỖI JSON
+    // =====================================================================
+    if (isDesktop) {
+      debugLog("Desktop detected - showing mobile-only notification");
+      closeModal();
+
+      // Tạo notification modal tùy chỉnh
+      showNotification(
+        "Chức năng chỉ dành cho thiết bị di động",
+        `Tính năng chuyển tiền nhanh qua app ngân hàng chỉ khả dụng trên điện thoại di động (iOS/Android).\n\n` +
+          `Vui lòng quét mã QR bằng ứng dụng ngân hàng trên điện thoại của bạn.`,
+        "info"
+      );
+      return;
+    }
 
     // =====================================================================
     // BƯỚC 2: THIẾT LẬP BIẾN THEO DÕI TRẠNG THÁI
@@ -1061,49 +1185,67 @@ function initBankSelector() {
         if (storeLink) {
           // Đợi modal đóng xong (300ms)
           setTimeout(() => {
-            const userChoice = confirm(
-              `Không thể mở ứng dụng ${bank.appName}.\n\n` +
-                `Ứng dụng có thể chưa được cài đặt hoặc cần cập nhật.\n\n` +
-                `Bạn có muốn mở ${
+            // Hiển thị thông báo tùy chỉnh với CSS đẹp
+            showNotification(
+              "Không thể mở ứng dụng",
+              `Không tìm thấy ứng dụng ${bank.appName} trên thiết bị của bạn.\n\n` +
+                `Bạn có muốn tải ứng dụng từ ${
                   isIOS ? "App Store" : "Google Play"
-                } để tải/cập nhật không?`
+                }?`,
+              "warning",
+              [
+                {
+                  text: "Đi tới cửa hàng",
+                  primary: true,
+                  callback: () => {
+                    debugLog("User wants to download app");
+                    // Mở App Store / Play Store
+                    try {
+                      window.location.href = storeLink;
+                    } catch (error) {
+                      debugWarn("Failed to open store:", error);
+                      // Fallback với window.open
+                      try {
+                        window.open(storeLink, "_blank");
+                      } catch (err) {
+                        showNotification(
+                          "Lỗi",
+                          "Không thể mở cửa hàng ứng dụng. Vui lòng thử lại.",
+                          "error"
+                        );
+                      }
+                    }
+                  },
+                },
+                {
+                  text: "Không",
+                  primary: false,
+                  callback: () => {
+                    debugLog("User cancelled download");
+                    // User không muốn tải - mở lại modal
+                    setTimeout(() => {
+                      openModal();
+                      if (searchInput) {
+                        searchInput.focus({ preventScroll: true });
+                      }
+                    }, 100);
+                  },
+                },
+              ]
             );
-
-            if (userChoice) {
-              debugLog("User wants to download app");
-              // Mở App Store / Play Store
-              try {
-                window.location.href = storeLink;
-              } catch (error) {
-                debugWarn("Failed to open store:", error);
-                // Fallback với window.open
-                try {
-                  window.open(storeLink, "_blank");
-                } catch (err) {
-                  alert("Không thể mở cửa hàng ứng dụng. Vui lòng thử lại.");
-                }
-              }
-            } else {
-              debugLog("User cancelled download");
-              // User không muốn tải - mở lại modal
-              setTimeout(() => {
-                openModal();
-                if (searchInput) {
-                  searchInput.focus({ preventScroll: true });
-                }
-              }, 100);
-            }
           }, 300);
         } else {
           // Không có store link
           debugWarn("No store link available");
           setTimeout(() => {
             openModal();
-            alert(
+            showNotification(
+              "Không tìm thấy liên kết",
               `Không tìm thấy liên kết tải ứng dụng ${bank.appName}.\n` +
                 `Vui lòng thử ngân hàng khác hoặc tải app trực tiếp từ ${
                   isIOS ? "App Store" : "Google Play"
-                }.`
+                }.`,
+              "error"
             );
           }, 100);
         }
