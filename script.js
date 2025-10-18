@@ -828,6 +828,10 @@ function initBankSelector() {
 
     document.body.appendChild(notification);
 
+    // Ngăn scroll khi notification hiển thị
+    const originalOverflow = document.body.style.overflow;
+    document.body.style.overflow = "hidden";
+
     // Hiện notification với animation
     setTimeout(() => {
       notification.classList.add("active");
@@ -836,6 +840,8 @@ function initBankSelector() {
     // Xử lý sự kiện click
     const closeNotification = () => {
       notification.classList.remove("active");
+      // Khôi phục overflow
+      document.body.style.overflow = originalOverflow;
       setTimeout(() => {
         if (notification.parentNode) {
           notification.remove();
@@ -1018,7 +1024,7 @@ function initBankSelector() {
     const handleVisibilityChange = () => {
       if (visibilityTimer) clearTimeout(visibilityTimer);
 
-      // Đợi 100ms để xác nhận visibility change là thật
+      // Đợi 50ms để xác nhận visibility change là thật (giảm từ 100ms)
       visibilityTimer = setTimeout(() => {
         if (document.hidden) {
           debugLog("Page hidden - App opened successfully!");
@@ -1026,7 +1032,7 @@ function initBankSelector() {
           cleanup();
           closeModal();
         }
-      }, 100);
+      }, 50);
     };
 
     // Khi trang bị ẩn hoàn toàn (pagehide)
@@ -1041,7 +1047,7 @@ function initBankSelector() {
     const handleBlur = () => {
       if (visibilityTimer) clearTimeout(visibilityTimer);
 
-      // Đợi 200ms để xác nhận blur là thật (không phải blur tạm thời)
+      // Đợi 100ms để xác nhận blur là thật (giảm từ 200ms)
       visibilityTimer = setTimeout(() => {
         if (document.hidden || !document.hasFocus()) {
           debugLog("Window blurred - App opened successfully!");
@@ -1049,7 +1055,7 @@ function initBankSelector() {
           cleanup();
           closeModal();
         }
-      }, 200);
+      }, 100);
     };
 
     // Khi window được focus lại (có thể app không mở được)
@@ -1142,26 +1148,16 @@ function initBankSelector() {
 
     /**
      * Timeout tùy theo nền tảng:
-     * - iOS Safari: 3500ms (Safari chậm hơn)
-     * - iOS Chrome/Firefox/Edge: 3000ms
-     * - Android: 2500ms
-     * - WebView: 3500ms (thường chậm hơn)
-     * - Desktop: 2000ms
+     * - iOS: 1000ms (1 giây - theo yêu cầu)
+     * - Android: 1500ms
+     * - WebView: 1500ms
      */
-    let timeoutDuration = 2500; // Mặc định
+    let timeoutDuration = 1000; // iOS mặc định 1 giây
 
-    if (isIOS) {
-      if (isSafari) {
-        timeoutDuration = 3500; // Safari chậm nhất
-      } else if (isWebView) {
-        timeoutDuration = 3500; // WebView cũng chậm
-      } else {
-        timeoutDuration = 3000; // Chrome/Firefox/Edge iOS
-      }
-    } else if (isAndroid) {
-      timeoutDuration = isWebView ? 3500 : 2500;
-    } else {
-      timeoutDuration = 2000; // Desktop
+    if (isAndroid) {
+      timeoutDuration = 1500; // Android 1.5 giây
+    } else if (isWebView) {
+      timeoutDuration = 1500; // WebView 1.5 giây
     }
 
     debugLog(`Fallback timeout: ${timeoutDuration}ms`);
@@ -1187,15 +1183,15 @@ function initBankSelector() {
           setTimeout(() => {
             // Hiển thị thông báo tùy chỉnh với CSS đẹp
             showNotification(
-              "Không thể mở ứng dụng",
-              `Không tìm thấy ứng dụng ${bank.appName} trên thiết bị của bạn.\n\n` +
-                `Bạn có muốn tải ứng dụng từ ${
+              "Ứng dụng chưa được cài đặt",
+              `Ứng dụng ${bank.appName} chưa được cài đặt trên thiết bị của bạn.\n\n` +
+                `Bạn có muốn đi tới ${
                   isIOS ? "App Store" : "Google Play"
-                }?`,
+                } để tải ứng dụng không?`,
               "warning",
               [
                 {
-                  text: "Đi tới cửa hàng",
+                  text: isIOS ? "Đi tới App Store" : "Đi tới Google Play",
                   primary: true,
                   callback: () => {
                     debugLog("User wants to download app");
