@@ -10,6 +10,7 @@ document.addEventListener("DOMContentLoaded", function () {
   initTypedText();
   initScrollAnimations();
   initGalleryFilter();
+  initGalleryModal();
   initLightbox();
   initSkillBars();
   initSmoothScrolling();
@@ -139,7 +140,47 @@ function initScrollAnimations() {
 function initGalleryFilter() {
   const filterBtns = document.querySelectorAll(".filter-btn");
   const galleryItems = document.querySelectorAll(".gallery-item");
+  const MAX_VISIBLE_ITEMS = 9;
 
+  // Function to show/hide items based on filter and limit
+  const applyFilter = (filterValue) => {
+    let visibleCount = 0;
+    let totalMatched = 0;
+
+    galleryItems.forEach((item) => {
+      const categories = item.getAttribute("data-category");
+      let shouldShow = false;
+
+      if (categories && categories.includes(filterValue)) {
+        shouldShow = true;
+        totalMatched++;
+      }
+
+      if (shouldShow && visibleCount < MAX_VISIBLE_ITEMS) {
+        item.classList.remove("hidden");
+        item.style.display = "block";
+        visibleCount++;
+      } else {
+        item.style.display = "none";
+        item.classList.add("hidden");
+      }
+    });
+
+    // Show/hide "Xem thêm" button based on total items
+    const viewMoreBtn = document.getElementById("viewMoreGallery");
+    if (viewMoreBtn) {
+      if (totalMatched > MAX_VISIBLE_ITEMS) {
+        viewMoreBtn.style.display = "inline-flex";
+      } else {
+        viewMoreBtn.style.display = "none";
+      }
+    }
+  };
+
+  // Initialize: show first 9 photos
+  applyFilter("photos");
+
+  // Filter button click handlers
   filterBtns.forEach((btn) => {
     btn.addEventListener("click", function () {
       // Remove active class from all buttons
@@ -148,27 +189,120 @@ function initGalleryFilter() {
       this.classList.add("active");
 
       const filterValue = this.getAttribute("data-filter");
+      applyFilter(filterValue);
+    });
+  });
 
-      galleryItems.forEach((item) => {
-        if (filterValue === "all") {
-          item.classList.remove("hidden");
-          setTimeout(() => {
-            item.style.display = "block";
-          }, 10);
-        } else {
-          const categories = item.getAttribute("data-category");
-          if (categories && categories.includes(filterValue)) {
-            item.classList.remove("hidden");
-            setTimeout(() => {
-              item.style.display = "block";
-            }, 10);
-          } else {
-            item.style.display = "none";
-            item.classList.add("hidden");
-          }
-        }
+  // "Xem thêm" button handler
+  const viewMoreBtn = document.getElementById("viewMoreGallery");
+  if (viewMoreBtn) {
+    viewMoreBtn.addEventListener("click", function () {
+      openGalleryModal();
+    });
+  }
+}
+
+// Gallery Modal Functions
+function openGalleryModal() {
+  const modal = document.getElementById("galleryModal");
+  const modalGrid = document.getElementById("galleryModalGrid");
+  const allItems = document.querySelectorAll(".gallery-item");
+
+  // Clear previous content
+  modalGrid.innerHTML = "";
+
+  // Clone all gallery items to modal
+  allItems.forEach((item) => {
+    const clone = item.cloneNode(true);
+    clone.style.display = "block";
+    clone.classList.remove("hidden");
+
+    // Add click handler to open lightbox
+    clone.addEventListener("click", function (e) {
+      // Don't trigger if clicking on the gallery button
+      if (e.target.closest(".gallery-btn")) {
+        return;
+      }
+
+      const img = clone.querySelector("img");
+      const video = clone.querySelector("video");
+      const title =
+        clone.querySelector(".gallery-info h4")?.textContent ||
+        "Không có tiêu đề";
+      const description =
+        clone.querySelector(".gallery-info p")?.textContent || "Không có mô tả";
+
+      // Close gallery modal first
+      closeGalleryModal();
+
+      // Then open lightbox
+      if (img) {
+        openLightbox(img.src, "image", title, description);
+      } else if (video) {
+        openLightbox(video.src, "video", title, description);
+      }
+    });
+
+    modalGrid.appendChild(clone);
+  });
+
+  // Show modal
+  modal.classList.add("active");
+  document.body.style.overflow = "hidden";
+
+  // Initialize modal scroll position
+  modalGrid.scrollTop = 0;
+}
+
+function closeGalleryModal() {
+  const modal = document.getElementById("galleryModal");
+  modal.classList.remove("active");
+  document.body.style.overflow = "auto";
+}
+
+function initGalleryModal() {
+  const modal = document.getElementById("galleryModal");
+  const closeBtn = document.getElementById("galleryModalClose");
+  const prevBtn = document.getElementById("galleryModalPrev");
+  const nextBtn = document.getElementById("galleryModalNext");
+  const modalGrid = document.getElementById("galleryModalGrid");
+
+  // Close button
+  if (closeBtn) {
+    closeBtn.addEventListener("click", closeGalleryModal);
+  }
+
+  // Click outside to close
+  modal.addEventListener("click", function (e) {
+    if (e.target === modal) {
+      closeGalleryModal();
+    }
+  });
+
+  // Navigation buttons - scroll the grid
+  if (prevBtn) {
+    prevBtn.addEventListener("click", function () {
+      modalGrid.scrollBy({
+        top: -300,
+        behavior: "smooth",
       });
     });
+  }
+
+  if (nextBtn) {
+    nextBtn.addEventListener("click", function () {
+      modalGrid.scrollBy({
+        top: 300,
+        behavior: "smooth",
+      });
+    });
+  }
+
+  // ESC key to close
+  document.addEventListener("keydown", function (e) {
+    if (e.key === "Escape" && modal.classList.contains("active")) {
+      closeGalleryModal();
+    }
   });
 }
 

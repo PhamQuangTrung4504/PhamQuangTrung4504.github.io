@@ -155,8 +155,7 @@
 
         <!-- Gallery Filter -->
         <div class="gallery-filter">
-          <button class="filter-btn active" data-filter="all">Tất cả</button>
-          <button class="filter-btn" data-filter="photos">Ảnh</button>
+          <button class="filter-btn active" data-filter="photos">Ảnh</button>
           <button class="filter-btn" data-filter="videos">Video</button>
           <button class="filter-btn" data-filter="friends">Bạn bè</button>
           <button class="filter-btn" data-filter="travel">Du lịch</button>
@@ -947,8 +946,8 @@
 
         <!-- Load More Button -->
         <div class="load-more-container">
-          <button class="btn btn-primary" id="loadMoreBtn">
-            <i class="fas fa-plus"></i>
+          <button class="btn btn-primary" id="viewMoreGallery">
+            <i class="fas fa-images"></i>
             Xem thêm
           </button>
         </div>
@@ -1260,6 +1259,33 @@
       <div class="lightbox-info" id="lightboxInfo">
         <h4 id="lightboxTitle">Tiêu đề ảnh</h4>
         <p id="lightboxDescription">Mô tả ảnh</p>
+      </div>
+    </div>
+
+    <!-- Gallery Full View Modal -->
+    <div class="gallery-modal" id="galleryModal">
+      <div class="gallery-modal-header">
+        <h3>Tất cả kỷ niệm</h3>
+        <button class="gallery-modal-close" id="galleryModalClose">
+          <i class="fas fa-times"></i>
+        </button>
+      </div>
+      <div class="gallery-modal-content">
+        <button
+          class="gallery-modal-nav gallery-modal-prev"
+          id="galleryModalPrev"
+        >
+          <i class="fas fa-chevron-left"></i>
+        </button>
+        <div class="gallery-modal-grid" id="galleryModalGrid">
+          <!-- Items will be populated by JavaScript -->
+        </div>
+        <button
+          class="gallery-modal-nav gallery-modal-next"
+          id="galleryModalNext"
+        >
+          <i class="fas fa-chevron-right"></i>
+        </button>
       </div>
     </div>
 
