@@ -263,9 +263,6 @@ function closeGalleryModal() {
 function initGalleryModal() {
   const modal = document.getElementById("galleryModal");
   const closeBtn = document.getElementById("galleryModalClose");
-  const prevBtn = document.getElementById("galleryModalPrev");
-  const nextBtn = document.getElementById("galleryModalNext");
-  const modalGrid = document.getElementById("galleryModalGrid");
 
   // Close button
   if (closeBtn) {
@@ -278,25 +275,6 @@ function initGalleryModal() {
       closeGalleryModal();
     }
   });
-
-  // Navigation buttons - scroll the grid
-  if (prevBtn) {
-    prevBtn.addEventListener("click", function () {
-      modalGrid.scrollBy({
-        top: -300,
-        behavior: "smooth",
-      });
-    });
-  }
-
-  if (nextBtn) {
-    nextBtn.addEventListener("click", function () {
-      modalGrid.scrollBy({
-        top: 300,
-        behavior: "smooth",
-      });
-    });
-  }
 
   // ESC key to close
   document.addEventListener("keydown", function (e) {
