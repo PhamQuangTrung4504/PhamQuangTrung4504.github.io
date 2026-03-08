@@ -131,7 +131,7 @@ function initScrollAnimations() {
 
   // Observe all elements with animation classes
   const animatedElements = document.querySelectorAll(
-    ".fade-in, .slide-in-left, .slide-in-right"
+    ".fade-in, .slide-in-left, .slide-in-right",
   );
   animatedElements.forEach((el) => observer.observe(el));
 }
@@ -462,7 +462,7 @@ function initSkillBars() {
         }
       });
     },
-    { threshold: 0.5 }
+    { threshold: 0.5 },
   );
 
   skillBars.forEach((bar) => skillObserver.observe(bar));
@@ -515,420 +515,9 @@ function initScrollToTop() {
 
 function initBankSelector() {
   const qrTrigger = document.querySelector(".qr-container");
-  const modal = document.getElementById("bankModal");
-  const closeBtn = document.getElementById("bankModalClose");
-  const searchInput = document.getElementById("bankSearch");
-  const listEl = document.getElementById("bankList");
-  const statusEl = document.getElementById("bankStatus");
 
-  if (
-    !qrTrigger ||
-    !modal ||
-    !closeBtn ||
-    !searchInput ||
-    !listEl ||
-    !statusEl
-  ) {
+  if (!qrTrigger) {
     return;
-  }
-
-  // Debug mode - enable by adding ?debug=1 to the URL (useful for testing on mobile)
-  const DEBUG_MODE = /[?&]debug=1/.test(window.location.search);
-
-  // Create an on-screen debug overlay when DEBUG_MODE is enabled so mobile users
-  // can capture logs without remote devtools.
-  let debugOverlay = null;
-  if (DEBUG_MODE) {
-    debugOverlay = document.createElement("div");
-    debugOverlay.id = "debug-overlay";
-    Object.assign(debugOverlay.style, {
-      position: "fixed",
-      left: "0",
-      right: "0",
-      bottom: "0",
-      maxHeight: "40vh",
-      overflow: "auto",
-      background: "rgba(0,0,0,0.8)",
-      color: "#b8ffb8",
-      fontFamily: "monospace",
-      fontSize: "12px",
-      lineHeight: "1.3",
-      zIndex: "999999",
-      padding: "8px",
-    });
-    document.body.appendChild(debugOverlay);
-  }
-
-  const formatLogArgs = (args) =>
-    Array.from(args)
-      .map((a) => {
-        try {
-          if (typeof a === "string") return a;
-          return JSON.stringify(a);
-        } catch (e) {
-          return String(a);
-        }
-      })
-      .join(" ");
-
-  const debugLog = (...args) => {
-    console.log(...args);
-    if (DEBUG_MODE && debugOverlay) {
-      const line = document.createElement("div");
-      line.textContent = formatLogArgs(args);
-      debugOverlay.appendChild(line);
-      debugOverlay.scrollTop = debugOverlay.scrollHeight;
-    }
-  };
-
-  const debugWarn = (...args) => {
-    console.warn(...args);
-    if (DEBUG_MODE && debugOverlay) {
-      const line = document.createElement("div");
-      line.style.color = "#ffd08a";
-      line.textContent = "WARN: " + formatLogArgs(args);
-      debugOverlay.appendChild(line);
-      debugOverlay.scrollTop = debugOverlay.scrollHeight;
-    }
-  };
-
-  const ACCOUNT_INFO = {
-    ba: "45404052004@TPB",
-    tn: "Ung ho Pham Quang Trung",
-  };
-
-  // Link tải app từ Store (iOS và Android) - Cập nhật đầy đủ 2025
-  const APP_STORE_LINKS = {
-    vcb: {
-      ios: "https://apps.apple.com/vn/app/vcb-dinh/id561433133",
-      android: "https://play.google.com/store/apps/details?id=com.VCB",
-    },
-    bidv: {
-      ios: "https://apps.apple.com/vn/app/bidv-smartbanking/id1061867449",
-      android: "https://play.google.com/store/apps/details?id=com.vnpay.bidv",
-    },
-    icb: {
-      ios: "https://apps.apple.com/vn/app/vietinbank-ipay/id689963454",
-      android:
-        "https://play.google.com/store/apps/details?id=com.vietinbank.ipay",
-    },
-    mb: {
-      ios: "https://apps.apple.com/vn/app/mb-bank/id1205807363",
-      android: "https://play.google.com/store/apps/details?id=com.mbmobile",
-    },
-    tcb: {
-      ios: "https://apps.apple.com/vn/app/techcombank-mobile/id1548623362",
-      android:
-        "https://play.google.com/store/apps/details?id=vn.com.techcombank.bb.app",
-    },
-    vpb: {
-      ios: "https://apps.apple.com/vn/app/vpbank-neo/id1209349510",
-      android:
-        "https://play.google.com/store/apps/details?id=com.vnpay.vpbankonline",
-    },
-    acb: {
-      ios: "https://apps.apple.com/vn/app/acb-one/id950141024",
-      android:
-        "https://play.google.com/store/apps/details?id=mobile.acb.com.vn",
-    },
-    ocb: {
-      ios: "https://apps.apple.com/vn/app/ocb-omni/id6472261202",
-      android: "https://play.google.com/store/apps/details?id=vn.com.ocb.awe",
-    },
-    tpb: {
-      ios: "https://apps.apple.com/vn/app/tpbank-mobile/id450464147",
-      android:
-        "https://play.google.com/store/apps/details?id=com.tpb.mb.gprsandroid",
-    },
-    vba: {
-      ios: "https://apps.apple.com/vn/app/agribank-plus/id935944952",
-      android:
-        "https://play.google.com/store/apps/details?id=com.vnpay.Agribank3g",
-    },
-    vib: {
-      ios: "https://apps.apple.com/vn/app/myvib/id1626624790",
-      android: "https://play.google.com/store/apps/details?id=com.vib.myvib2",
-    },
-    lpb: {
-      ios: "https://apps.apple.com/vn/app/lpbank/id1488794748",
-      android:
-        "https://play.google.com/store/apps/details?id=vn.com.lpb.lienviet24h",
-    },
-    shb: {
-      ios: "https://apps.apple.com/vn/app/shb-mobile/id538278798",
-      android: "https://play.google.com/store/apps/details?id=vn.shb.mbanking",
-    },
-    hdb: {
-      ios: "https://apps.apple.com/vn/app/hdbank/id1461658565",
-      android: "https://play.google.com/store/apps/details?id=com.vnpay.hdbank",
-    },
-    cake: {
-      ios: "https://apps.apple.com/vn/app/cake-ng%C3%A2n-h%C3%A0ng-s%E1%BB%91/id1551907051",
-      android: "https://play.google.com/store/apps/details?id=xyz.be.cake",
-    },
-    seab: {
-      ios: "https://apps.apple.com/vn/app/seamobile/id846407152",
-      android:
-        "https://play.google.com/store/apps/details?id=vn.com.seabank.mb1",
-    },
-    scb: {
-      ios: "https://apps.apple.com/vn/app/scb-mobile-banking/id954973621",
-      android: "https://play.google.com/store/apps/details?id=com.vnpay.SCB",
-    },
-    eib: {
-      ios: "https://apps.apple.com/vn/app/eximbank-edigi/id1571427361",
-      android:
-        "https://play.google.com/store/apps/details?id=com.vnpay.EximBankOmni",
-    },
-    timo: {
-      ios: "https://apps.apple.com/vn/app/timo-ng%C3%A2n-h%C3%A0ng-s%E1%BB%91-by-bvbank/id1521230347",
-      android:
-        "https://play.google.com/store/apps/details?id=io.lifestyle.plus",
-    },
-  };
-
-  const POPULAR_BANK_IDS = [
-    "vcb",
-    "bidv",
-    "icb",
-    "mb",
-    "tcb",
-    "vpb",
-    "acb",
-    "ocb",
-    "tpb",
-    "vba",
-    "vib",
-    "lpb",
-    "shb",
-    "hdb",
-    "cake",
-    "seab",
-    "scb",
-    "eib",
-    "timo",
-  ];
-
-  // Danh sách ngân hàng với deep link scheme chính thức (cập nhật 2025)
-  const fallbackBanks = [
-    {
-      appId: "vcb",
-      appName: "Vietcombank",
-      bankName: "Ngân hàng TMCP Ngoại Thương Việt Nam",
-      deeplink: "vcbdigibank://", // Deep link chính thức của Vietcombank
-      vietqrLink: "https://dl.vietqr.io/pay?app=vcb",
-      appLogo: "",
-    },
-    {
-      appId: "bidv",
-      appName: "BIDV SmartBanking",
-      bankName: "Ngân hàng TMCP Đầu tư và Phát triển Việt Nam",
-      deeplink: "bidvsmartbanking://", // Deep link chính thức của BIDV
-      vietqrLink: "https://dl.vietqr.io/pay?app=bidv",
-      appLogo: "",
-    },
-    {
-      appId: "icb",
-      appName: "VietinBank iPay",
-      bankName: "Ngân hàng TMCP Công thương Việt Nam",
-      deeplink: "vietinbank://", // Deep link chính thức của VietinBank
-      vietqrLink: "https://dl.vietqr.io/pay?app=icb",
-      appLogo: "",
-    },
-    {
-      appId: "mb",
-      appName: "MB Bank",
-      bankName: "Ngân hàng TMCP Quân đội",
-      deeplink: "mbbank://", // Deep link chính thức của MB Bank
-      vietqrLink: "https://dl.vietqr.io/pay?app=mb",
-      appLogo: "",
-    },
-    {
-      appId: "tcb",
-      appName: "Techcombank Mobile",
-      bankName: "Ngân hàng TMCP Kỹ Thương Việt Nam",
-      deeplink: "techcombank://", // Deep link chính thức của Techcombank
-      vietqrLink: "https://dl.vietqr.io/pay?app=tcb",
-      appLogo: "",
-    },
-    {
-      appId: "vpb",
-      appName: "VPBank NEO",
-      bankName: "Ngân hàng TMCP Việt Nam Thịnh Vượng",
-      deeplink: "vpbank://", // Deep link chính thức của VPBank
-      vietqrLink: "https://dl.vietqr.io/pay?app=vpb",
-      appLogo: "",
-    },
-    {
-      appId: "acb",
-      appName: "ACB One",
-      bankName: "Ngân hàng TMCP Á Châu",
-      deeplink: "acbmobilebanking://", // Deep link chính thức của ACB
-      vietqrLink: "https://dl.vietqr.io/pay?app=acb",
-      appLogo: "",
-    },
-    {
-      appId: "ocb",
-      appName: "OCB OMNI",
-      bankName: "Ngân hàng TMCP Phương Đông",
-      deeplink: "ocb_omni://", // Deep link chính thức của OCB
-      vietqrLink: "https://dl.vietqr.io/pay?app=ocb",
-      appLogo: "",
-    },
-    {
-      appId: "tpb",
-      appName: "TPBank Mobile",
-      bankName: "Ngân hàng TMCP Tiên Phong",
-      deeplink: "tpbank://", // Deep link chính thức của TPBank
-      vietqrLink: "https://dl.vietqr.io/pay?app=tpb",
-      appLogo: "",
-    },
-    {
-      appId: "vba",
-      appName: "Agribank E-Mobile Banking",
-      bankName: "Ngân hàng Nông nghiệp và Phát triển Nông thôn Việt Nam",
-      deeplink: "agribank://", // Deep link chính thức của Agribank
-      vietqrLink: "https://dl.vietqr.io/pay?app=vba",
-      appLogo: "",
-    },
-    {
-      appId: "vib",
-      appName: "MyVIB",
-      bankName: "Ngân hàng TMCP Quốc tế Việt Nam",
-      deeplink: "myvib://", // Deep link chính thức của VIB
-      vietqrLink: "https://dl.vietqr.io/pay?app=vib",
-      appLogo: "",
-    },
-    {
-      appId: "lpb",
-      appName: "LienViet24h",
-      bankName: "Ngân hàng TMCP Bưu điện Liên Việt",
-      deeplink: "lpbank://", // Deep link chính thức của LienVietPostBank
-      vietqrLink: "https://dl.vietqr.io/pay?app=lpb",
-      appLogo: "",
-    },
-    {
-      appId: "shb",
-      appName: "SHB Mobile Banking",
-      bankName: "Ngân hàng TMCP Sài Gòn - Hà Nội",
-      deeplink: "shbmobile://", // Deep link chính thức của SHB
-      vietqrLink: "https://dl.vietqr.io/pay?app=shb",
-      appLogo: "",
-    },
-    {
-      appId: "hdb",
-      appName: "HDBank",
-      bankName: "Ngân hàng TMCP Phát triển TP.HCM",
-      deeplink: "hdbank://", // Deep link chính thức của HDBank
-      vietqrLink: "https://dl.vietqr.io/pay?app=hdb",
-      appLogo: "",
-    },
-    {
-      appId: "cake",
-      appName: "CAKE by VPBank",
-      bankName: "Ngân hàng số CAKE by VPBank",
-      deeplink: "cake://", // Deep link chính thức của CAKE
-      vietqrLink: "https://dl.vietqr.io/pay?app=cake",
-      appLogo: "",
-    },
-    {
-      appId: "seab",
-      appName: "SeAMobile",
-      bankName: "Ngân hàng TMCP Đông Nam Á",
-      deeplink: "seabank://", // Deep link chính thức của SeABank
-      vietqrLink: "https://dl.vietqr.io/pay?app=seab",
-      appLogo: "",
-    },
-    {
-      appId: "scb",
-      appName: "SCB Mobile Banking",
-      bankName: "Ngân hàng TMCP Sài Gòn",
-      deeplink: "scbmobilebanking://", // Deep link chính thức của SCB
-      vietqrLink: "https://dl.vietqr.io/pay?app=scb",
-      appLogo: "",
-    },
-    {
-      appId: "eib",
-      appName: "Eximbank Mobile Banking",
-      bankName: "Ngân hàng TMCP Xuất Nhập khẩu Việt Nam",
-      deeplink: "eximbank://", // Deep link chính thức của Eximbank
-      vietqrLink: "https://dl.vietqr.io/pay?app=eib",
-      appLogo: "",
-    },
-    {
-      appId: "timo",
-      appName: "Timo Digital Bank",
-      bankName: "Ngân hàng TMCP Bản Việt (Timo)",
-      deeplink: "timo://", // Deep link chính thức của Timo
-      vietqrLink: "https://dl.vietqr.io/pay?app=timo",
-      appLogo: "",
-    },
-  ];
-
-  const root = document.documentElement;
-  const viewport = window.visualViewport;
-
-  const fallbackBankMap = new Map(
-    fallbackBanks.map((bank) => [bank.appId, bank])
-  );
-
-  let bankData = [...fallbackBanks];
-
-  function normalizeText(value) {
-    return value
-      ? value
-          .normalize("NFD")
-          .replace(/[\u0300-\u036f]/g, "")
-          .toLowerCase()
-      : "";
-  }
-
-  function buildDeeplink(base) {
-    try {
-      const url = new URL(base);
-      url.searchParams.set("ba", ACCOUNT_INFO.ba);
-      url.searchParams.set("tn", ACCOUNT_INFO.tn);
-      const result = url.toString();
-      debugLog(`Built deeplink: ${result}`);
-      return result;
-    } catch (error) {
-      debugWarn(`Failed to build deeplink from ${base}:`, error);
-      // Fallback: thêm params thủ công nếu URL constructor lỗi
-      const separator = base.includes("?") ? "&" : "?";
-      return `${base}${separator}ba=${encodeURIComponent(
-        ACCOUNT_INFO.ba
-      )}&tn=${encodeURIComponent(ACCOUNT_INFO.tn)}`;
-    }
-  }
-
-  // Detect thiết bị để lấy link store phù hợp
-  function getStoreLink(appId) {
-    const storeLinks = APP_STORE_LINKS[appId];
-    if (!storeLinks) {
-      debugWarn(`No store links found for bank: ${appId}`);
-      return null;
-    }
-
-    // Detect iOS
-    const isIOS = /iPhone|iPad|iPod/i.test(navigator.userAgent);
-    // Detect Android
-    const isAndroid = /Android/i.test(navigator.userAgent);
-
-    // Validate links exist
-    if (isIOS && storeLinks.ios) {
-      return storeLinks.ios;
-    } else if (isAndroid && storeLinks.android) {
-      return storeLinks.android;
-    }
-
-    // Fallback: ưu tiên Android nếu có, không thì iOS
-    if (storeLinks.android) {
-      return storeLinks.android;
-    } else if (storeLinks.ios) {
-      return storeLinks.ios;
-    }
-
-    return null;
   }
 
   /**
@@ -966,9 +555,6 @@ function initBankSelector() {
     };
 
     // Tạo nút bấm
-    // Support buttons with optional `href` property. If provided, render an
-    // anchor tag so the browser performs a native navigation on click which
-    // tends to be more reliable for deeplinks on mobile (especially iOS).
     let buttonsHTML = "";
     if (buttons && buttons.length > 0) {
       buttonsHTML = '<div class="notification-buttons">';
@@ -979,7 +565,6 @@ function initBankSelector() {
 
         if (btn.href) {
           // Render anchor for native navigation
-          // data-callback-index used to wire up optional JS callback after DOM insertion
           buttonsHTML += `<a class="${btnClass}" data-action="${btn.text}" data-callback-index="${idx}" href="${btn.href}">${btn.text}</a>`;
         } else {
           buttonsHTML += `<button class="${btnClass}" data-action="${btn.text}" data-callback-index="${idx}">${btn.text}</button>`;
@@ -1035,20 +620,15 @@ function initBankSelector() {
     const btnElements = notification.querySelectorAll(".notification-btn");
     btnElements.forEach((el) => {
       const idx = parseInt(el.getAttribute("data-callback-index"), 10);
-      // If the element is an anchor, call its callback (if any) then allow
-      // the native navigation to proceed. For buttons, call callback then
-      // close the notification.
       if (el.tagName.toLowerCase() === "a") {
         el.addEventListener("click", (e) => {
-          // Call callback synchronously before navigation
           if (buttons && buttons[idx] && buttons[idx].callback) {
             try {
               buttons[idx].callback();
             } catch (err) {
-              debugWarn("Callback error:", err);
+              console.warn("Callback error:", err);
             }
           }
-          // Let the navigation happen naturally (no preventDefault)
         });
       } else {
         el.addEventListener("click", () => {
@@ -1056,7 +636,7 @@ function initBankSelector() {
             try {
               buttons[idx].callback();
             } catch (err) {
-              debugWarn("Callback error:", err);
+              console.warn("Callback error:", err);
             }
           }
           closeNotification();
@@ -1074,610 +654,66 @@ function initBankSelector() {
     document.addEventListener("keydown", handleEsc);
   }
 
-  /**
-   * ========================================================================
-   * GIẢI PHÁP MỞ APP NGÂN HÀNG - KHÔNG TỰ ĐỘNG MỞ DEEPLINK
-   * ========================================================================
-   *
-   * GIẢI PHÁP MỚI:
-   * - KHÔNG tự động gọi deeplink (tránh lỗi "Địa chỉ không hợp lệ")
-   * - LUÔN hiện modal hỏi người dùng trước khi mở app
-   * - Người dùng tự quyết định: "Mở app" hoặc "Đi tới cửa hàng"
-   * - Hoàn toàn loại bỏ các lỗi iOS về deeplink
-   *
-   * HỖ TRỢ:
-   * - ✅ iOS Safari (iPhone/iPad) - Không còn lỗi
-   * - ✅ iOS Chrome/Edge/Firefox - Không còn lỗi
-   * - ✅ Android - Hoạt động mượt mà
-   * - ✅ Desktop - Hiện thông báo phù hợp
-   * ========================================================================
-   */
-  function openBankApp(bank) {
-    debugLog(`=== Opening bank app: ${bank.appName} (${bank.appId}) ===`);
+  // Copy account number to clipboard and show notification
+  const copyAccountNumber = () => {
+    const accountNumber = "45404052004";
 
-    // Xây dựng deep link với thông tin tài khoản
-    // NOTE: prefer the bank's custom scheme (bank.deeplink) when available.
-    // Using vietqrLink (https) often doesn't trigger the app open the same
-    // way as the custom scheme on iOS/Android.
-    const deeplinkUrl = buildDeeplink(bank.deeplink || bank.vietqrLink);
-    const storeLink = getStoreLink(bank.appId);
-
-    debugLog(`Deep link: ${deeplinkUrl}`);
-    debugLog(`Store link: ${storeLink}`);
-
-    // =====================================================================
-    // BƯỚC 1: PHÁT HIỆN NỀN TẢNG
-    // =====================================================================
-    const ua = navigator.userAgent || navigator.vendor || window.opera;
-    const isIOS = /iPhone|iPad|iPod/i.test(ua) && !window.MSStream;
-    const isAndroid = /Android/i.test(ua);
-    const isMobile = isIOS || isAndroid;
-    const isDesktop = !isMobile;
-
-    debugLog(`Platform: ${isIOS ? "iOS" : isAndroid ? "Android" : "Desktop"}`);
-
-    // =====================================================================
-    // BƯỚC 2: DESKTOP - HIỂN THỊ THÔNG BÁO
-    // =====================================================================
-    if (isDesktop) {
-      debugLog("Desktop detected - showing mobile-only notification");
-      closeModal();
-
-      showNotification(
-        "Chức năng chỉ dành cho thiết bị di động",
-        `Tính năng chuyển tiền nhanh qua app ngân hàng chỉ khả dụng trên điện thoại di động (iOS/Android).\n\n` +
-          `Vui lòng quét mã QR bằng ứng dụng ngân hàng trên điện thoại của bạn.`,
-        "info"
-      );
-      return;
-    }
-
-    // =====================================================================
-    // BƯỚC 3: MOBILE - HIỂN THỊ MODAL XÁC NHẬN TRƯỚC
-    // =====================================================================
-    debugLog("Mobile detected - showing confirmation modal FIRST");
-    closeModal();
-
-    // HIỂN THỊ MODAL HỎI NGƯỜI DÙNG TRƯỚC KHI MỞ APP
-    showNotification(
-      `Mở ứng dụng ${bank.appName}`,
-      `Bạn có muốn mở ứng dụng ${bank.appName} để chuyển khoản nhanh chóng không?`,
-      "success",
-      [
-        {
-          text: `Mở ${bank.appName}`,
-          primary: true,
-          href: deeplinkUrl,
-          callback: () => {
-            debugLog("User confirmed - attempting to open app (callback)");
-            // Start detection in background while letting the native anchor
-            // navigation proceed.
-            attemptOpenBankApp(bank, deeplinkUrl, storeLink, isIOS, isAndroid);
-          },
-        },
-        {
-          text: "Đi tới cửa hàng",
-          primary: false,
-          callback: () => {
-            debugLog("User chose to go to store directly");
-            if (storeLink) {
-              window.open(storeLink, "_blank");
-            } else {
-              showNotification(
-                "Link cửa hàng không khả dụng",
-                `Không tìm thấy link cửa hàng cho ${bank.appName}.\n\n` +
-                  `Vui lòng tìm kiếm "${bank.appName}" trong ${
-                    isIOS ? "App Store" : "Google Play"
-                  }.`,
-                "warning"
-              );
-            }
-          },
-        },
-      ]
-    );
-  }
-
-  /**
-   * ========================================================================
-   * THỬ MỞ APP SAU KHI NGƯỜI DÙNG XÁC NHẬN
-   * ========================================================================
-   * Chỉ gọi sau khi người dùng click "Mở app"
-   * Sử dụng iframe ẩn để tránh lỗi browser trên iOS
-   * ========================================================================
-   */
-  function attemptOpenBankApp(bank, deeplinkUrl, storeLink, isIOS, isAndroid) {
-    debugLog("=== Attempting to open app (after user confirmation) ===");
-    debugLog(`Bank: ${bank.appName}`);
-    debugLog(`Deeplink: ${deeplinkUrl}`);
-    debugLog(`Platform: ${isIOS ? "iOS" : isAndroid ? "Android" : "Unknown"}`);
-
-    // =====================================================================
-    // BƯỚC 1: THIẾT LẬP BIẾN THEO DÕI TRẠNG THÁI
-    // =====================================================================
-    let appOpened = false; // App đã mở thành công?
-    let wasHidden = false; // Page đã bị hidden ít nhất 1 lần (app đã mở)
-    let cleanedUp = false; // Đã cleanup?
-    let fallbackTimer = null; // Timer cho fallback
-    let visibilityTimer = null; // Timer cho visibility check
-    const startTime = Date.now(); // Thời điểm bắt đầu
-
-    debugLog(`Start time: ${startTime}`);
-
-    // =====================================================================
-    // BƯỚC 2: HÀM CLEANUP (DỌN DẸP LISTENERS VÀ TIMERS)
-    // =====================================================================
-    const cleanup = () => {
-      if (cleanedUp) return;
-      cleanedUp = true;
-
-      debugLog("Cleaning up listeners and timers");
-
-      // Clear timers
-      if (fallbackTimer) {
-        clearTimeout(fallbackTimer);
-        fallbackTimer = null;
-      }
-      if (visibilityTimer) {
-        clearTimeout(visibilityTimer);
-        visibilityTimer = null;
-      }
-
-      // Remove event listeners
-      document.removeEventListener("visibilitychange", handleVisibilityChange);
-      window.removeEventListener("pagehide", handlePageHide);
-      window.removeEventListener("blur", handleBlur);
-      window.removeEventListener("focus", handleFocus);
-    };
-
-    // =====================================================================
-    // BƯỚC 3: CÁC HÀM XỬ LÝ SỰ KIỆN (DETECT APP ĐÃ MỞ)
-    // =====================================================================
-
-    // Khi trang bị ẩn (chuyển sang app khác)
-    const handleVisibilityChange = () => {
-      if (visibilityTimer) clearTimeout(visibilityTimer);
-
-      // Check ngay lập tức nếu page đã hidden
-      if (document.hidden) {
-        const elapsed = Date.now() - startTime;
-        debugLog(
-          `✅ DETECTED: Page hidden after ${elapsed}ms - App opened successfully!`
-        );
-        appOpened = true;
-        wasHidden = true; // Đánh dấu đã bị hidden
-        cleanup();
-        return;
-      }
-
-      // Nếu page visible lại SAU KHI đã hidden → user quay lại từ app
-      if (!document.hidden && wasHidden) {
-        const elapsed = Date.now() - startTime;
-        debugLog(
-          `📱 User returned from app after ${elapsed}ms - app was successfully opened`
-        );
-        // Không làm gì cả - app đã mở thành công
-        return;
-      }
-
-      // Đợi 25ms để xác nhận visibility change là thật (giảm từ 50ms)
-      visibilityTimer = setTimeout(() => {
-        if (document.hidden) {
-          const elapsed = Date.now() - startTime;
-          debugLog(
-            `✅ DETECTED: Page hidden (delayed) after ${elapsed}ms - App opened!`
+    // Try to copy to clipboard
+    if (navigator.clipboard && navigator.clipboard.writeText) {
+      navigator.clipboard
+        .writeText(accountNumber)
+        .then(() => {
+          showNotification(
+            "Đã copy số tài khoản",
+            `Số tài khoản ${accountNumber} đã được sao chép vào clipboard.\n\nBạn có thể dán vào ứng dụng ngân hàng để chuyển khoản.`,
+            "success",
           );
-          appOpened = true;
-          wasHidden = true; // Đánh dấu đã bị hidden
-          cleanup();
-        }
-      }, 25);
-    };
-
-    // Khi trang bị ẩn hoàn toàn (pagehide)
-    const handlePageHide = () => {
-      const elapsed = Date.now() - startTime;
-      debugLog(`✅ DETECTED: Page hide after ${elapsed}ms - App opened!`);
-      appOpened = true;
-      wasHidden = true; // Đánh dấu đã bị hidden
-      cleanup();
-    };
-
-    // Khi window mất focus (blur)
-    const handleBlur = () => {
-      if (visibilityTimer) clearTimeout(visibilityTimer);
-
-      // Đợi 50ms để xác nhận blur là thật
-      visibilityTimer = setTimeout(() => {
-        if (document.hidden || !document.hasFocus()) {
-          const elapsed = Date.now() - startTime;
-          debugLog(`✅ DETECTED: Window blur after ${elapsed}ms - App opened!`);
-          appOpened = true;
-          wasHidden = true; // Đánh dấu đã bị hidden
-          cleanup();
-        }
-      }, 50);
-    };
-
-    // Khi window được focus lại (có thể app không mở được)
-    const handleFocus = () => {
-      if (visibilityTimer) {
-        clearTimeout(visibilityTimer);
-        visibilityTimer = null;
-      }
-      const elapsed = Date.now() - startTime;
-      debugLog(
-        `⚠️ Window focused after ${elapsed}ms - checking if app opened: ${appOpened}`
-      );
-    };
-
-    // Đăng ký các event listeners
-    document.addEventListener("visibilitychange", handleVisibilityChange);
-    window.addEventListener("pagehide", handlePageHide);
-    window.addEventListener("blur", handleBlur);
-    window.addEventListener("focus", handleFocus);
-
-    // =====================================================================
-    // BƯỚC 4: MỞ DEEP LINK - PHƯƠNG PHÁP ĐƠN GIẢN VÀ HIỆU QUẢ
-    // =====================================================================
-
-    /**
-     * GIẢI PHÁP CUỐI CÙNG:
-     * - iOS: Dùng WINDOW.LOCATION.HREF (user-initiated, hoạt động!)
-     * - Đơn giản, trực tiếp, hiệu quả
-     * - Không cần iframe (iframe bị iOS chặn)
-     */
-    function attemptOpenDeeplink() {
-      try {
-        debugLog("Attempting to open deep link...");
-        const attemptTime = Date.now() - startTime;
-        debugLog(`Attempt at ${attemptTime}ms`);
-        debugLog(`Deeplink URL: ${deeplinkUrl}`);
-
-        // Try several user-gesture friendly methods synchronously.
-        // Note: these should be executed within the user's click handler
-        // so the browser considers them user-initiated.
-
-        // 1) Try direct navigation
-        try {
-          debugLog("Method 1: window.location.href = deeplinkUrl");
-          window.location.href = deeplinkUrl;
-          debugLog("Method 1 executed (may navigate away)");
-          return true;
-        } catch (e) {
-          debugWarn("Method 1 failed:", e);
-        }
-
-        // 2) Create an anchor and click it (some browsers treat this well)
-        try {
-          debugLog("Method 2: creating anchor and dispatching click");
-          const a = document.createElement("a");
-          a.href = deeplinkUrl;
-          // Use same window to avoid popup blockers
-          a.target = "_self";
-          a.rel = "noopener";
-          // Some browsers require it to be in DOM
-          a.style.display = "none";
-          document.body.appendChild(a);
-          // Use native click
-          a.click();
-          // remove anchor after click
-          setTimeout(() => a.remove(), 1000);
-          debugLog("Method 2 executed (anchor click)");
-          return true;
-        } catch (e) {
-          debugWarn("Method 2 failed:", e);
-        }
-
-        // 3) Try window.open with _self (some engines allow it in user gesture)
-        try {
-          debugLog("Method 3: window.open(deeplinkUrl, '_self')");
-          const win = window.open(deeplinkUrl, "_self");
-          if (win !== null) {
-            debugLog("Method 3 returned a window object (may have navigated)");
-            return true;
-          } else {
-            debugWarn("Method 3 returned null (blocked)");
-          }
-        } catch (e) {
-          debugWarn("Method 3 failed:", e);
-        }
-
-        // 4) Fallback to hidden iframe (last resort)
-        try {
-          debugLog("Method 4: injecting hidden iframe with src");
-          const iframe = document.createElement("iframe");
-          iframe.style.width = "0";
-          iframe.style.height = "0";
-          iframe.style.border = "0";
-          iframe.style.display = "none";
-          iframe.src = deeplinkUrl;
-          document.body.appendChild(iframe);
-          setTimeout(() => iframe.remove(), 2000);
-          debugLog("Method 4 executed (iframe)");
-          return true;
-        } catch (e) {
-          debugWarn("Method 4 failed:", e);
-        }
-
-        debugWarn("All deeplink methods attempted and failed synchronously");
-        return false;
-      } catch (error) {
-        debugWarn("Failed to open deep link:", error);
-        return false;
-      }
-    }
-
-    // Mở deep link NGAY LẬP TỨC
-    const openSuccess = attemptOpenDeeplink();
-
-    if (!openSuccess) {
-      debugWarn("Deep link failed to open");
-    }
-
-    // Kiểm tra sớm sau 100ms (iOS thường chuyển app rất nhanh)
-    setTimeout(() => {
-      if (document.hidden && !appOpened) {
-        debugLog("Early detection (100ms): Page hidden - App opened!");
-        appOpened = true;
-        wasHidden = true;
-        cleanup();
-      }
-    }, 100);
-
-    // Kiểm tra lần 2 sau 300ms
-    setTimeout(() => {
-      if (document.hidden && !appOpened) {
-        debugLog("Early detection (300ms): Page hidden - App opened!");
-        appOpened = true;
-        wasHidden = true;
-        cleanup();
-      }
-    }, 300);
-
-    // =====================================================================
-    // BƯỚC 5: KHÔNG DÙNG TIMEOUT - ĐỂ USER TỰ XỬ LÝ
-    // =====================================================================
-    // ⚠️ QUAN TRỌNG: Trên iOS, khi dùng iframe mở deeplink:
-    //    - App MỞ ĐƯỢC nhưng KHÔNG che browser
-    //    - User phải TỰ CHUYỂN sang app
-    //    - Page vẫn visible → không thể detect tự động
-    //
-    // GIẢI PHÁP: KHÔNG hiện modal tự động!
-    // User đã click "Mở app" → app sẽ mở → user tự chuyển sang app
-    // KHÔNG cần thông báo gì thêm!
-
-    debugLog("✅ Deeplink triggered - letting user handle app switching");
-
-    // Chỉ cleanup listeners sau 3 giây (không hiện modal)
-    setTimeout(() => {
-      cleanup();
-      debugLog("Cleanup completed after 3s - user has handled app switching");
-    }, 3000);
-  }
-
-  function renderList(items, isInitial = false) {
-    // Nếu không phải lần đầu render, không clear innerHTML
-    if (isInitial) {
-      listEl.innerHTML = "";
-    }
-
-    if (!items.length) {
-      statusEl.textContent = "Không tìm thấy ngân hàng phù hợp.";
-      if (!isInitial) {
-        // Ẩn tất cả items thay vì xóa
-        const allItems = listEl.querySelectorAll(".bank-item");
-        allItems.forEach((item) => (item.style.display = "none"));
-      }
-      return;
-    }
-
-    statusEl.textContent = "";
-
-    if (isInitial) {
-      // Lần đầu tiên: tạo tất cả items
-      items.forEach((bank) => {
-        const button = document.createElement("button");
-        button.type = "button";
-        button.className = "bank-item";
-        button.setAttribute("role", "listitem");
-        button.setAttribute("data-app-id", bank.appId);
-
-        const fallbackSource = bank.appName || bank.bankName || bank.appId;
-        const fallbackText =
-          fallbackSource
-            .split(/\s+/)
-            .filter((word) => word && /[a-zA-Z0-9]/.test(word))
-            .map((word) => word[0])
-            .join("")
-            .slice(0, 2)
-            .toUpperCase() || bank.appId.slice(0, 2).toUpperCase();
-
-        const logoMarkup = bank.appLogo
-          ? `<img src="${bank.appLogo}" alt="${bank.bankName}" loading="lazy" />`
-          : `<div class="bank-logo-fallback">${fallbackText}</div>`;
-
-        button.innerHTML = `
-          ${logoMarkup}
-          <div class="bank-item-text">
-            <span class="bank-name">${bank.appName}</span>
-            <span class="bank-desc">${bank.bankName}</span>
-          </div>
-        `;
-
-        button.addEventListener("click", () => {
-          openBankApp(bank);
+        })
+        .catch(() => {
+          // Fallback for clipboard error
+          showNotification(
+            "Số tài khoản",
+            `STK: ${accountNumber}\n\nVui lòng sao chép số tài khoản này để chuyển khoản.`,
+            "info",
+          );
         });
-
-        listEl.appendChild(button);
-      });
     } else {
-      // Khi filter: chỉ ẩn/hiện items, KHÔNG tạo lại DOM
-      const allItems = listEl.querySelectorAll(".bank-item");
-      const visibleIds = new Set(items.map((bank) => bank.appId));
+      // Fallback for older browsers
+      const textArea = document.createElement("textarea");
+      textArea.value = accountNumber;
+      textArea.style.position = "fixed";
+      textArea.style.left = "-999999px";
+      textArea.style.top = "-999999px";
+      document.body.appendChild(textArea);
+      textArea.focus();
+      textArea.select();
 
-      allItems.forEach((item) => {
-        const appId = item.getAttribute("data-app-id");
-        item.style.display = visibleIds.has(appId) ? "" : "none";
-      });
+      try {
+        document.execCommand("copy");
+        textArea.remove();
+        showNotification(
+          "Đã copy số tài khoản",
+          `Số tài khoản ${accountNumber} đã được sao chép vào clipboard.\n\nBạn có thể dán vào ứng dụng ngân hàng để chuyển khoản.`,
+          "success",
+        );
+      } catch (err) {
+        textArea.remove();
+        showNotification(
+          "Số tài khoản",
+          `STK: ${accountNumber}\n\nVui lòng sao chép số tài khoản này để chuyển khoản.`,
+          "info",
+        );
+      }
     }
-  }
+  };
 
-  function filterBanks(term) {
-    const normalized = normalizeText(term.trim());
-    if (!normalized) {
-      // Hiện tất cả items
-      const allItems = listEl.querySelectorAll(".bank-item");
-      allItems.forEach((item) => (item.style.display = ""));
-      statusEl.textContent = "";
-      return;
-    }
-
-    const filtered = bankData.filter((bank) => {
-      const appName = normalizeText(bank.appName);
-      const bankName = normalizeText(bank.bankName);
-      const appId = normalizeText(bank.appId);
-
-      return (
-        appName.includes(normalized) ||
-        bankName.includes(normalized) ||
-        appId.includes(normalized)
-      );
-    });
-
-    renderList(filtered, false);
-  }
-
-  function openModal() {
-    updateViewportHeight();
-    attachViewportListeners();
-    modal.classList.add("active");
-    modal.setAttribute("aria-hidden", "false");
-    document.body.style.overflow = "hidden";
-    modal.scrollTop = 0;
-
-    // Đảm bảo danh sách hiển thị khi mở modal
-    if (listEl.children.length === 0) {
-      renderList(bankData, true);
-    } else {
-      // Hiện tất cả items nếu đã có
-      const allItems = listEl.querySelectorAll(".bank-item");
-      allItems.forEach((item) => (item.style.display = ""));
-    }
-
-    setTimeout(() => searchInput.focus({ preventScroll: true }), 100);
-  }
-
-  function closeModal() {
-    modal.classList.remove("active");
-    modal.setAttribute("aria-hidden", "true");
-    document.body.style.overflow = "";
-    detachViewportListeners();
-    root.style.removeProperty("--modal-viewport-height");
-    qrTrigger.focus();
-  }
-
-  qrTrigger.addEventListener("click", openModal);
+  qrTrigger.addEventListener("click", copyAccountNumber);
   qrTrigger.addEventListener("keypress", (event) => {
     if (["Enter", " ", "Space", "Spacebar"].includes(event.key)) {
       event.preventDefault();
-      openModal();
+      copyAccountNumber();
     }
   });
-
-  closeBtn.addEventListener("click", closeModal);
-  modal.addEventListener("click", (event) => {
-    if (event.target === modal) {
-      closeModal();
-    }
-  });
-
-  document.addEventListener("keydown", (event) => {
-    if (event.key === "Escape" && modal.classList.contains("active")) {
-      closeModal();
-    }
-  });
-
-  searchInput.addEventListener("input", (event) => {
-    filterBanks(event.target.value);
-  });
-
-  function updateViewportHeight() {
-    const height = viewport ? viewport.height : window.innerHeight;
-    root.style.setProperty("--modal-viewport-height", `${height}px`);
-
-    // Xử lý đặc biệt cho iOS Safari khi bàn phím bật
-    if (/iPhone|iPad|iPod/i.test(navigator.userAgent)) {
-      document.body.style.height = `${height}px`;
-    }
-  }
-
-  function attachViewportListeners() {
-    if (!viewport) {
-      window.addEventListener("resize", updateViewportHeight);
-      window.addEventListener("orientationchange", updateViewportHeight);
-      return;
-    }
-
-    viewport.addEventListener("resize", updateViewportHeight);
-    viewport.addEventListener("scroll", updateViewportHeight);
-  }
-
-  function detachViewportListeners() {
-    if (!viewport) {
-      window.removeEventListener("resize", updateViewportHeight);
-      window.removeEventListener("orientationchange", updateViewportHeight);
-      document.body.style.height = "";
-      return;
-    }
-
-    viewport.removeEventListener("resize", updateViewportHeight);
-    viewport.removeEventListener("scroll", updateViewportHeight);
-    document.body.style.height = "";
-  }
-
-  renderList(bankData, true);
-
-  fetch("https://api.vietqr.io/v2/android-app-deeplinks")
-    .then((response) => response.json())
-    .then((data) => {
-      if (!data || !Array.isArray(data.apps)) {
-        renderList(bankData, true);
-        return;
-      }
-
-      const mapped = data.apps.reduce((acc, app) => {
-        if (POPULAR_BANK_IDS.includes(app.appId)) {
-          acc.set(app.appId, {
-            appId: app.appId,
-            appName: app.appName,
-            bankName: app.bankName,
-            deeplink: app.deeplink,
-            appLogo: app.appLogo,
-          });
-        }
-        return acc;
-      }, new Map());
-
-      if (mapped.size) {
-        // Keep order as POPULAR_BANK_IDS while falling back when API misses entries
-        bankData = POPULAR_BANK_IDS.map((id) => {
-          const fallbackEntry = fallbackBankMap.get(id);
-          const remoteEntry = mapped.get(id);
-
-          if (fallbackEntry && remoteEntry) {
-            return { ...fallbackEntry, ...remoteEntry };
-          }
-
-          return remoteEntry || fallbackEntry;
-        }).filter(Boolean);
-
-        renderList(bankData, true);
-      }
-    })
-    .catch(() => {
-      renderList(bankData, true);
-    });
 }
 
 // Lazy Loading for Images
@@ -1732,7 +768,7 @@ window.addEventListener(
       ticking = true;
     }
   },
-  { passive: true }
+  { passive: true },
 ); // Passive listener để tăng performance
 
 // Add some fun easter eggs
