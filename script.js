@@ -12,10 +12,15 @@ document.addEventListener("DOMContentLoaded", function () {
   initGalleryFilter();
   initGalleryModal();
   initLightbox();
+  initGalleryButtonActions();
   initSkillBars();
   initSmoothScrolling();
   initScrollToTop();
   initBankSelector();
+  initLazyLoading();
+  initVideoHoverEffects();
+  initAvatarEasterEgg();
+  preloadImages();
 });
 
 // Loading Screen - Optimized for faster loading
@@ -37,6 +42,10 @@ function initNavbar() {
   const navbar = document.getElementById("navbar");
   const mobileMenu = document.getElementById("mobile-menu");
   const navLinks = document.getElementById("nav-links");
+
+  if (!navbar || !mobileMenu || !navLinks) {
+    return;
+  }
 
   window.addEventListener("scroll", function () {
     if (window.scrollY > 100) {
@@ -74,6 +83,10 @@ function initNavbar() {
 // Typed Text Effect
 function initTypedText() {
   const typedElement = document.getElementById("typed-text");
+  if (!typedElement) {
+    return;
+  }
+
   const texts = [
     "Đam mê công nghệ",
     "Vui vẻ và thân thiện",
@@ -264,6 +277,10 @@ function initGalleryModal() {
   const modal = document.getElementById("galleryModal");
   const closeBtn = document.getElementById("galleryModalClose");
 
+  if (!modal) {
+    return;
+  }
+
   // Close button
   if (closeBtn) {
     closeBtn.addEventListener("click", closeGalleryModal);
@@ -290,6 +307,10 @@ function initLightbox() {
   const lightboxClose = document.getElementById("lightboxClose");
   const lightboxPrev = document.getElementById("lightboxPrev");
   const lightboxNext = document.getElementById("lightboxNext");
+
+  if (!lightbox || !lightboxClose || !lightboxPrev || !lightboxNext) {
+    return;
+  }
 
   // Collect all gallery items for navigation
   const galleryItems = document.querySelectorAll(".gallery-item");
@@ -410,6 +431,9 @@ function updateLightboxContent() {
   const lightboxNext = document.getElementById("lightboxNext");
 
   const currentItem = lightboxItems[currentLightboxIndex];
+  if (!currentItem) {
+    return;
+  }
 
   // Update media content
   if (currentItem.type === "image") {
@@ -434,6 +458,10 @@ function updateLightboxContent() {
 
 function closeLightbox() {
   const lightbox = document.getElementById("lightbox");
+  if (!lightbox) {
+    return;
+  }
+
   const videos = lightbox.querySelectorAll("video");
 
   // Pause any playing videos
@@ -494,6 +522,9 @@ function initSmoothScrolling() {
 // Scroll to Top
 function initScrollToTop() {
   const scrollTopBtn = document.getElementById("scrollTop");
+  if (!scrollTopBtn) {
+    return;
+  }
 
   window.addEventListener("scroll", function () {
     if (window.scrollY > 300) {
@@ -716,6 +747,47 @@ function initBankSelector() {
   });
 }
 
+function initGalleryButtonActions() {
+  const galleryButtons = document.querySelectorAll(".gallery-btn");
+  if (galleryButtons.length === 0) {
+    return;
+  }
+
+  galleryButtons.forEach((button) => {
+    if (button.hasAttribute("onclick")) {
+      button.removeAttribute("onclick");
+    }
+  });
+
+  document.addEventListener("click", function (event) {
+    const button = event.target.closest(".gallery-btn");
+    if (!button) {
+      return;
+    }
+
+    event.preventDefault();
+    event.stopPropagation();
+
+    const item = button.closest(".gallery-item");
+    if (!item) {
+      return;
+    }
+
+    const img = item.querySelector("img");
+    const video = item.querySelector("video");
+    const title =
+      item.querySelector(".gallery-info h4")?.textContent || "Không có tiêu đề";
+    const description =
+      item.querySelector(".gallery-info p")?.textContent || "Không có mô tả";
+
+    if (img) {
+      openLightbox(img.src, "image", title, description);
+    } else if (video) {
+      openLightbox(video.src, "video", title, description);
+    }
+  });
+}
+
 // Lazy Loading for Images
 function initLazyLoading() {
   const images = document.querySelectorAll('img[loading="lazy"]');
@@ -736,8 +808,7 @@ function initLazyLoading() {
   }
 }
 
-// Video hover effects
-document.addEventListener("DOMContentLoaded", function () {
+function initVideoHoverEffects() {
   const videos = document.querySelectorAll(".gallery-item video");
 
   videos.forEach((video) => {
@@ -750,7 +821,7 @@ document.addEventListener("DOMContentLoaded", function () {
       this.currentTime = 0;
     });
   });
-});
+}
 
 // Performance optimizations - Throttled scroll handler
 let ticking = false;
@@ -771,18 +842,24 @@ window.addEventListener(
   { passive: true },
 ); // Passive listener để tăng performance
 
-// Add some fun easter eggs
-let clickCount = 0;
-document.querySelector(".hero-avatar").addEventListener("click", function () {
-  clickCount++;
-  if (clickCount === 5) {
-    this.style.animation = "spin 2s linear";
-    setTimeout(() => {
-      this.style.animation = "pulse 2s ease-in-out infinite";
-      clickCount = 0;
-    }, 2000);
+function initAvatarEasterEgg() {
+  const heroAvatar = document.querySelector(".hero-avatar");
+  if (!heroAvatar) {
+    return;
   }
-});
+
+  let clickCount = 0;
+  heroAvatar.addEventListener("click", function () {
+    clickCount++;
+    if (clickCount === 5) {
+      this.style.animation = "spin 2s linear";
+      setTimeout(() => {
+        this.style.animation = "pulse 2s ease-in-out infinite";
+        clickCount = 0;
+      }, 2000);
+    }
+  });
+}
 
 // Preload critical images
 function preloadImages() {
@@ -793,6 +870,3 @@ function preloadImages() {
     img.src = src;
   });
 }
-
-// Initialize preloading
-preloadImages();
