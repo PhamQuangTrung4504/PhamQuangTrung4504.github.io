@@ -105,6 +105,15 @@ export const ENEMY_STATS = {
     color: 0x4a1226,
     rewardCoin: 2,
   },
+  boss: {
+    hp: 180,
+    speed: 22,
+    attackDamage: ENEMY_DAMAGE + 2,
+    attackRange: ENEMY_ATTACK_RANGE + 14,
+    attackSpeed: ENEMY_ATTACK_SPEED * 0.9,
+    color: 0x6b1d14,
+    rewardCoin: 5,
+  },
 };
 
 export const WAVE_CONFIG = {
@@ -116,6 +125,8 @@ export const WAVE_CONFIG = {
   fastChanceMid: 0.35,
   fastChanceLate: 0.45,
   tankChanceLate: 0.25,
+  bossStartWave: 6,
+  bossWaveInterval: 4,
   hpScale: 0.14,
   speedScale: 0.045,
 };
@@ -147,6 +158,11 @@ export const SKILL_CONFIG = {
   energyCost: 5,
   tornadoDamage: 26,
   tornadoKnockback: 48,
+  meteorKey: "E",
+  meteorCooldownMs: 18000,
+  meteorEnergyCost: 7,
+  meteorDamage: 86,
+  meteorRadius: 132,
 };
 
 export const UI_CONFIG = {

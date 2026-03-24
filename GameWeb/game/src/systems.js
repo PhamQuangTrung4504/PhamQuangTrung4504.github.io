@@ -1,4 +1,10 @@
-import { Bullet, FastEnemy, NormalEnemy, TankEnemy } from "./entities.js";
+import {
+  Bullet,
+  BossEnemy,
+  FastEnemy,
+  NormalEnemy,
+  TankEnemy,
+} from "./entities.js";
 import {
   BASE_UPGRADE_COST,
   COST_SCALE,
@@ -77,6 +83,15 @@ export class WaveSystem {
   }
 
   pickEnemyClass() {
+    if (
+      this.wave >= WAVE_CONFIG.bossStartWave &&
+      this.spawnedInWave === this.enemiesPerWave - 1 &&
+      (this.wave - WAVE_CONFIG.bossStartWave) % WAVE_CONFIG.bossWaveInterval ===
+        0
+    ) {
+      return BossEnemy;
+    }
+
     const roll = Math.random();
 
     if (this.wave >= WAVE_CONFIG.lateWaveStart) {
@@ -103,6 +118,10 @@ export class WaveSystem {
   }
 
   getBaseStats(enemyClass) {
+    if (enemyClass === BossEnemy) {
+      return ENEMY_STATS.boss;
+    }
+
     if (enemyClass === FastEnemy) {
       return ENEMY_STATS.fast;
     }
@@ -151,7 +170,52 @@ export class CombatSystem {
     this.updateEnemyAttacks(time);
     this.updateUnitAttacks(time, deltaSeconds);
     this.updatePlayerAttack(time);
+    this.updatePetBirdAttack(time, deltaSeconds);
     this.updateBullets(deltaSeconds);
+  }
+
+  updatePetBirdAttack(time, deltaSeconds) {
+    const pet = this.scene.petBird;
+    const player = this.scene.player;
+    if (
+      !pet ||
+      !pet.active ||
+      !player ||
+      !player.active ||
+      this.scene.isGameOver
+    ) {
+      return;
+    }
+
+    pet.follow?.(player, deltaSeconds);
+
+    const target = this.findNearestEnemy(pet.x, pet.range);
+    if (!target) {
+      pet.playIdle?.();
+      return;
+    }
+
+    const direction = target.x >= pet.x ? 1 : -1;
+    pet.setFlipX(direction < 0);
+
+    if (!pet.canAttack(time)) {
+      pet.playIdle?.();
+      return;
+    }
+
+    pet.nextAttackAt = time + 1000 / pet.attackSpeed;
+    pet.playAttack?.();
+    this.playAttackPunch(pet.visual ?? pet);
+
+    this.spawnBullet(
+      pet.x + direction * 24,
+      pet.y - 2,
+      target,
+      pet.damage,
+      pet.bulletSpeed,
+      0xeaf8ff,
+      "bullet-bird",
+    );
   }
 
   updateUnitAttacks(time, deltaSeconds) {
@@ -217,7 +281,7 @@ export class CombatSystem {
       const scaledDamage = this.getScaledUnitDamage(unit.damage, level);
 
       unit.nextAttackAt = time + 1000 / scaledAttackSpeed;
-      unit.playAttack?.(time);
+      unit.playAttack?.();
       this.playAttackPunch(unit.visual ?? unit);
 
       if (unit.unitType === UNIT_TYPES.MELEE) {
@@ -271,7 +335,7 @@ export class CombatSystem {
       }
 
       enemy.nextAttackAt = time + 1000 / enemy.attackSpeed;
-      enemy.playAttack?.(time);
+      enemy.playAttack?.();
       this.playAttackPunch(enemy.visual ?? enemy);
       const difficulty = this.scene.getDifficultyConfig?.() ?? null;
       const damageScale = difficulty?.enemyDamageScale ?? 1;
@@ -294,7 +358,7 @@ export class CombatSystem {
     const baseScaleY = Math.max(0.0001, Math.abs(target.scaleY ?? 1));
 
     if (target._attackPunchTween && target._attackPunchTween.isPlaying()) {
-      target._attackPunchTween.stop();
+      return;
     }
 
     target._attackPunchTween = this.scene.tweens.add({
@@ -350,7 +414,7 @@ export class CombatSystem {
 
     if (distance <= player.meleeRange) {
       player.nextAttackAt = time + 1000 / player.attackSpeed;
-      player.playAttackMelee?.(time);
+      player.playAttackMelee?.();
       this.applyDamage(target, player.meleeDamage);
       return;
     }
@@ -358,7 +422,7 @@ export class CombatSystem {
     player.nextAttackAt =
       time +
       1000 / Math.max(0.2, player.attackSpeed * this.playerRangedCooldownScale);
-    player.playAttackRanged?.(time);
+    player.playAttackRanged?.();
     this.spawnBullet(
       player.x + 22,
       player.y - 10,
@@ -424,7 +488,7 @@ export class CombatSystem {
     }
 
     const died = target.takeDamage(damage);
-    this.scene.onEntityDamaged(target, damage);
+    this.scene.onEntityDamaged(target, damage, { isZombieHit: true });
     if (!died) {
       return;
     }
@@ -506,7 +570,9 @@ export class SkillSystem {
   constructor(scene) {
     this.scene = scene;
     this.lastUsedAt = -SKILL_CONFIG.cooldownMs;
+    this.lastMeteorUsedAt = -SKILL_CONFIG.meteorCooldownMs;
     this.keyQ = scene.input.keyboard.addKey(SKILL_CONFIG.key);
+    this.keyE = scene.input.keyboard.addKey(SKILL_CONFIG.meteorKey);
   }
 
   update(time) {
@@ -514,13 +580,44 @@ export class SkillSystem {
       0,
       SKILL_CONFIG.cooldownMs - (time - this.lastUsedAt),
     );
+    const meteorCooldownRemaining = Math.max(
+      0,
+      SKILL_CONFIG.meteorCooldownMs - (time - this.lastMeteorUsedAt),
+    );
     this.scene.registry.set("skillCooldownMs", Math.ceil(cooldownRemaining));
+    this.scene.registry.set(
+      "meteorSkillCooldownMs",
+      Math.ceil(meteorCooldownRemaining),
+    );
 
-    if (!Phaser.Input.Keyboard.JustDown(this.keyQ)) {
-      return;
+    if (Phaser.Input.Keyboard.JustDown(this.keyQ)) {
+      this.tryCast(time);
     }
 
-    this.tryCast(time);
+    if (Phaser.Input.Keyboard.JustDown(this.keyE)) {
+      this.tryCastMeteor(time);
+    }
+  }
+
+  isTornadoReady(time) {
+    const cooldownRemaining = Math.max(
+      0,
+      SKILL_CONFIG.cooldownMs - (time - this.lastUsedAt),
+    );
+    return (
+      cooldownRemaining <= 0 && this.scene.energy >= SKILL_CONFIG.energyCost
+    );
+  }
+
+  isMeteorReady(time) {
+    const cooldownRemaining = Math.max(
+      0,
+      SKILL_CONFIG.meteorCooldownMs - (time - this.lastMeteorUsedAt),
+    );
+    return (
+      cooldownRemaining <= 0 &&
+      this.scene.energy >= SKILL_CONFIG.meteorEnergyCost
+    );
   }
 
   tryCast(time) {
@@ -546,6 +643,33 @@ export class SkillSystem {
     return true;
   }
 
+  tryCastMeteor(time) {
+    const cooldownRemaining = Math.max(
+      0,
+      SKILL_CONFIG.meteorCooldownMs - (time - this.lastMeteorUsedAt),
+    );
+
+    if (cooldownRemaining > 0) {
+      this.scene.handleMeteorHotkeyFeedback?.();
+      return false;
+    }
+
+    if (this.scene.energy < SKILL_CONFIG.meteorEnergyCost) {
+      this.scene.showDamageText(420, 104, "Need energy", "#7d1d1d", 18);
+      this.scene.handleMeteorHotkeyFeedback?.();
+      return false;
+    }
+
+    const didCast = this.castMeteor();
+    if (!didCast) {
+      return false;
+    }
+
+    this.scene.addEnergy(-SKILL_CONFIG.meteorEnergyCost);
+    this.lastMeteorUsedAt = time;
+    return true;
+  }
+
   castTornado() {
     if (typeof this.scene.launchTornadoSweep === "function") {
       this.scene.launchTornadoSweep();
@@ -555,6 +679,14 @@ export class SkillSystem {
     const laneCenterY = this.scene.laneY;
     const sceneWidth = this.scene.scale.width;
     this.scene.playSkillFx?.(sceneWidth * 0.5, laneCenterY);
+  }
+
+  castMeteor() {
+    if (typeof this.scene.launchMeteorStrike === "function") {
+      return this.scene.launchMeteorStrike();
+    }
+
+    return false;
   }
 }
 

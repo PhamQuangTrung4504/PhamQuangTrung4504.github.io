@@ -51,6 +51,7 @@ export class UIScene extends Phaser.Scene {
     this.createTopRightSkillHud(panelY);
     this.createBottomHud(panelY);
     this.createSettingsMenu();
+    this.input.on("pointerdown", this.handleSkillPointerFallback, this);
 
     this.gameOverText = this.add.text(GAME_WIDTH - 170, topPadding + 102, "", {
       fontFamily: "Georgia",
@@ -107,7 +108,7 @@ export class UIScene extends Phaser.Scene {
       .on("pointerdown", () => this.setSettingsMenuOpen(false));
 
     this.settingsPanel = this.add
-      .rectangle(panelX, panelTopY, 460, 372, 0x252a2f, 0.93)
+      .rectangle(panelX, panelTopY, 460, 520, 0x252a2f, 0.93)
       .setOrigin(0.5, 0)
       .setStrokeStyle(3, 0x8a7858, 0.95)
       .setDepth(219)
@@ -162,8 +163,130 @@ export class UIScene extends Phaser.Scene {
       this.difficultyMenuItems.push(item);
     }
 
+    this.speedSubtitle = this.add
+      .text(panelX, panelTopY + 304, "Tốc độ trò chơi", {
+        fontFamily: "Verdana",
+        fontSize: "24px",
+        color: "#d8ccb2",
+        fontStyle: "bold",
+      })
+      .setOrigin(0.5, 0)
+      .setDepth(221)
+      .setVisible(false);
+
+    this.speedMin = 1;
+    this.speedMax = 3;
+    this.speedStep = 0.05;
+    this.speedSliderTrackWidth = 280;
+    this.speedSliderY = panelTopY + 372;
+
+    this.speedSliderTrack = this.add
+      .rectangle(
+        panelX,
+        this.speedSliderY,
+        this.speedSliderTrackWidth,
+        10,
+        0x14181d,
+        0.95,
+      )
+      .setOrigin(0.5)
+      .setStrokeStyle(1, 0x7a6d57, 0.95)
+      .setDepth(221)
+      .setVisible(false);
+
+    this.speedSliderFill = this.add
+      .rectangle(
+        panelX - this.speedSliderTrackWidth * 0.5,
+        this.speedSliderY,
+        this.speedSliderTrackWidth,
+        10,
+        0x66cc7c,
+        0.95,
+      )
+      .setOrigin(0, 0.5)
+      .setDepth(222)
+      .setVisible(false);
+
+    this.speedSliderKnob = this.add
+      .circle(panelX, this.speedSliderY, 12, 0xf0e5c9, 1)
+      .setStrokeStyle(2, 0x2b2f34, 0.95)
+      .setDepth(223)
+      .setVisible(false)
+      .setInteractive({ useHandCursor: true });
+
+    this.speedSliderHitArea = this.add
+      .rectangle(
+        panelX,
+        this.speedSliderY,
+        this.speedSliderTrackWidth + 40,
+        36,
+        0xffffff,
+        0.001,
+      )
+      .setDepth(220)
+      .setVisible(false)
+      .setInteractive({ useHandCursor: true });
+
+    this.speedMinLabel = this.add
+      .text(
+        panelX - this.speedSliderTrackWidth * 0.5,
+        this.speedSliderY + 18,
+        "1x",
+        {
+          fontFamily: "Verdana",
+          fontSize: "18px",
+          color: "#b9ae99",
+          fontStyle: "bold",
+        },
+      )
+      .setOrigin(0.5, 0)
+      .setDepth(221)
+      .setVisible(false);
+
+    this.speedMaxLabel = this.add
+      .text(
+        panelX + this.speedSliderTrackWidth * 0.5,
+        this.speedSliderY + 18,
+        "3x",
+        {
+          fontFamily: "Verdana",
+          fontSize: "18px",
+          color: "#b9ae99",
+          fontStyle: "bold",
+        },
+      )
+      .setOrigin(0.5, 0)
+      .setDepth(221)
+      .setVisible(false);
+
+    this.speedValueText = this.add
+      .text(panelX, this.speedSliderY + 48, "1x", {
+        fontFamily: "Verdana",
+        fontSize: "22px",
+        color: "#8fe38d",
+        fontStyle: "bold",
+      })
+      .setOrigin(0.5, 0)
+      .setDepth(221)
+      .setVisible(false);
+
+    this.speedSliderDragging = false;
+    this.speedSliderTrackLeftX = panelX - this.speedSliderTrackWidth * 0.5;
+    this.speedSliderTrackRightX = panelX + this.speedSliderTrackWidth * 0.5;
+
+    this.speedSliderHitArea.on("pointerdown", (pointer) => {
+      this.speedSliderDragging = true;
+      this.updateSpeedFromPointer(pointer, false);
+    });
+    this.speedSliderKnob.on("pointerdown", (pointer) => {
+      this.speedSliderDragging = true;
+      this.updateSpeedFromPointer(pointer, false);
+    });
+    this.input.on("pointermove", this.handleSpeedSliderDrag, this);
+    this.input.on("pointerup", this.handleSpeedSliderPointerUp, this);
+
     this.fullscreenMenuItem = this.add
-      .text(panelX, panelTopY + 320, "Toàn màn", {
+      .text(panelX, panelTopY + 484, "Toàn màn", {
         fontFamily: "Verdana",
         fontSize: "24px",
         color: "#f0e5c9",
@@ -193,6 +316,15 @@ export class UIScene extends Phaser.Scene {
 
     this.scale.on("enterfullscreen", this.refreshSettingsMenuState, this);
     this.scale.on("leavefullscreen", this.refreshSettingsMenuState, this);
+    document.addEventListener(
+      "fullscreenchange",
+      (this.refreshSettingsMenuStateBound ??= () =>
+        this.refreshSettingsMenuState()),
+    );
+    document.addEventListener(
+      "webkitfullscreenchange",
+      this.refreshSettingsMenuStateBound,
+    );
     this.refreshSettingsMenuState();
   }
 
@@ -234,6 +366,12 @@ export class UIScene extends Phaser.Scene {
       inside(this.settingsPanel) ||
       inside(this.settingsTitle) ||
       inside(this.settingsSubtitle) ||
+      inside(this.speedSubtitle) ||
+      inside(this.speedSliderTrack) ||
+      inside(this.speedSliderFill) ||
+      inside(this.speedSliderHitArea) ||
+      inside(this.speedSliderKnob) ||
+      inside(this.speedValueText) ||
       inside(this.fullscreenMenuItem)
     ) {
       return true;
@@ -246,6 +384,62 @@ export class UIScene extends Phaser.Scene {
     }
 
     return false;
+  }
+
+  handleSpeedSliderDrag(pointer) {
+    if (!this.settingsMenuOpen || !this.speedSliderDragging) {
+      return;
+    }
+
+    this.updateSpeedFromPointer(pointer, false);
+  }
+
+  handleSpeedSliderPointerUp(pointer) {
+    if (!this.speedSliderDragging) {
+      return;
+    }
+
+    this.speedSliderDragging = false;
+    this.updateSpeedFromPointer(pointer, true);
+  }
+
+  updateSpeedFromPointer(pointer, announce) {
+    const value = this.speedFromPointerX(pointer.x);
+    this.selectGameSpeed(value, announce);
+  }
+
+  speedFromPointerX(pointerX) {
+    const clampedX = Phaser.Math.Clamp(
+      pointerX,
+      this.speedSliderTrackLeftX,
+      this.speedSliderTrackRightX,
+    );
+    const ratio = Phaser.Math.Clamp(
+      (clampedX - this.speedSliderTrackLeftX) / this.speedSliderTrackWidth,
+      0,
+      1,
+    );
+    const raw = this.speedMin + (this.speedMax - this.speedMin) * ratio;
+    return Math.round(raw / this.speedStep) * this.speedStep;
+  }
+
+  updateSpeedSliderUi(speed) {
+    const safeSpeed = Phaser.Math.Clamp(
+      speed ?? 1,
+      this.speedMin,
+      this.speedMax,
+    );
+    const ratio = (safeSpeed - this.speedMin) / (this.speedMax - this.speedMin);
+    const knobX =
+      this.speedSliderTrackLeftX + ratio * this.speedSliderTrackWidth;
+    this.speedSliderKnob.x = knobX;
+    this.speedSliderFill.width = Math.max(
+      0,
+      knobX - this.speedSliderTrackLeftX,
+    );
+    this.speedValueText.setText(
+      `${safeSpeed.toFixed(2).replace(/\.00$/, "")}x`,
+    );
   }
 
   toggleSettingsMenu() {
@@ -271,22 +465,44 @@ export class UIScene extends Phaser.Scene {
 
   refreshSettingsMenuState() {
     const visible = !!this.settingsMenuOpen;
+    const setInputEnabled = (target, enabled) => {
+      if (target?.input) {
+        target.input.enabled = enabled;
+      }
+    };
+
     this.settingsBackdrop.setVisible(visible);
     this.settingsPanel.setVisible(visible);
     this.settingsTitle.setVisible(visible);
     this.settingsSubtitle.setVisible(visible);
+    this.speedSubtitle.setVisible(visible);
+    this.speedSliderTrack.setVisible(visible);
+    this.speedSliderFill.setVisible(visible);
+    this.speedSliderKnob.setVisible(visible);
+    this.speedSliderHitArea.setVisible(visible);
+    this.speedMinLabel.setVisible(visible);
+    this.speedMaxLabel.setVisible(visible);
+    this.speedValueText.setVisible(visible);
+    setInputEnabled(this.settingsBackdrop, visible);
+    setInputEnabled(this.speedSliderHitArea, visible);
+    setInputEnabled(this.speedSliderKnob, visible);
+    setInputEnabled(this.fullscreenMenuItem, visible);
 
     const currentDifficulty = this.registry.get("difficulty") ?? "medium";
     for (const item of this.difficultyMenuItems) {
       item.setVisible(visible);
+      setInputEnabled(item, visible);
       item.setColor(
         item._difficultyKey === currentDifficulty ? "#8fe38d" : "#d8ccb2",
       );
     }
 
+    const currentSpeed = this.registry.get("gameSpeed") ?? 1;
+    this.updateSpeedSliderUi(currentSpeed);
+
     this.fullscreenMenuItem.setVisible(visible);
     this.fullscreenMenuItem.setText(
-      this.scale.isFullscreen ? "Thu nhỏ màn" : "Toàn màn",
+      this.isFullscreenActive() ? "Thu nhỏ màn" : "Toàn màn",
     );
   }
 
@@ -300,13 +516,51 @@ export class UIScene extends Phaser.Scene {
     this.refreshSettingsMenuState();
   }
 
-  toggleFullscreenFromMenu() {
-    if (this.scale.isFullscreen) {
-      this.scale.stopFullscreen();
-    } else {
-      this.scale.startFullscreen();
+  selectGameSpeed(speedValue, announce = true) {
+    const gameScene = this.scene.get("GameScene");
+    if (!gameScene || gameScene.isGameOver) {
+      return;
     }
+
+    gameScene.setGameSpeedMultiplier?.(speedValue, { announce });
     this.refreshSettingsMenuState();
+  }
+
+  isFullscreenActive() {
+    return (
+      this.scale.isFullscreen ||
+      !!document.fullscreenElement ||
+      !!document.webkitFullscreenElement
+    );
+  }
+
+  toggleFullscreenFromMenu() {
+    const rootEl = document.getElementById("game-root");
+    if (!rootEl) {
+      return;
+    }
+
+    if (this.isFullscreenActive()) {
+      if (document.exitFullscreen) {
+        document.exitFullscreen();
+      } else if (document.webkitExitFullscreen) {
+        document.webkitExitFullscreen();
+      } else if (this.scale.isFullscreen) {
+        this.scale.stopFullscreen();
+      }
+    } else {
+      if (rootEl.requestFullscreen) {
+        rootEl.requestFullscreen().catch(() => {
+          this.scale.startFullscreen();
+        });
+      } else if (rootEl.webkitRequestFullscreen) {
+        rootEl.webkitRequestFullscreen();
+      } else {
+        this.scale.startFullscreen();
+      }
+    }
+
+    this.time.delayedCall(60, () => this.refreshSettingsMenuState());
   }
 
   createTopLeftHud(topPadding) {
@@ -453,30 +707,81 @@ export class UIScene extends Phaser.Scene {
 
   createTopRightSkillHud(panelY) {
     const cardY = panelY + UI_CONFIG.panelHeight * 0.5 - 52;
-    const skillCenterX = GAME_WIDTH - 220;
+    const tornadoCenterX = GAME_WIDTH - 292;
+    const meteorCenterX = GAME_WIDTH - 150;
     const skillCenterY = cardY;
 
     if (this.textures.exists("skill-icon-tornado")) {
       this.skillIcon = this.add
-        .image(skillCenterX, skillCenterY, "skill-icon-tornado")
-        .setDisplaySize(128, 128)
+        .image(tornadoCenterX, skillCenterY, "skill-icon-tornado")
+        .setDisplaySize(98, 98)
         .setAlpha(0.9)
         .setDepth(3);
     } else {
       this.skillIcon = this.add
-        .rectangle(skillCenterX, skillCenterY, 128, 128, 0x5d7eb6, 0.82)
+        .rectangle(tornadoCenterX, skillCenterY, 116, 116, 0x5d7eb6, 0.82)
         .setStrokeStyle(2, 0x95b7f1, 0.95)
         .setDepth(3);
     }
 
-    this.skillIcon.setInteractive({ useHandCursor: true });
-    this.skillIcon.on("pointerdown", this.handleSkillIconTap, this);
+    if (this.textures.exists("skill-icon-meteor")) {
+      this.meteorSkillIcon = this.add
+        .image(meteorCenterX, skillCenterY, "skill-icon-meteor")
+        .setDisplaySize(98, 98)
+        .setAlpha(0.9)
+        .setDepth(3);
+    } else {
+      this.meteorSkillIcon = this.add
+        .circle(meteorCenterX, skillCenterY, 56, 0xcf2a2a, 0.9)
+        .setDepth(3);
+    }
+
+    this.skillTapZone = this.add
+      .circle(tornadoCenterX, skillCenterY, 58, 0xffffff, 0.001)
+      .setDepth(6)
+      .setInteractive({ useHandCursor: true })
+      .on("pointerdown", this.handleSkillIconTap, this);
+
+    this.meteorSkillTapZone = this.add
+      .circle(meteorCenterX, skillCenterY, 58, 0xffffff, 0.001)
+      .setDepth(6)
+      .setInteractive({ useHandCursor: true })
+      .on("pointerdown", this.handleMeteorSkillTap, this);
+
+    this.skillTapCenterX = tornadoCenterX;
+    this.skillTapCenterY = skillCenterY;
+    this.meteorTapCenterX = meteorCenterX;
+    this.meteorTapCenterY = skillCenterY;
+    this.skillTapRadius = 58;
+    this.lastTornadoUiTapMs = -1000;
+    this.lastMeteorUiTapMs = -1000;
+
+    this.skillIconBaseScaleX = this.skillIcon.scaleX || 1;
+    this.skillIconBaseScaleY = this.skillIcon.scaleY || 1;
+    this.meteorSkillIconBaseScaleX = this.meteorSkillIcon.scaleX || 1;
+    this.meteorSkillIconBaseScaleY = this.meteorSkillIcon.scaleY || 1;
 
     this.skillMetaText = this.add
       .text(
-        skillCenterX,
+        tornadoCenterX,
         skillCenterY + 74,
-        `Tốn ${SKILL_CONFIG.energyCost} cost - Q`,
+        `Q - ${SKILL_CONFIG.energyCost} EN`,
+        {
+          fontFamily: "Verdana",
+          fontSize: "14px",
+          color: "#f0e5c9",
+          fontStyle: "bold",
+          stroke: "#2f261b",
+          strokeThickness: 2,
+        },
+      )
+      .setOrigin(0.5, 0);
+
+    this.meteorSkillMetaText = this.add
+      .text(
+        meteorCenterX,
+        skillCenterY + 74,
+        `E - ${SKILL_CONFIG.meteorEnergyCost} EN`,
         {
           fontFamily: "Verdana",
           fontSize: "14px",
@@ -489,13 +794,79 @@ export class UIScene extends Phaser.Scene {
       .setOrigin(0.5, 0);
   }
 
-  handleSkillIconTap() {
+  handleSkillIconTap(pointer, localX, localY, event) {
+    event?.stopPropagation?.();
+
+    this.tryCastTornadoFromUi();
+  }
+
+  tryCastTornadoFromUi() {
+    const now = this.time.now;
+    if (now - this.lastTornadoUiTapMs < 90) {
+      return;
+    }
+
+    this.lastTornadoUiTapMs = now;
+
     const gameScene = this.scene.get("GameScene");
     if (!gameScene || gameScene.isGameOver || !gameScene.skillSystem) {
       return;
     }
 
-    gameScene.skillSystem.tryCast(gameScene.time.now);
+    gameScene.skillSystem.tryCast(gameScene.getGameTimeMs());
+  }
+
+  handleMeteorSkillTap(pointer, localX, localY, event) {
+    event?.stopPropagation?.();
+
+    this.tryCastMeteorFromUi();
+  }
+
+  tryCastMeteorFromUi() {
+    const now = this.time.now;
+    if (now - this.lastMeteorUiTapMs < 90) {
+      return;
+    }
+
+    this.lastMeteorUiTapMs = now;
+
+    const gameScene = this.scene.get("GameScene");
+    if (!gameScene || gameScene.isGameOver || !gameScene.skillSystem) {
+      return;
+    }
+
+    gameScene.skillSystem.tryCastMeteor(gameScene.getGameTimeMs());
+  }
+
+  handleSkillPointerFallback(pointer) {
+    if (!pointer || this.settingsMenuOpen) {
+      return;
+    }
+
+    const inTornadoZone =
+      Phaser.Math.Distance.Between(
+        pointer.x,
+        pointer.y,
+        this.skillTapCenterX,
+        this.skillTapCenterY,
+      ) <= this.skillTapRadius;
+
+    if (inTornadoZone) {
+      this.tryCastTornadoFromUi();
+      return;
+    }
+
+    const inMeteorZone =
+      Phaser.Math.Distance.Between(
+        pointer.x,
+        pointer.y,
+        this.meteorTapCenterX,
+        this.meteorTapCenterY,
+      ) <= this.skillTapRadius;
+
+    if (inMeteorZone) {
+      this.tryCastMeteorFromUi();
+    }
   }
 
   createBottomHud(panelY) {
@@ -618,7 +989,12 @@ export class UIScene extends Phaser.Scene {
       this.registry.get("skillCooldown") ??
       this.registry.get("skillCooldownMs") ??
       0;
+    const meteorCooldownMs =
+      this.registry.get("meteorSkillCooldown") ??
+      this.registry.get("meteorSkillCooldownMs") ??
+      0;
     const skillReady = this.registry.get("skillReady") ?? false;
+    const meteorSkillReady = this.registry.get("meteorSkillReady") ?? false;
     const rangedCardCooldownMs = this.registry.get("rangedCardCooldownMs") ?? 0;
     const meleeCardCooldownMs = this.registry.get("meleeCardCooldownMs") ?? 0;
     const rangedUnitCost =
@@ -671,7 +1047,70 @@ export class UIScene extends Phaser.Scene {
     this.waveText.setText(`WAVE ${wave}`);
 
     const skillAvailable = cooldownMs <= 0 && skillReady;
-    this.skillIcon.setAlpha(skillAvailable ? 0.95 : 0.35);
+    const meteorSkillAvailable = meteorCooldownMs <= 0 && meteorSkillReady;
+    const skillCooldownProgress = Phaser.Math.Clamp(
+      1 - cooldownMs / Math.max(1, SKILL_CONFIG.cooldownMs),
+      0,
+      1,
+    );
+    const meteorCooldownProgress = Phaser.Math.Clamp(
+      1 - meteorCooldownMs / Math.max(1, SKILL_CONFIG.meteorCooldownMs),
+      0,
+      1,
+    );
+
+    const skillAlpha = skillAvailable
+      ? 1
+      : Phaser.Math.Linear(0.28, 0.8, skillCooldownProgress);
+    const meteorAlpha = meteorSkillAvailable
+      ? 1
+      : Phaser.Math.Linear(0.28, 0.8, meteorCooldownProgress);
+
+    this.skillIcon.setAlpha(skillAlpha);
+    this.meteorSkillIcon.setAlpha(meteorAlpha);
+
+    if (skillAvailable) {
+      this.skillMetaText.setColor("#f6edbf");
+      this.skillMetaText.setText(`Q - ${SKILL_CONFIG.energyCost} EN`);
+    } else if (cooldownMs > 0) {
+      this.skillMetaText.setColor("#d9c18a");
+      this.skillMetaText.setText(`Q - ${(cooldownMs / 1000).toFixed(1)}s`);
+    } else {
+      this.skillMetaText.setColor("#d28d8d");
+      this.skillMetaText.setText(`Q - ${SKILL_CONFIG.energyCost} EN`);
+    }
+
+    if (meteorSkillAvailable) {
+      this.meteorSkillMetaText.setColor("#f6edbf");
+      this.meteorSkillMetaText.setText(
+        `E - ${SKILL_CONFIG.meteorEnergyCost} EN`,
+      );
+    } else if (meteorCooldownMs > 0) {
+      this.meteorSkillMetaText.setColor("#d9c18a");
+      this.meteorSkillMetaText.setText(
+        `E - ${(meteorCooldownMs / 1000).toFixed(1)}s`,
+      );
+    } else {
+      this.meteorSkillMetaText.setColor("#d28d8d");
+      this.meteorSkillMetaText.setText(
+        `E - ${SKILL_CONFIG.meteorEnergyCost} EN`,
+      );
+    }
+
+    const pulseScale = skillAvailable
+      ? 1 + Math.sin(this.time.now * 0.012) * 0.03
+      : 1;
+    const meteorPulseScale = meteorSkillAvailable
+      ? 1 + Math.sin(this.time.now * 0.012 + 0.6) * 0.03
+      : 1;
+    this.skillIcon.setScale(
+      this.skillIconBaseScaleX * pulseScale,
+      this.skillIconBaseScaleY * pulseScale,
+    );
+    this.meteorSkillIcon.setScale(
+      this.meteorSkillIconBaseScaleX * meteorPulseScale,
+      this.meteorSkillIconBaseScaleY * meteorPulseScale,
+    );
 
     const rangedUpgradeColor =
       coin >= upgradeCostRanged
